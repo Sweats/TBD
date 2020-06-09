@@ -13,13 +13,13 @@ public class ProfileUI : MonoBehaviour
 
     public void Show()
     {
-        profileCanvas.enabled = false;
+        profileCanvas.enabled = true;
     }
 
 
     public void Hide()
     {
-        profileCanvas.enabled = true;
+        profileCanvas.enabled = false;
         SaveProfileConfig();
     }
 

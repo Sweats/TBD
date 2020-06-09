@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 public class PausedGameInput : MonoBehaviour
 {
@@ -44,9 +45,13 @@ public class PausedGameInput : MonoBehaviour
     [SerializeField]
     private MiscUI miscUI;
 
+    [SerializeField]
     private bool[] openedMenus;
 
     public bool gamePaused;
+
+    [SerializeField]
+    private Color buttonTextColor;
 
     // This class should fix the bug where if we hit escape we go back straight to the pause
     // menu instead of the previous menu.
@@ -61,93 +66,106 @@ public class PausedGameInput : MonoBehaviour
         openedMenus = new bool[ARRAY_SIZE];
     }
 
-    // Update is called once per frame
+    // this update method does one job and that is to detect which menus are being opened and if they are opened
+    // make it so it closes and goes back to the main options menu.
     void Update()
     {
-        if (Keybinds.GetKey(Action.GUiReturn))
+        if (Keybinds.GetKey(Action.GUiReturn) && !gamePaused)
         {
-            if (!openedMenus[(int)Menu.Pause])
-            {
-                openedMenus[(int)Menu.Pause] = true;
-                gamePaused = true;
-                pauseUI.Show();
-                Cursor.lockState = CursorLockMode.Confined;
-                return;
-            }
+            openedMenus[(int)Menu.Pause] = true;
+            gamePaused = true;
+            pauseUI.Show();
+            Cursor.lockState = CursorLockMode.Confined;
+        }
 
-            // I tried to make this clean but oh well.
-            else
-            {
-                bool openedMenuFound = false;
+        // I tried to make this clean but oh well.
+        else if (Keybinds.GetKey(Action.GUiReturn) && gamePaused)
+        {
+            bool openedMenuFound = false;
 
-                for (var i = 0; i < openedMenus.Length; i++)
+            for (var i = 0; i < openedMenus.Length; i++)
+            {
+                if (!openedMenus[i])
                 {
-                    if (!openedMenus[i])
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    Menu openedMenu = (Menu)i;
+                Menu openedMenu = (Menu)i;
 
-                    switch (openedMenu)
-                    {
-                        case Menu.Connection:
-                            connectionUI.Hide();
-                            openedMenus[(int)Menu.Connection] = false;
-                            openedMenus[(int)Menu.Options] = true;
-                            optionsUI.Show();
-                            openedMenuFound = true;
-                            break;
-                        case Menu.Profile:
-                            profileUI.Hide();
-                            openedMenus[(int)Menu.Profile] = false;
-                            openedMenus[(int)Menu.Options] = true;
-                            openedMenuFound = true;
-                            optionsUI.Show();
-                            break;
-                        case Menu.Graphics:
-                            graphicsUI.Hide();
-                            openedMenus[(int)Menu.Graphics] = false;
-                            openedMenus[(int)Menu.Options] = true;
-                            openedMenuFound = true;
-                            optionsUI.Show();
-                            break;
-                        case Menu.Options:
-                            optionsUI.Hide();
-                            openedMenus[(int)Menu.Options] = false;
-                            openedMenus[(int)Menu.Pause] = true;
-                            pauseUI.Show();
-                            openedMenuFound = true;
-                            break;
-                        case Menu.Controls:
-                            controlsUI.Hide();
-                            optionsUI.Show();
-                            openedMenus[(int)Menu.Controls] = false;
-                            openedMenus[(int)Menu.Options] = true;
-                            openedMenuFound = true;
-                            break;
-                        case Menu.Pause:
-                            pauseUI.Hide();
-                            gamePaused = false;
-                            openedMenuFound = true;
-                            openedMenus[(int)Menu.Pause] = false;
-                            Cursor.lockState = CursorLockMode.Locked;
-                            break;
-                        case Menu.Misc:
-                            miscUI.Hide();
-                            optionsUI.Show();
-                            openedMenus[(int)Menu.Misc] = false;
-                            openedMenus[(int)Menu.Options] = true;
-                            break;
-                    }
-
-                    if (openedMenuFound)
-                    {
+                switch (openedMenu)
+                {
+                    case Menu.Connection:
+                        connectionUI.Hide();
+                        openedMenus[(int)Menu.Connection] = false;
+                        openedMenus[(int)Menu.Options] = true;
+                        optionsUI.Show();
+                        openedMenuFound = true;
                         break;
-                    }
+                    case Menu.Profile:
+                        profileUI.Hide();
+                        openedMenus[(int)Menu.Profile] = false;
+                        openedMenus[(int)Menu.Options] = true;
+                        openedMenuFound = true;
+                        optionsUI.Show();
+                        break;
+                    case Menu.Graphics:
+                        graphicsUI.Hide();
+                        openedMenus[(int)Menu.Graphics] = false;
+                        openedMenus[(int)Menu.Options] = true;
+                        openedMenuFound = true;
+                        optionsUI.Show();
+                        break;
+                    case Menu.Options:
+                        optionsUI.Hide();
+                        openedMenus[(int)Menu.Options] = false;
+                        openedMenus[(int)Menu.Pause] = true;
+                        pauseUI.Show();
+                        openedMenuFound = true;
+                        break;
+                    case Menu.Controls:
+                        controlsUI.Hide();
+                        optionsUI.Show();
+                        openedMenus[(int)Menu.Controls] = false;
+                        openedMenus[(int)Menu.Options] = true;
+                        openedMenuFound = true;
+                        break;
+                    case Menu.Pause:
+                        pauseUI.Hide();
+                        gamePaused = false;
+                        openedMenuFound = true;
+                        openedMenus[(int)Menu.Pause] = false;
+                        Cursor.lockState = CursorLockMode.Locked;
+                        break;
+                    case Menu.Misc:
+                        miscUI.Hide();
+                        optionsUI.Show();
+                        openedMenus[(int)Menu.Misc] = false;
+                        openedMenus[(int)Menu.Options] = true;
+                        break;
+
+                    case Menu.Sound:
+                        soundUI.Hide();
+                        optionsUI.Show();
+                        openedMenus[(int)Menu.Sound] = false;
+                        openedMenus[(int)Menu.Options] = true;
+                        break;
+                }
+
+                if (openedMenuFound)
+                {
+                    break;
                 }
             }
         }
+    }
+
+
+    public void OnGraphicsButtonClicked()
+    {
+        openedMenus[(int)Menu.Graphics] = true;
+        openedMenus[(int)Menu.Options] = false;
+        graphicsUI.Show();
+        optionsUI.Hide();
     }
 
     public void OnConnectionButtonClicked()
@@ -241,5 +259,19 @@ public class PausedGameInput : MonoBehaviour
         openedMenus[(int)Menu.Pause] = true;
         optionsUI.Hide();
         pauseUI.Show();
+    }
+
+
+    public void OnMouseHover(Button button)
+    {
+        button.GetComponentInChildren<Text>().color = buttonTextColor;
+        
+    }
+
+
+    public void OnMouseLeft(Button button)
+    {
+        button.GetComponentInChildren<Text>().color = Color.white;
+
     }
 }
