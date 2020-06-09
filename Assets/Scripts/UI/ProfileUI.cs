@@ -9,28 +9,7 @@ public class ProfileUI : MonoBehaviour
     [SerializeField]
     private Canvas profileCanvas;
 
-
-    [SerializeField]
-    private OptionsUI optionsUI;
-
     public static string profileName;
-
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Keybinds.GetKey(Action.GUiReturn) && profileCanvas.enabled)
-        {
-
-            Hide();
-            optionsUI.Show();
-
-        }
-    }
 
     public void Show()
     {
@@ -41,12 +20,18 @@ public class ProfileUI : MonoBehaviour
     public void Hide()
     {
         profileCanvas.enabled = true;
+        SaveProfileConfig();
     }
 
 
     public void OnEditProfileName(string name)
     {
         profileName = name;
+
+    }
+
+    private void SaveProfileConfig()
+    {
 
     }
 }

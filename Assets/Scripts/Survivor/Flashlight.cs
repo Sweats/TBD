@@ -2,20 +2,24 @@
 
 public class Flashlight : MonoBehaviour
 {
-    public float maxCharge;
-    public float minCharge;
-    public float charge;
-    public float dischargeRate;
-    private bool flashlightDead = false;
-
-    public Light flashlightSource;
-
-    public AudioSource flashlightToggleSound;
+    [SerializeField]
+    private float maxCharge;
 
     [SerializeField]
-    private PauseUI pauseUI;
+    private float minCharge;
 
-    private const int MOUSEBUTTON_RIGHT = 1;
+    [SerializeField]
+    private float dischargeRate;
+
+    [SerializeField]
+    private AudioSource flashlightToggleSound;
+
+    public float charge;
+
+    private Light flashlightSource;
+
+    private bool flashlightDead = false;
+
     void Start()
     {
         flashlightSource = GetComponent<Light>();
@@ -23,12 +27,6 @@ public class Flashlight : MonoBehaviour
 
     void Update()
     {
-        if (Keybinds.GetKey(Action.SwitchFlashlight) && !pauseUI.gamePaused)
-        {
-            flashlightSource.enabled = !flashlightSource.enabled;
-            flashlightToggleSound.Play();
-        }
-
         if (flashlightSource.enabled && charge > 0 && !flashlightDead)
         {
             charge -= Time.deltaTime * dischargeRate;
@@ -44,5 +42,12 @@ public class Flashlight : MonoBehaviour
                 flashlightDead = true;
             }
         }
+    }
+
+
+    public void Toggle()
+    {
+        flashlightSource.enabled = !flashlightSource.enabled;
+        flashlightToggleSound.Play();
     }
 }

@@ -2,113 +2,116 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Battery : MonoBehaviour
+namespace Darned
 {
-    [SerializeField]
-    private string name = "battery";
-
-    [SerializeField]
-    private Color originalMeshColor = Color.yellow;
-
-    [SerializeField]
-    private Color outlineGlowColor = Color.red;
-
-    [SerializeField]
-    private float timeBetweenGlows = 45;
-
-    [SerializeField]
-    private float rechargeAmount = 100;
-
-    [SerializeField]
-    private float distanceToPickUp = 20;
-
-    [SerializeField]
-    private float glowTimerLength = 115;
-
-    [SerializeField]
-    private Color glowColor = Color.white;
-
-    [SerializeField]
-    private float maxTimerForGlow = 100;
-    [SerializeField]
-    private float minTimer = 0;
-    [SerializeField]
-    private float maxTimer;
-
-    private float glowTimer = 1.0f;
-    private float noGlowTimer = 1.0f;
-
-    private Renderer batteryRenderer;
-
-    private float defaultSpecular;
-
-    private bool glowing = false;
-
-    void Start()
+    public class Battery : MonoBehaviour
     {
-        noGlowTimer = maxTimerForGlow;
+        [SerializeField]
+        private string name = "battery";
 
-        batteryRenderer = GetComponent<Renderer>();
-        //defaultSpecular = batteryRenderer.material.GetFloat("_Shininess");
-        //batteryRenderer.material.SetColor("_Color", originalMeshColor);
+        [SerializeField]
+        private Color originalMeshColor = Color.yellow;
 
-    }
+        [SerializeField]
+        private Color outlineGlowColor = Color.red;
 
-    // Update is called once per frame
-    void Update()
-    {
-        noGlowTimer -= Time.deltaTime * timeBetweenGlows;
+        [SerializeField]
+        private float timeBetweenGlows = 45;
 
-        if (noGlowTimer <= minTimer && !glowing)
+        [SerializeField]
+        private float rechargeAmount = 100;
+
+        [SerializeField]
+        private float distanceToPickUp = 20;
+
+        [SerializeField]
+        private float glowTimerLength = 115;
+
+        [SerializeField]
+        private Color glowColor = Color.white;
+
+        [SerializeField]
+        private float maxTimerForGlow = 100;
+        [SerializeField]
+        private float minTimer = 0;
+        [SerializeField]
+        private float maxTimer;
+
+        private float glowTimer = 1.0f;
+        private float noGlowTimer = 1.0f;
+
+        private Renderer batteryRenderer;
+
+        private float defaultSpecular;
+
+        private bool glowing = false;
+
+        void Start()
         {
-            glowing = true;
+            noGlowTimer = maxTimerForGlow;
+
+            batteryRenderer = GetComponent<Renderer>();
+            //defaultSpecular = batteryRenderer.material.GetFloat("_Shininess");
+            //batteryRenderer.material.SetColor("_Color", originalMeshColor);
+
         }
 
-        if (glowing)
+        // Update is called once per frame
+        void Update()
         {
-            glowTimer -= Time.deltaTime * glowTimerLength;
-            noGlowTimer = 0;
-            Glow();
+            noGlowTimer -= Time.deltaTime * timeBetweenGlows;
 
-            if (glowTimer <= minTimer)
+            if (noGlowTimer <= minTimer && !glowing)
             {
-                glowing = false;
-                UnGlow();
-                noGlowTimer = maxTimerForGlow;
-                glowTimer = maxTimerForGlow;
+                glowing = true;
+            }
+
+            if (glowing)
+            {
+                glowTimer -= Time.deltaTime * glowTimerLength;
+                noGlowTimer = 0;
+                Glow();
+
+                if (glowTimer <= minTimer)
+                {
+                    glowing = false;
+                    UnGlow();
+                    noGlowTimer = maxTimerForGlow;
+                    glowTimer = maxTimerForGlow;
+                }
             }
         }
-    }
 
 
-    void OnMouseEnter()
-    {
-        float distanceFromPlayer = 0f;
+        void OnMouseEnter()
+        {
+            float distanceFromPlayer = 0f;
 
-        if (distanceFromPlayer <= distanceToPickUp)
+            if (distanceFromPlayer <= distanceToPickUp)
+            {
+                batteryRenderer.material.SetColor("_Color", outlineGlowColor);
+            }
+        }
+
+
+        void OnMouseExit()
+        {
+            // Set the outline color to Color.clear.
+        }
+
+        private void Glow()
         {
             batteryRenderer.material.SetColor("_Color", outlineGlowColor);
+            //batteryRenderer.material.SetFloat("_Shininess", 1.0f);
+
         }
-    }
 
+        private void UnGlow()
+        {
+            batteryRenderer.material.SetColor("_Color", originalMeshColor);
+            //batteryRenderer.material.SetFloat("_Shininess", defaultSpecular);
 
-    void OnMouseExit()
-    {
-        // Set the outline color to Color.clear.
-    }
-
-    private void Glow()
-    {
-        batteryRenderer.material.SetColor("_Color", outlineGlowColor);
-        //batteryRenderer.material.SetFloat("_Shininess", 1.0f);
-
-    }
-
-    private void UnGlow()
-    {
-        batteryRenderer.material.SetColor("_Color", originalMeshColor);
-        //batteryRenderer.material.SetFloat("_Shininess", defaultSpecular);
-
+        }
     }
 
 }

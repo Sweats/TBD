@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public enum Action
@@ -38,19 +37,24 @@ public class Keybinds : MonoBehaviour
     {
         if (!onKeyUp)
         {
-            return Input.GetKeyDown(actions[action]);
+            return UnityEngine.Input.GetKeyDown(actions[action]);
         }
 
         else
         {
-            return Input.GetKeyUp(actions[action]);
+            return UnityEngine.Input.GetKeyUp(actions[action]);
         }
     }
 
 
     public static bool Get(Action action)
     {
-        return Input.GetKey(actions[action]);
+        return UnityEngine.Input.GetKey(actions[action]);
+    }
+
+    public static void Set(Action action, KeyCode keyCode)
+    {
+        actions[action] = keyCode;
     }
 }
 

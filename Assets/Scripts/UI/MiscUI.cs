@@ -1,15 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
-public class GraphicsUI : MonoBehaviour
+public class MiscUI : MonoBehaviour
 {
     // Start is called before the first frame update
 
-
     [SerializeField]
-    private Canvas graphicsMenu;
+    private Canvas miscCanvas;
 
     void Start()
     {
@@ -18,21 +16,20 @@ public class GraphicsUI : MonoBehaviour
 
     public void Show()
     {
-        graphicsMenu.enabled = true;
 
+        miscCanvas.enabled = true;
     }
 
 
     public void Hide()
     {
-        graphicsMenu.enabled = false;
-        SaveGraphicsConfig();
+        SaveMiscConfig();
+        miscCanvas.enabled = false;
 
     }
 
-    private void SaveGraphicsConfig()
+    private void SaveMiscConfig()
     {
 
     }
 }
-

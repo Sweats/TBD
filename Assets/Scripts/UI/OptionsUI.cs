@@ -1,5 +1,4 @@
-﻿using Sound;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class OptionsUI : MonoBehaviour
@@ -27,22 +26,6 @@ public class OptionsUI : MonoBehaviour
 
     [SerializeField]
     private SoundUI soundUI;
-
-    void Update()
-    {
-        if (!optionsCanvas.enabled)
-        {
-            return;
-
-        }
-
-        if (Keybinds.GetKey(Action.GUiReturn))
-        {
-            Hide();
-            pauseMenu.Show();
-        }
-        
-    }
 
     public void OnGraphicsButtonClicked()
     {
@@ -109,3 +92,4 @@ public class OptionsUI : MonoBehaviour
     }
 
 }
+

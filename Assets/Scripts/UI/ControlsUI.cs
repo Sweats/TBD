@@ -67,9 +67,6 @@ public class ControlsUI : MonoBehaviour
     private Button guiReturnKeyButton;
 
     [SerializeField]
-    private OptionsUI optionsUI;
-
-    [SerializeField]
     private Canvas keybindingsCanvas;
 
     [SerializeField]
@@ -94,17 +91,10 @@ public class ControlsUI : MonoBehaviour
     // Apparently changing the toggle via code causes the callback to be called so we need to use this variable to stop that from happening
     // when the scene is launched.
     private bool initialized;
-   
+
 
     void Update()
     {
-        if (Keybinds.GetKey(Action.GUiReturn) && keybindingsCanvas.enabled)
-        {
-            Hide();
-            Save();
-            optionsUI.Show();
-        }
-
         if (Input.anyKeyDown && (int)lastSettingPressed != ACTION_NONE && Cursor.lockState == CursorLockMode.Locked)
         {
             KeyCode[] keyCodes = (KeyCode[])Enum.GetValues(typeof(KeyCode));
@@ -115,7 +105,7 @@ public class ControlsUI : MonoBehaviour
 
                 if (Input.GetKeyDown(keyCodes[i]))
                 {
-                    Keybinds.actions[lastSettingPressed] = currentKeyCode;
+                    //Keybinds.actions[lastSettingPressed] = currentKeyCode;
                     Text text = buttonDict[lastSettingPressed].GetComponentInChildren<Text>();
                     text.color = Color.white;
                     text.text = Enum.GetName(typeof(KeyCode), currentKeyCode);
@@ -124,7 +114,6 @@ public class ControlsUI : MonoBehaviour
                     break;
                 }
             }
-
         }
     }
 
@@ -230,7 +219,7 @@ public class ControlsUI : MonoBehaviour
         {
             invertYToggle.isOn = false;
         }
-        
+
     }
 
     private void SetDefaultBindings()
@@ -255,7 +244,7 @@ public class ControlsUI : MonoBehaviour
         Keybinds.actions[Action.GuiAccept] = KeyCode.Mouse0;
         Keybinds.actions[Action.GUiReturn] = KeyCode.Escape;
 
-    
+
 
         PlayerPrefs.SetInt(INVERT_X_KEY, 0);
         PlayerPrefs.SetInt(INVERT_Y_KEY, 0);
@@ -440,8 +429,6 @@ public class ControlsUI : MonoBehaviour
 
     }
 
-
-
     public void OnMouseEnterButton(Button button)
     {
         Text text = button.GetComponentInChildren<Text>();
@@ -460,15 +447,6 @@ public class ControlsUI : MonoBehaviour
         }
 
     }
-
-
-    public void OnBackButtonPressed()
-    {
-        Save();
-        Hide();
-        optionsUI.Show();
-    }
-
     public void OnLoadDefaultsButton()
     {
         initialized = false;
@@ -545,7 +523,7 @@ public class ControlsUI : MonoBehaviour
     }
 
 
-    private void Save()
+    private void SaveKeybindsConfig()
     {
         foreach (KeyValuePair<Action, KeyCode> pair in Keybinds.actions)
         {
@@ -560,3 +538,4 @@ public class ControlsUI : MonoBehaviour
         PlayerPrefs.Save();
     }
 }
+

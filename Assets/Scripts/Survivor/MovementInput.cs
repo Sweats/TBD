@@ -1,11 +1,6 @@
 ﻿using UnityEngine;
-
 public class MovementInput : MonoBehaviour
 {
-
-    [SerializeField]
-    private CharacterController playerController;
-
     [SerializeField]
     private float crouchAndSneakingSpeed;
     [SerializeField]
@@ -15,44 +10,40 @@ public class MovementInput : MonoBehaviour
     public LayerMask groundMask;
     public Vector3 velocity;
 
-    public AudioSource sprintingSound;
-    public AudioSource walkingSound;
-
-    [SerializeField]
-    private PauseUI pauseUI;
-
-    void Update()
+    public void Handle(CharacterController controller, bool gamePaused)
     {
-        float x = Input.GetAxis("Horizontal");
-        float z = Input.GetAxis("Vertical");
         velocity.y -= gravity * Time.deltaTime;
-        playerController.Move(velocity * Time.deltaTime);
+        controller.Move(velocity * Time.deltaTime);
 
-        if (pauseUI.gamePaused)
-        {
-            return;
-        }
-
-        else if (playerController.isGrounded && velocity.y < 0)
+        if (controller.isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
 
-
-        if (Keybinds.Get(Action.MoveForward))
+        if (gamePaused)
         {
-            if (Keybinds.GetKey(Action.Crouch) || Keybinds.GetKey(Action.Walk))
-            {
-                speed = crouchAndSneakingSpeed;
-            }
-
-            Vector3 move = transform.right * x + transform.forward * z;
-            playerController.Move(move * speed * Time.deltaTime);
+            return;
         }
+
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+
+        if (Keybinds.GetKey(Action.Crouch) || Keybinds.GetKey(Action.Walk))
+        {
+            speed = crouchAndSneakingSpeed;
+        }
+
+        Vector3 move = transform.right * x + transform.forward * z;
+        controller.Move(move * speed * Time.deltaTime);
     }
-             
+
     private bool IsPressingMovementKey()
     {
         return Keybinds.Get(Action.MoveForward) || Keybinds.Get(Action.MoveLeft) || Keybinds.Get(Action.MoveRight) || Keybinds.Get(Action.MoveBack);
+    }
+
+    public void SetSpeed(float speed)
+    {
+        this.speed = speed;
     }
 }

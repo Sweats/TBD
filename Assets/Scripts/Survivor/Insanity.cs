@@ -10,6 +10,9 @@ public class Insanity : MonoBehaviour
     public float insanityRate;
     public float initialInsanityValue;
 
+    [SerializeField]
+    private InsanityEffect[] insanityEffects;
+
     // Start is called before the first frame update
     void Start()
     {

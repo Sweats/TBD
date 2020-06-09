@@ -52,13 +52,13 @@ public class Key : MonoBehaviour
         noGlowTimer = maxTimerForGlow;
         keyRenderer = GetComponent<Renderer>();
         keyRenderer.material.SetColor("_Color", glowOutlineColor);
-        
+
     }
 
     void Update()
     {
         noGlowTimer -= Time.deltaTime * timeBetweenGlows;
-        
+
         if (noGlowTimer <= minTimer)
         {
             Glow();
@@ -109,7 +109,7 @@ public class Key : MonoBehaviour
             keyRenderer.material.SetColor("_Color", Color.clear);
 
         }
-        
+
     }
 
 
@@ -119,19 +119,15 @@ public class Key : MonoBehaviour
 
         if (distance <= distanceToPickUp)
         {
-            if (Keybinds.GetKey(Action.Grab))
-            {
-                pickupSound.Play();
-                Grab();
-            }
-
+            pickupSound.Play();
+            Grab();
         }
-
     }
 
 
-    private void Grab()
+    public void Grab()
     {
-        Destroy(this);
+
     }
 }
+

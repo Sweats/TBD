@@ -22,7 +22,6 @@ public class Door : MonoBehaviour
     [SerializeField]
     private Color lockedColor = Color.red;
 
-
     [SerializeField]
     private Color outlineColor = Color.yellow;
 
@@ -85,30 +84,34 @@ public class Door : MonoBehaviour
             {
                 outlineColor = Color.clear;
             }
+
         }
     }
 
 
     void OnMouseDown()
     {
-        bool found = false;
-
-        for (var i = 0; i < keys.Length; i++)
+        if (locked)
         {
-            int keyMask = keys[i].keyMask;
+            bool found = false;
 
-            if (keyMask == unlockMask)
+            for (var i = 0; i < keys.Length; i++)
             {
-                unlockedSound.Play();
-                found = true;
-                Unlock();
-                break;
-            }
-        }
+                int keyMask = keys[i].keyMask;
 
-        if (!found)
-        {
-            lockedSound.Play();
+                if (keyMask == unlockMask)
+                {
+                    unlockedSound.Play();
+                    found = true;
+                    Unlock();
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                lockedSound.Play();
+            }
         }
     }
 }
