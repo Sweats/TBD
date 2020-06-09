@@ -45,10 +45,21 @@ public class Survivor : MonoBehaviour
         rect = new Rect(Screen.width / 2, Screen.height / 2, 2, 2);
     }
 
+    // We will handle all survivor input here. Everything else that is not related to input will be handled in their own class.
     void Update()
     {
         mouseInput.Handle(survivorCamera, flashlight.transform, position, pausedGameInput.gamePaused);
         movementInput.Handle(controller, pausedGameInput.gamePaused);
+
+        if (pausedGameInput.gamePaused)
+        {
+            return;
+        }
+
+        if (Keybinds.GetKey(Action.SwitchFlashlight))
+        {
+            flashlight.Toggle();
+        }
     }
 
 
