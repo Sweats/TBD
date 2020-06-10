@@ -5,8 +5,7 @@ public class MovementInput : MonoBehaviour
     private float crouchAndSneakingSpeed;
     [SerializeField]
     private float gravity;
-    [SerializeField]
-    private float speed;
+    public float speed;
     public LayerMask groundMask;
     public Vector3 velocity;
 
@@ -46,4 +45,7 @@ public class MovementInput : MonoBehaviour
     {
         this.speed = speed;
     }
+
+
+    
 }

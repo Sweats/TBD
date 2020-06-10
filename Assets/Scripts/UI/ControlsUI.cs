@@ -105,7 +105,7 @@ public class ControlsUI : MonoBehaviour
 
                 if (Input.GetKeyDown(keyCodes[i]))
                 {
-                    //Keybinds.actions[lastSettingPressed] = currentKeyCode;
+                    Keybinds.actions[lastSettingPressed] = currentKeyCode;
                     Text text = buttonDict[lastSettingPressed].GetComponentInChildren<Text>();
                     text.color = Color.white;
                     text.text = Enum.GetName(typeof(KeyCode), currentKeyCode);
@@ -164,6 +164,7 @@ public class ControlsUI : MonoBehaviour
 
     public void Hide()
     {
+        SaveKeybindsConfig();
         keybindingsCanvas.enabled = false;
     }
 

@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class Sprint : MonoBehaviour
 {
-    [SerializeField]
-    private float sprintSpeed;
+    public float sprintSpeed;
 
     public bool sprinting;
 
@@ -29,18 +29,22 @@ public class Sprint : MonoBehaviour
 
     private float energy;
 
-    private const int DEFAULT_SPEED = 3;
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     // Update is called once per frame
     void Update()
-    { 
+    {
+        if (Keybinds.Get(Action.Sprint))
+        {
+            if (energy >= energyNeededToSprint)
+            {
+                sprinting = true;
+            }
+        }
+
+        else if (Keybinds.GetKey(Action.Sprint, true))
+        {
+            sprinting = false;
+        }
+
         if (sprinting)
         {
             energy -= dischargeRate * Time.deltaTime;
@@ -48,7 +52,6 @@ public class Sprint : MonoBehaviour
             if (energy <= minEnergy)
             {
                 outOfBreath.Play();
-                sprintSpeed = DEFAULT_SPEED;
                 sprinting = false;
             }
         }
@@ -57,7 +60,7 @@ public class Sprint : MonoBehaviour
         {
             energy += rechargeRate * Time.deltaTime;
 
-            if (energy >= maxEnergy)
+            if (energy > maxEnergy)
             {
                 energy = maxEnergy;
             }

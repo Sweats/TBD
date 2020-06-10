@@ -15,7 +15,7 @@ public class Key : MonoBehaviour
     [SerializeField]
     private AudioSource pickupSound;
 
-    public Image Icon;
+    public Texture iconTexture;
 
     [SerializeField]
     private float distanceToPickUp = 20f;

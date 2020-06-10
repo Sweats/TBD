@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,8 +23,6 @@ public class Survivor : MonoBehaviour
     [SerializeField]
     private MovementInput movementInput;
 
-    private Rect rect;
-
     [SerializeField]
     private Texture crosshair;
 
@@ -35,7 +34,28 @@ public class Survivor : MonoBehaviour
     private CharacterController controller;
 
     [SerializeField]
+    private int defaultSpeed;
+
+    [SerializeField]
+    private int sprintSpeed;
+
+    [SerializeField]
+    private int walkSpeed;
+
+    [SerializeField]
+    private int crouchSpeed;
+
+    [SerializeField]
     private MouseInput mouseInput;
+    [SerializeField]
+    private GameMessages survivorChat;
+
+
+    private bool crouched;
+    private bool walking;
+
+    private Rect rect;
+
 
     void Start()
     {
@@ -43,9 +63,10 @@ public class Survivor : MonoBehaviour
         controller = GetComponent<CharacterController>();
 
         rect = new Rect(Screen.width / 2, Screen.height / 2, 2, 2);
+
     }
 
-    // We will handle all survivor input here. Everything else that is not related to input will be handled in their own class.
+    // We will try to handle as much input as possible here. If not that is okay I think.
     void Update()
     {
         mouseInput.Handle(survivorCamera, flashlight.transform, position, pausedGameInput.gamePaused);
@@ -56,12 +77,54 @@ public class Survivor : MonoBehaviour
             return;
         }
 
-        if (Keybinds.GetKey(Action.SwitchFlashlight))
+        if (sprint.sprinting)
+        {
+            movementInput.speed = sprint.sprintSpeed;
+        }
+
+        else
+        {
+            movementInput.speed = defaultSpeed;
+        }
+
+        if (Keybinds.GetKey(Action.Grab))
+        {
+
+        }
+
+        else if (Keybinds.GetKey(Action.SwitchFlashlight))
         {
             flashlight.Toggle();
         }
-    }
 
+
+        else if (Keybinds.GetKey(Action.Crouch))
+        {
+            movementInput.speed = crouchSpeed;
+            crouched = true;
+
+        }
+
+        else if (Keybinds.GetKey(Action.Crouch, true))
+        {
+            movementInput.speed = defaultSpeed;
+            crouched = false;
+        }
+
+        else if (Keybinds.GetKey(Action.Walk))
+        {
+            movementInput.speed = crouchSpeed;
+            walking = true;
+
+        }
+
+        else if (Keybinds.GetKey(Action.Walk, true))
+        {
+            movementInput.speed = defaultSpeed;
+            walking = false;
+        }
+
+    }
 
     void OnGUI()
     {
@@ -71,8 +134,25 @@ public class Survivor : MonoBehaviour
         }
 
         GUI.DrawTexture(rect, crosshair);
+        inventory.Draw();
+
+        if (walking)
+        {
+
+            // TO DO. Find a crouching walking icon and draw it here.
+        }
+
+        if (crouched)
+        {
+
+            // TO DO. Find a crouching icon and draw it here.
+        }
         
     }
 
 
+    private void HandleGrab()
+    {
+
+    }
 }
