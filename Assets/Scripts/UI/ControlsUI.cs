@@ -189,18 +189,18 @@ public class ControlsUI : MonoBehaviour
             buttonDict[action].GetComponentInChildren<Text>().text = Enum.GetName(typeof(KeyCode), loadedKeycode);
         }
 
-        MouseInput.mouseSensitivity = PlayerPrefs.GetFloat(MOUSE_SENSITIVITY_KEY);
-        MouseInput.invertX = PlayerPrefs.GetInt(INVERT_X_KEY);
-        MouseInput.invertY = PlayerPrefs.GetInt(INVERT_Y_KEY);
+        Survivor.mouseSensitivity = PlayerPrefs.GetFloat(MOUSE_SENSITIVITY_KEY);
+        Survivor.invertX = PlayerPrefs.GetInt(INVERT_X_KEY);
+        Survivor.invertY = PlayerPrefs.GetInt(INVERT_Y_KEY);
 
         UpdateMiscControls();
     }
 
     private void UpdateMiscControls()
     {
-        mouseSensitivySlider.value = MouseInput.mouseSensitivity;
+        mouseSensitivySlider.value = Survivor.mouseSensitivity;
 
-        if (MouseInput.invertX == 1)
+        if (Survivor.invertX == 1)
         {
             invertXToggle.isOn = true;
         }
@@ -211,7 +211,7 @@ public class ControlsUI : MonoBehaviour
         }
 
 
-        if (MouseInput.invertY == 1)
+        if (Survivor.invertY == 1)
         {
             invertYToggle.Select();
         }
@@ -251,9 +251,9 @@ public class ControlsUI : MonoBehaviour
         PlayerPrefs.SetInt(INVERT_Y_KEY, 0);
         PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_KEY, 5);
 
-        MouseInput.mouseSensitivity = 5;
-        MouseInput.invertX = 0;
-        MouseInput.invertY = 0;
+        Survivor.mouseSensitivity = 5;
+        Survivor.invertX = 0;
+        Survivor.invertY = 0;
 
         UpdateMiscControls();
 
@@ -484,7 +484,7 @@ public class ControlsUI : MonoBehaviour
 
     public void OnMouseSensitivySliderChanged(float value)
     {
-        MouseInput.mouseSensitivity = value;
+        Survivor.mouseSensitivity = value;
     }
 
     public void OnInvertXToggle(bool value)
@@ -496,12 +496,12 @@ public class ControlsUI : MonoBehaviour
 
         if (value)
         {
-            MouseInput.invertX = 1;
+            Survivor.invertX = 1;
         }
 
         else
         {
-            MouseInput.invertX = 0;
+            Survivor.invertX = 0;
         }
     }
 
@@ -514,12 +514,12 @@ public class ControlsUI : MonoBehaviour
 
         if (value)
         {
-            MouseInput.invertY = 1;
+            Survivor.invertY = 1;
         }
 
         else
         {
-            MouseInput.invertY = 0;
+            Survivor.invertY = 0;
         }
     }
 
@@ -532,9 +532,9 @@ public class ControlsUI : MonoBehaviour
             PlayerPrefs.SetInt(keyName, (int)pair.Value);
         }
 
-        PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_KEY, MouseInput.mouseSensitivity);
-        PlayerPrefs.SetInt(INVERT_X_KEY, MouseInput.invertX);
-        PlayerPrefs.SetInt(INVERT_Y_KEY, MouseInput.invertY);
+        PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_KEY, Survivor.mouseSensitivity);
+        PlayerPrefs.SetInt(INVERT_X_KEY, Survivor.invertX);
+        PlayerPrefs.SetInt(INVERT_Y_KEY, Survivor.invertY);
 
         PlayerPrefs.Save();
     }

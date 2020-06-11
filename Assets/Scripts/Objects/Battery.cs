@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace Darned
@@ -29,6 +30,10 @@ namespace Darned
 
         [SerializeField]
         private Color glowColor = Color.white;
+
+
+        public float chargeNeededToGrab;
+        
 
         [SerializeField]
         private float maxTimerForGlow = 100;
@@ -93,7 +98,6 @@ namespace Darned
             }
         }
 
-
         void OnMouseExit()
         {
             // Set the outline color to Color.clear.
@@ -112,6 +116,10 @@ namespace Darned
             //batteryRenderer.material.SetFloat("_Shininess", defaultSpecular);
 
         }
-    }
 
+        public void Grab()
+        {
+            Destroy(this.gameObject);
+        }
+    }
 }

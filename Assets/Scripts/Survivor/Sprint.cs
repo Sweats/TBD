@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class Sprint : MonoBehaviour
 {
-    public float sprintSpeed;
-
     public bool sprinting;
 
     [SerializeField]

@@ -458,6 +458,133 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &40253312
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 40253314}
+  - component: {fileID: 40253313}
+  m_Layer: 0
+  m_Name: Key Picking Sound
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!82 &40253313
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 40253312}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 1a5f0f5f970c3384baf11caac7489658, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+--- !u!4 &40253314
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 40253312}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 931488578}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &49355821
 GameObject:
   m_ObjectHideFlags: 0
@@ -2252,7 +2379,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1916031736}
-  m_RootOrder: 6
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!114 &223974228
 MonoBehaviour:
@@ -2269,6 +2396,7 @@ MonoBehaviour:
   maxCharge: 100
   minCharge: 0
   dischargeRate: 0.2380952
+  chargeNeededToGrab: 0
   flashlightToggleSound: {fileID: 747005328}
   charge: 100
 --- !u!108 &223974229
@@ -4673,7 +4801,7 @@ Transform:
   - {fileID: 790043573}
   - {fileID: 1641920360}
   m_Father: {fileID: 1916031736}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &509944470
 MonoBehaviour:
@@ -6683,7 +6811,7 @@ Transform:
   m_Children:
   - {fileID: 681713435}
   m_Father: {fileID: 1916031736}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &686738009
 MonoBehaviour:
@@ -7043,7 +7171,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1916031736}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!136 &712653841
 CapsuleCollider:
@@ -8708,7 +8836,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1916031736}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &823875997
 MonoBehaviour:
@@ -9495,8 +9623,9 @@ Transform:
   - {fileID: 1803718677}
   - {fileID: 747005327}
   - {fileID: 1128834376}
+  - {fileID: 40253314}
   m_Father: {fileID: 1916031736}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &931488579
 MonoBehaviour:
@@ -9696,7 +9825,6 @@ GameObject:
   - component: {fileID: 963194228}
   - component: {fileID: 963194227}
   - component: {fileID: 963194226}
-  - component: {fileID: 963194229}
   m_Layer: 0
   m_Name: Camera
   m_TagString: MainCamera
@@ -9737,7 +9865,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 81
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -9769,20 +9897,6 @@ Transform:
   m_Father: {fileID: 1916031736}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &963194229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 963194225}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41c995757b564da4c847fc442725c937, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  minimumX: -60
-  maximumX: 60
 --- !u!1 &972045448
 GameObject:
   m_ObjectHideFlags: 0
@@ -11909,6 +12023,7 @@ MonoBehaviour:
   distanceToPickUp: 20
   glowTimerLength: 1.2
   glowColor: {r: 1, g: 1, b: 1, a: 1}
+  chargeNeededToGrab: 0
   maxTimerForGlow: 1
   minTimer: 0
   maxTimer: 1
@@ -14950,9 +15065,10 @@ MonoBehaviour:
   keyName: Rusty Key
   keyMask: -1
   group: 0
+  keyID: 0
   groupColor: {r: 0, g: 0, b: 0, a: 0}
-  pickupSound: {fileID: 0}
-  iconTexture: {fileID: 0}
+  pickupSound: {fileID: 40253313}
+  iconTexture: {fileID: 2800000, guid: 4a5d688cd5f4d9b4ab0679e8e4bddd74, type: 3}
   distanceToPickUp: 20
   timeBetweenGlows: 45
   glowTimerLength: 115
@@ -15029,13 +15145,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1487144751}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0.0015035587, y: -0.1493719, z: -0.009952428, w: 0.9887299}
   m_LocalPosition: {x: -134.28654, y: -169.91086, z: 429.368}
   m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
   m_Children: []
   m_Father: {fileID: 428276776}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -17.182001, z: -1.153}
 --- !u!1 &1495010882
 GameObject:
   m_ObjectHideFlags: 0
@@ -18152,7 +18268,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1916031736}
-  m_RootOrder: 4
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1785676747
 MonoBehaviour:
@@ -18166,14 +18282,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c23fa7c5bc28a4a46ad21fce2221a973, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sprintSpeed: 0
   sprinting: 0
-  maxEnergy: 0
+  maxEnergy: 8
   minEnergy: 0
-  dischargeRate: 0
-  rechargeRate: 0
-  energyNeededToSprint: 0
-  outOfBreath: {fileID: 0}
+  dischargeRate: 4
+  rechargeRate: 2
+  energyNeededToSprint: 2
+  outOfBreath: {fileID: 1128834375}
 --- !u!1 &1801302481
 GameObject:
   m_ObjectHideFlags: 0
@@ -18289,6 +18404,7 @@ MonoBehaviour:
   distanceToPickUp: 20
   glowTimerLength: 1.2
   glowColor: {r: 1, g: 1, b: 1, a: 1}
+  chargeNeededToGrab: 0
   maxTimerForGlow: 1
   minTimer: 0
   maxTimer: 1
@@ -19016,56 +19132,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1862682284}
   m_CullTransparentMesh: 0
---- !u!1 &1871859234
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1871859235}
-  - component: {fileID: 1871859236}
-  m_Layer: 0
-  m_Name: Movement
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1871859235
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1871859234}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 1916031736}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1871859236
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1871859234}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ce0c3d170c80174d9cbb5d8069d15b1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  crouchAndSneakingSpeed: 0
-  gravity: 20
-  speed: 7
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 0
-  velocity: {x: 0, y: 0, z: 0}
 --- !u!1 &1873120038
 GameObject:
   m_ObjectHideFlags: 0
@@ -19344,7 +19410,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 963194228}
-  - {fileID: 1871859235}
   - {fileID: 823875996}
   - {fileID: 686738008}
   - {fileID: 1785676746}
@@ -19373,15 +19438,17 @@ MonoBehaviour:
   flashlight: {fileID: 223974228}
   sprint: {fileID: 1785676747}
   pausedGameInput: {fileID: 509944470}
-  movementInput: {fileID: 1871859236}
   crosshair: {fileID: 2800000, guid: 4a5d688cd5f4d9b4ab0679e8e4bddd74, type: 3}
   survivorCamera: {fileID: 963194227}
-  defaultSpeed: 0
-  sprintSpeed: 0
-  walkSpeed: 0
-  crouchSpeed: 0
-  mouseInput: {fileID: 963194229}
+  defaultSpeed: 4
+  sprintSpeed: 10
+  walkSpeed: 2
+  crouchSpeed: 2
   survivorChat: {fileID: 0}
+  minimumX: -90
+  maximumX: 90
+  gravity: 10
+  grabDistance: 1
 --- !u!1 &1920936817
 GameObject:
   m_ObjectHideFlags: 0

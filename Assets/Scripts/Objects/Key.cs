@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Runtime.InteropServices.WindowsRuntime;
+using System.Security.Cryptography;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Key : MonoBehaviour
@@ -8,6 +10,9 @@ public class Key : MonoBehaviour
     public int keyMask = -1;
 
     public int group = 0;
+
+    [SerializeField]
+    private int keyID;
 
     [SerializeField]
     private Color groupColor;
@@ -44,13 +49,17 @@ public class Key : MonoBehaviour
     private Color glowColor = Color.white;
 
 
+    private BoxCollider collider;
     private Renderer keyRenderer;
+    private MeshFilter filter;
 
 
     void Start()
     {
         noGlowTimer = maxTimerForGlow;
         keyRenderer = GetComponent<Renderer>();
+        collider = GetComponent<BoxCollider>();
+        filter = GetComponent<MeshFilter>();
         keyRenderer.material.SetColor("_Color", glowOutlineColor);
 
     }
@@ -109,25 +118,19 @@ public class Key : MonoBehaviour
             keyRenderer.material.SetColor("_Color", Color.clear);
 
         }
-
     }
 
-
-    void OnMouseDown()
+    public int ID()
     {
-        float distance = 0f;
-
-        if (distance <= distanceToPickUp)
-        {
-            pickupSound.Play();
-            Grab();
-        }
+        return keyID;
     }
-
 
     public void Grab()
     {
+        pickupSound.Play();
+        this.enabled = false;
+        Destroy(this.gameObject);
+   }
 
-    }
 }
 

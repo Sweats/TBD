@@ -44,7 +44,7 @@ public class Door : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
 
@@ -66,12 +66,43 @@ public class Door : MonoBehaviour
     public void Unlock()
     {
         locked = false;
+        unlockedSound.Play();
+        //Destroy(GetComponent<MeshRenderer>());
+        Destroy(this.gameObject);
+
     }
 
     public void Lock()
     {
         locked = true;
-        
+
+    }
+
+    public void PlayLockedSound()
+    {
+        lockedSound.Play();
+    }
+
+    private bool Locked()
+    {
+        return locked;
+    }
+
+    public bool Unlockable(Inventory inventory)
+    {
+        Key[] keys = inventory.Keys();
+        bool unlockable = false;
+
+        for (var i = 0; i < keys.Length; i++)
+        {
+            if (keys[i].keyMask == unlockMask)
+            {
+                unlockable = true;
+                break;
+            }
+        }
+
+        return unlockable;
     }
 
     void OnMouseExit()
@@ -83,34 +114,6 @@ public class Door : MonoBehaviour
             if (distanceFromPlayer >= distanceToUnlock)
             {
                 outlineColor = Color.clear;
-            }
-
-        }
-    }
-
-
-    void OnMouseDown()
-    {
-        if (locked)
-        {
-            bool found = false;
-
-            for (var i = 0; i < keys.Length; i++)
-            {
-                int keyMask = keys[i].keyMask;
-
-                if (keyMask == unlockMask)
-                {
-                    unlockedSound.Play();
-                    found = true;
-                    Unlock();
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                lockedSound.Play();
             }
         }
     }

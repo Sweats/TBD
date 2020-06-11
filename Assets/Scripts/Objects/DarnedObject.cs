@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 
-public class Object : MonoBehaviour
+public class DarnedObject : MonoBehaviour
 {
 
     [SerializeField]
@@ -17,7 +17,7 @@ public class Object : MonoBehaviour
 
     private bool grabbed;
 
-    public enum ObjectType
+    public enum DarnedObjectType
     {
         None = 0,
         Key,

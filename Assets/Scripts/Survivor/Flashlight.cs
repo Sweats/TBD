@@ -11,12 +11,15 @@ public class Flashlight : MonoBehaviour
     [SerializeField]
     private float dischargeRate;
 
+    public float chargeNeededToGrab;
+
     [SerializeField]
     private AudioSource flashlightToggleSound;
 
     public float charge;
 
     private Light flashlightSource;
+
 
     private bool flashlightDead = false;
 
@@ -39,6 +42,7 @@ public class Flashlight : MonoBehaviour
             if (charge < minCharge)
             {
                 charge = minCharge;
+                flashlightSource.intensity = 0;
                 flashlightDead = true;
             }
         }
@@ -49,5 +53,12 @@ public class Flashlight : MonoBehaviour
     {
         flashlightSource.enabled = !flashlightSource.enabled;
         flashlightToggleSound.Play();
+    }
+
+    public void Recharge()
+    {
+        charge = maxCharge;
+        flashlightSource.intensity = 4;
+        flashlightDead = false;
     }
 }
