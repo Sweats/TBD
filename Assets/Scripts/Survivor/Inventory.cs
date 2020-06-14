@@ -41,7 +41,7 @@ public class Inventory : MonoBehaviour
 
         for (var i = 0; i < keys.Count; i++)
         {
-            if (keys[i].ID() == key.ID())
+            if (keys[i].mask == key.mask)
             {
                 found = true;
                 break;
@@ -65,7 +65,7 @@ public class Inventory : MonoBehaviour
     {
         for (int i = 0; i < keys.Count; i++)
         {
-            if (keys[i].keyMask == key.keyMask)
+            if (keys[i].mask == key.mask)
             {
                 keys.RemoveAt(i);
                 break;
@@ -81,7 +81,7 @@ public class Inventory : MonoBehaviour
 
         for (var i = 0; i < keys.Count; i++)
         {
-            Texture itemIcon = keys[i].iconTexture;
+            Texture itemIcon = keys[i].textureIcon;
 
             if (i % 8 == 0)
             {

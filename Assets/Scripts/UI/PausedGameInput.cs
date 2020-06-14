@@ -268,10 +268,8 @@ public class PausedGameInput : MonoBehaviour
         
     }
 
-
     public void OnMouseLeft(Button button)
     {
         button.GetComponentInChildren<Text>().color = Color.white;
-
     }
 }

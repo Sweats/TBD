@@ -86,12 +86,13 @@ public class ControlsUI : MonoBehaviour
     private const string INVERT_X_KEY = "invert_x";
     private const string INVERT_Y_KEY = "invert_y";
 
+    private const string TEST_KEY = "test";
+
     private const int ACTION_NONE = -1;
 
     // Apparently changing the toggle via code causes the callback to be called so we need to use this variable to stop that from happening
     // when the scene is launched.
     private bool initialized;
-
 
     void Update()
     {
@@ -481,7 +482,6 @@ public class ControlsUI : MonoBehaviour
         }
     }
 
-
     public void OnMouseSensitivySliderChanged(float value)
     {
         Survivor.mouseSensitivity = value;
@@ -538,5 +538,6 @@ public class ControlsUI : MonoBehaviour
 
         PlayerPrefs.Save();
     }
+    
 }
 

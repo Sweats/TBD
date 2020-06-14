@@ -56,5 +56,10 @@ public class Keybinds : MonoBehaviour
     {
         actions[action] = keyCode;
     }
+
+    private static void testfunction()
+    {
+
+    }
 }
 

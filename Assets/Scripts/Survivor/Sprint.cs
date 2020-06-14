@@ -1,8 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
-using UnityEngine;
-
+﻿using UnityEngine;
+using UnityEngine.Events;
 public class Sprint : MonoBehaviour
 {
     public bool sprinting;

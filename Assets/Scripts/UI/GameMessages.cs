@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,7 +6,7 @@ using UnityEngine.UI;
 public class GameMessages : MonoBehaviour
 {
 
-    private List<GameMessage> message;
+    private List<GameMessage> messages;
 
     // How long should a chat message appear for? 
     [SerializeField]
@@ -20,29 +19,31 @@ public class GameMessages : MonoBehaviour
     private Canvas gameMessagesCanvas;
 
     private int nextMessageID;
-
     private StringBuilder stringBuilder;
-
     // Start is called before the first frame update
     void Start()
     {
         stringBuilder = new StringBuilder();
-        message = new List<GameMessage>();
+        messages = new List<GameMessage>();
     }
 
-
-    public void HandleChatMessages()
+    void Update()
     {
         if (gameMessagesCanvas.enabled)
         {
             bool expiredMessageFound = false;
 
-            for (var i = 0; i < message.Count; i++)
+            for (var i = 0; i < messages.Count; i++)
             {
-                if (message[i].Expired())
+                if (messages[i].length <= 0)
                 {
                     expiredMessageFound = true;
-                    message.RemoveAt(i);
+                    messages.RemoveAt(i);
+                }
+
+                else
+                {
+                    messages[i].length -= Time.deltaTime;
                 }
             }
 
@@ -71,18 +72,109 @@ public class GameMessages : MonoBehaviour
     {
         stringBuilder.Clear();
 
-        for (var i = 0; i < message.Count; i++)
+        for (var i = 0; i < messages.Count; i++)
         {
-            stringBuilder.AppendLine(message[i].message);
+            stringBuilder.AppendLine(messages[i].message);
         }
 
         messagesBox.text = stringBuilder.ToString();
     }
 
-    public void Add(GameMessage message)
+    private void Add(GameMessage message)
     {
         gameMessagesCanvas.enabled = true;
-        message.id = nextMessageID;
-        this.message.Add(message);
+        this.messages.Add(message);
     }
+    public void OnSurvivorGrabbedKey(Survivor survivor, KeyObject key)
+    {
+        GameMessage newMessage = new GameMessage()
+        {
+            message = $"{survivor.name} picked up a {key.key.name}!",
+            id = nextMessageID,
+            length = chatMessageAppearanceLength
+        };
+
+        messages.Add(newMessage);
+    }
+
+    public void OnSurvivorUnlockedDoor(Survivor survivor, Key key, Door door)
+    {
+        GameMessage newMessage = new GameMessage()
+        {
+            message = $"{survivor.name} used a {key.name} to unlock a {door.name}!",
+            id = nextMessageID,
+            length = chatMessageAppearanceLength
+        };
+
+        messages.Add(newMessage);
+
+    }
+
+    public void OnSurvivorDeath(Survivor survivor)
+    {
+        GameMessage newMessage = new GameMessage()
+        {
+            message = $"{survivor.name} died!",
+            id = nextMessageID,
+            length = chatMessageAppearanceLength
+        };
+
+        messages.Add(newMessage);
+
+    }
+
+
+    public void OnFailedToPickUpBatteryEvent()
+    {
+        GameMessage newMessage = new GameMessage()
+        {
+            message = "Your flashlight is already charged!",
+            id = nextMessageID,
+            length = chatMessageAppearanceLength 
+        };
+
+        messages.Add(newMessage);
+    }
+
+    public void OnPickedUpBatteryEvent()
+    {
+        GameMessage newMessage = new GameMessage()
+        {
+            message = "You picked up a battery!",
+            id = nextMessageID,
+            length = chatMessageAppearanceLength
+        };
+
+        messages.Add(newMessage);
+    }
+
+
+    public void OnPickupKeySurvivorAlreadyHasEvent()
+    {
+        GameMessage newMesasge = new GameMessage()
+        {
+            message = "You already have this key!",
+            id = nextMessageID,
+            length = chatMessageAppearanceLength
+        };
+
+
+        messages.Add(newMesasge);
+    }
+
+    public void OnSurvivorDisconnect(Survivor suvivor)
+    {
+
+    }
+
+    public void OnSurvivorConnect(Survivor survivor)
+    {
+
+    }
+
+    public void OnHostStartedTheGame()
+    {
+
+    }
+
 }

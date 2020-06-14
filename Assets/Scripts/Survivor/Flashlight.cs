@@ -1,4 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
+
+// we will use this at some point to tell other clients that we have toggeled the flashlight.
+public class FlashlightEvent: UnityEvent<Flashlight> { }
 
 public class Flashlight : MonoBehaviour
 {

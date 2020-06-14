@@ -4,7 +4,6 @@ public class ConnectionUI : MonoBehaviour
 
     [SerializeField]
     private Canvas connectionCanvas;
-
     void Start()
     {
 
@@ -22,8 +21,11 @@ public class ConnectionUI : MonoBehaviour
         connectionCanvas.enabled = true;
     }
 
+
     private void SaveConnectionConfig()
     {
 
     }
+    
 }
+

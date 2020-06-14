@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
 public class OptionsUI : MonoBehaviour
 {
@@ -16,6 +15,8 @@ public class OptionsUI : MonoBehaviour
     {
         optionsCanvas.enabled = false;
     }
-
+    
+    
+    
 }
 

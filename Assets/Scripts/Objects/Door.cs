@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 public class Door : MonoBehaviour
 {
@@ -25,14 +26,10 @@ public class Door : MonoBehaviour
     [SerializeField]
     private Color outlineColor = Color.yellow;
 
-    [SerializeField]
-    private float distanceToUnlock = 20f;
+    //[SerializeField]
+    //private float distanceToUnlock = 20f;
 
     public bool locked;
-
-    [SerializeField]
-    private Key[] keys;
-
     private Renderer doorRenderer;
 
     void Start()
@@ -41,80 +38,42 @@ public class Door : MonoBehaviour
         doorRenderer = GetComponent<Renderer>();
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-
-    void OnMouseEnter()
-    {
-        if (locked)
-        {
-            float distanceFromPlayer = 0f;
-
-            if (distanceFromPlayer <= distanceToUnlock)
-            {
-                //outlineColor = 
-            }
-        }
-
-    }
-
-
     public void Unlock()
     {
         locked = false;
         unlockedSound.Play();
-        //Destroy(GetComponent<MeshRenderer>());
         Destroy(this.gameObject);
 
     }
 
-    public void Lock()
-    {
-        locked = true;
-
-    }
-
+    // for now we will play the locked sound in here. We may want to move it out at some point.
     public void PlayLockedSound()
     {
         lockedSound.Play();
     }
+
 
     private bool Locked()
     {
         return locked;
     }
 
-    public bool Unlockable(Inventory inventory)
+    public bool Unlockable(Inventory inventory, out Key correctKey)
     {
         Key[] keys = inventory.Keys();
         bool unlockable = false;
+        correctKey = null;
 
         for (var i = 0; i < keys.Length; i++)
         {
-            if (keys[i].keyMask == unlockMask)
+            if (keys[i].mask == unlockMask)
             {
+                correctKey = keys[i];
                 unlockable = true;
                 break;
             }
         }
 
         return unlockable;
-    }
-
-    void OnMouseExit()
-    {
-        if (locked)
-        {
-            float distanceFromPlayer = 0;
-
-            if (distanceFromPlayer >= distanceToUnlock)
-            {
-                outlineColor = Color.clear;
-            }
-        }
     }
 }

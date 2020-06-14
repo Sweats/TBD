@@ -1,42 +1,63 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
+
+// will be used to show spectating players the insaniy effect that the player is currently seeing.
+public class InsanityEffectEvent : UnityEvent<InsanityEffect> { }
 
 public class InsanityEffect : MonoBehaviour
 {
-    public enum Insanity
-    {
-        None = 0,
-        Gamma,
-        Deaf
-    }
-
-
-    [SerializeField]
-    private Insanity effect;
-
-    [SerializeField]
     private bool enabled;
 
     [SerializeField]
-    private float insanityNeededToStart;
+    public float insanityNeededToStart;
 
     [SerializeField]
-    private float minTimer;
+    private float timerDischargeRate;
 
     [SerializeField]
-    private float maxTimer;
+    private float timer = 100;
 
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
+    [SerializeField]
+    private AudioSource insanitySoundEffect;
 
     public bool Enabled()
     {
         return enabled;
     }
+
+    void Update()
+    {
+        if (enabled)
+        {
+            timer -= timerDischargeRate * Time.deltaTime;
+
+            if (timer <= 0)
+            {
+                Trigger();
+                timer = 100;
+            }
+        }
+    }
+
+
+    public void Trigger()
+    {
+        insanitySoundEffect.Play();
+
+    }
+
+
+    public void Enable()
+    {
+        enabled = true;
+
+    }
+
+    public void Disable()
+    {
+        enabled = false;
+    }
+
 }
 
 

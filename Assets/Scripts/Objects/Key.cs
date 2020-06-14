@@ -1,136 +1,25 @@
-﻿using System.Runtime.InteropServices.WindowsRuntime;
-using System.Security.Cryptography;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
-public class Key : MonoBehaviour
+[System.Serializable]
+public class Key
 {
-    public string keyName = "Rusty Key";
+    public string name = "Rusty Key";
+    public int mask;
 
-    public int keyMask = -1;
+    public int Id;
 
-    public int group = 0;
-
-    [SerializeField]
-    private int keyID;
-
-    [SerializeField]
-    private Color groupColor;
-
-    [SerializeField]
-    private AudioSource pickupSound;
-
-    public Texture iconTexture;
-
-    [SerializeField]
-    private float distanceToPickUp = 20f;
-
-    [SerializeField]
-    private float timeBetweenGlows = 45;
-    [SerializeField]
-    private float glowTimerLength = 115;
-
-    [SerializeField]
-    private float maxTimerForGlow = 100;
-    [SerializeField]
-    private float minTimer = 0;
-    [SerializeField]
-    private float noGlowTimer;
-
-    [SerializeField]
-    private float glowTimer;
-
-
-    [SerializeField]
-    // this is the color that will appear around the key mesh to let the player know they can pick it up
-    private Color glowOutlineColor = Color.red;
-
-    [SerializeField]
-    private Color glowColor = Color.white;
-
-
-    private BoxCollider collider;
-    private Renderer keyRenderer;
-    private MeshFilter filter;
-
-
-    void Start()
+    public int group;
+    public AudioSource pickupSound;
+    public Texture textureIcon;
+    
+    public Key(Key key)
     {
-        noGlowTimer = maxTimerForGlow;
-        keyRenderer = GetComponent<Renderer>();
-        collider = GetComponent<BoxCollider>();
-        filter = GetComponent<MeshFilter>();
-        keyRenderer.material.SetColor("_Color", glowOutlineColor);
-
+        this.name = key.name;
+        this.mask = key.mask;
+        this.Id = key.Id;
+        this.group = key.group;
+        this.pickupSound = key.pickupSound;
+        this.textureIcon = key.textureIcon;
     }
-
-    void Update()
-    {
-        noGlowTimer -= Time.deltaTime * timeBetweenGlows;
-
-        if (noGlowTimer <= minTimer)
-        {
-            Glow();
-
-            glowTimer -= Time.deltaTime * glowTimerLength;
-            noGlowTimer = 0;
-
-            if (glowTimer <= minTimer)
-            {
-                UnGlow();
-                noGlowTimer = maxTimerForGlow;
-                glowTimer = maxTimerForGlow;
-            }
-        }
-
-    }
-
-    private void Glow()
-    {
-        keyRenderer.material.SetColor("_Color", glowColor);
-
-    }
-
-    private void UnGlow()
-    {
-        keyRenderer.material.SetColor("_Color", glowOutlineColor);
-
-    }
-
-
-    void OnMouseEnter()
-    {
-        float distance = 0f;
-
-        if (distance <= distanceToPickUp)
-        {
-            keyRenderer.material.SetColor("_Color", glowOutlineColor);
-        }
-    }
-
-
-    void OnMouseExit()
-    {
-        float distance = 0f;
-
-        if (distance <= distanceToPickUp)
-        {
-            keyRenderer.material.SetColor("_Color", Color.clear);
-
-        }
-    }
-
-    public int ID()
-    {
-        return keyID;
-    }
-
-    public void Grab()
-    {
-        pickupSound.Play();
-        this.enabled = false;
-        Destroy(this.gameObject);
-   }
-
 }
 
