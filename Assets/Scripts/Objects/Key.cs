@@ -6,7 +6,7 @@ public class Key
     public string name = "Rusty Key";
     public int mask;
 
-    public int Id;
+    public int id;
 
     public int group;
     public AudioSource pickupSound;
@@ -16,7 +16,7 @@ public class Key
     {
         this.name = key.name;
         this.mask = key.mask;
-        this.Id = key.Id;
+        this.id = key.id;
         this.group = key.group;
         this.pickupSound = key.pickupSound;
         this.textureIcon = key.textureIcon;

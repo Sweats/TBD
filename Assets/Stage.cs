@@ -14,6 +14,7 @@ public class Stage : MonoBehaviour
             {
                 // We will mark this survivor as dead later.
                 survivor.insanity.Reset();
+                continue;
             }
 
             survivors[i].insanity.insanityValue += survivors[i].insanity.insanitySurvivorDeathAmount;
