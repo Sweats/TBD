@@ -77,7 +77,7 @@ public class Inventory : MonoBehaviour
     public void Draw()
     {
         int currentX = Screen.width - 20;
-        int currentY = Screen.height - 20;
+        int currentY = 20;
 
         for (var i = 0; i < keys.Count; i++)
         {
@@ -86,14 +86,14 @@ public class Inventory : MonoBehaviour
             if (i % 8 == 0)
             {
                 // go back to the top where we were when we started and then go left 50 because images will be 50 in pixels
-                currentY = Screen.height - 20;
-                currentX -= 50;
+                currentX  -= 50;
+                currentY = 20;
             }
 
             currentPosition.x = currentX;
             currentPosition.y = currentY;
             GUI.DrawTexture(currentPosition, itemIcon);
-            currentY = -50;
+            currentY += 55;
 
         }
 

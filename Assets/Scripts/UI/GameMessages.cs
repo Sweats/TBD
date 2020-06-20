@@ -29,30 +29,29 @@ public class GameMessages : MonoBehaviour
 
     void Update()
     {
+        bool messagesfound = true;
+
         if (gameMessagesCanvas.enabled)
         {
-            bool expiredMessageFound = false;
-
             for (var i = 0; i < messages.Count; i++)
             {
                 if (messages[i].length <= 0)
                 {
-                    expiredMessageFound = true;
                     messages.RemoveAt(i);
                 }
 
                 else
                 {
                     messages[i].length -= Time.deltaTime;
+                    messagesfound = true;
                 }
             }
 
             UpdateChatText();
 
-            if (!expiredMessageFound)
+            if (!messagesfound)
             {
                 Hide();
-                nextMessageID = 0;
             }
         }
     }
@@ -82,17 +81,18 @@ public class GameMessages : MonoBehaviour
 
     private void Add(GameMessage message)
     {
-        gameMessagesCanvas.enabled = true;
+        Show();
         this.messages.Add(message);
     }
     public void OnSurvivorGrabbedKey(Survivor survivor, KeyObject key)
     {
         GameMessage newMessage = new GameMessage()
         {
-            message = $"{survivor.name} picked up a {key.key.name}!",
+            message = $"{survivor.survivorName} picked up a {key.key.name}!",
             id = nextMessageID,
             length = chatMessageAppearanceLength
         };
+
 
         messages.Add(newMessage);
     }
@@ -101,7 +101,7 @@ public class GameMessages : MonoBehaviour
     {
         GameMessage newMessage = new GameMessage()
         {
-            message = $"{survivor.name} used a {key.name} to unlock a {door.name}!",
+            message = $"{survivor.survivorName} used a {key.name} to unlock a {door.name}!",
             id = nextMessageID,
             length = chatMessageAppearanceLength
         };
@@ -114,7 +114,7 @@ public class GameMessages : MonoBehaviour
     {
         GameMessage newMessage = new GameMessage()
         {
-            message = $"{survivor.name} died!",
+            message = $"{survivor.survivorName} died!",
             id = nextMessageID,
             length = chatMessageAppearanceLength
         };
@@ -162,19 +162,42 @@ public class GameMessages : MonoBehaviour
         messages.Add(newMesasge);
     }
 
-    public void OnSurvivorDisconnect(Survivor suvivor)
+    public void OnSurvivorDisconnect(Survivor survivor)
     {
+        GameMessage newMessage = new GameMessage()
+        {
+            message = $"Player {survivor.survivorName} has left the game!",
+            id = nextMessageID,
+            length = chatMessageAppearanceLength
+        };
+
+        messages.Add(newMessage);
 
     }
 
     public void OnSurvivorConnect(Survivor survivor)
     {
+        GameMessage newMessage = new GameMessage()
+        {
+            message = $"Player {survivor.survivorName} has connected!",
+            id = nextMessageID,
+            length = chatMessageAppearanceLength
+        };
+
+        messages.Add(newMessage);
 
     }
 
     public void OnHostStartedTheGame()
     {
+        GameMessage newMessage = new GameMessage()
+        {
+            message = "The host has started the game!",
+            id = nextMessageID,
+            length = chatMessageAppearanceLength
+        };
 
+        messages.Add(newMessage);
     }
 
 }

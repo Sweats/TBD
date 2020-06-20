@@ -53,8 +53,7 @@ public class Insanity : MonoBehaviour
     {
         if (insanityEnabled && !maxed)
         {
-            insanityValue += insanityRate * Time.deltaTime;
-
+            insanityValue += insanityRate * Time.deltaTime; 
             if (insanityRate >= maxInsanity)
             {
                 maxed = true;

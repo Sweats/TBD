@@ -10,13 +10,10 @@ public class OptionsUI : MonoBehaviour
         optionsCanvas.enabled = true;
     }
 
-
     public void Hide()
     {
         optionsCanvas.enabled = false;
     }
-    
-    
     
 }
 

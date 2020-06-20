@@ -538,6 +538,5 @@ public class ControlsUI : MonoBehaviour
 
         PlayerPrefs.Save();
     }
-    
 }
 

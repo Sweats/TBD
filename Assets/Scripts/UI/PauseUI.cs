@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PauseUI : MonoBehaviour
 {
+    private const string MAIN_MENU_SCENE = "menu";
+
     [SerializeField]
     private Canvas pauseCanvas;
 
@@ -24,5 +27,11 @@ public class PauseUI : MonoBehaviour
         {
             UnityEditor.EditorApplication.isPlaying = false;
         }
+     }
+
+
+     public void OnBackToTitleScreenButtonClicked()
+     {
+         SceneManager.LoadScene(MAIN_MENU_SCENE);
      }
 }
