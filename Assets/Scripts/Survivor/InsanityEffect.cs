@@ -2,13 +2,11 @@
 using UnityEngine.Events;
 
 // will be used to show spectating players the insaniy effect that the player is currently seeing.
-public class InsanityEffectEvent : UnityEvent<InsanityEffect> { }
+//public class InsanityEffectEvent : UnityEvent<InsanityEffect> { }
 
 public class InsanityEffect : MonoBehaviour
 {
     private bool enabled;
-
-    [SerializeField]
     public float insanityNeededToStart;
 
     [SerializeField]
@@ -19,6 +17,8 @@ public class InsanityEffect : MonoBehaviour
 
     [SerializeField]
     private AudioSource insanitySoundEffect;
+
+    public InsanityEffectEvent insanityEffectEvent;
 
     public bool Enabled()
     {
@@ -43,6 +43,42 @@ public class InsanityEffect : MonoBehaviour
     public void Trigger()
     {
         insanitySoundEffect.Play();
+        insanityEffectEvent.Invoke();
+    }
+
+
+    public void OnGammaInsanityEffectTriggered()
+    {
+
+    }
+
+
+    public void OnDeafInsanityEffectTriggered()
+    {
+
+    }
+
+
+    public void OnFlashlightFlickerInsanityEffectTriggered()
+    {
+
+    }
+
+
+    public void OnBlackAndWhiteInsanityEffectTriggered()
+    {
+
+    }
+
+
+    public void OnFakeTrapInsanityEffectTriggered()
+    {
+
+    }
+
+
+    public void OnJumpScareInsanityEffectTriggered()
+    {
 
     }
 
@@ -59,7 +95,3 @@ public class InsanityEffect : MonoBehaviour
     }
 
 }
-
-
-    
-

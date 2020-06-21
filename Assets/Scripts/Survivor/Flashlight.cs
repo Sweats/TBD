@@ -37,16 +37,12 @@ public class Flashlight : MonoBehaviour
         if (flashlightSource.enabled && charge > 0 && !flashlightDead)
         {
             charge -= Time.deltaTime * dischargeRate;
-
-            if (charge < flashlightSource.intensity)
-            {
-                flashlightSource.intensity = charge;
-            }
+            flashlightSource.intensity = charge;
 
             if (charge < minCharge)
             {
                 charge = minCharge;
-                flashlightSource.intensity = 0;
+                flashlightSource.intensity = minCharge;
                 flashlightDead = true;
             }
         }

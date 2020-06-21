@@ -6,8 +6,6 @@ public class Survivor : MonoBehaviour
     public Insanity insanity;
     public Inventory inventory;
     public Flashlight flashlight;
-    [SerializeField]
-
     public int survivorID;
 
     [SerializeField]
@@ -18,6 +16,12 @@ public class Survivor : MonoBehaviour
 
     [SerializeField]
     private Texture crosshair;
+
+    [SerializeField]
+    private Texture walkingTexture;
+    
+    [SerializeField]
+    private Texture crouchingTexture;
 
     //private Transform survivorBody;
 
@@ -40,8 +44,8 @@ public class Survivor : MonoBehaviour
 
     private bool crouched;
     private bool walking;
+    private Rect crouchingAndWalkingIconPosition;
 
-    private Rect rect;
 
     [SerializeField]
     private float minimumX;
@@ -86,6 +90,21 @@ public class Survivor : MonoBehaviour
 
     public SurvivorAlreadyHaveKeyEvent survivorAlreadyHaveKeyEvent;
 
+    public SurvivorOpenedChatEvent survivorOpenedChatEvent;
+
+    public SurvivorClosedChat survivorClosedChatEvent;
+
+    public SurvivorSendChatMessage survivorSendChatEvent;
+
+
+    public SurvivorOpenedPlayerStats survivorOpenedPlayerStats;
+
+    public SurvivorClosedPlayerStats survivorClosedPlayerStats;
+
+    private bool isChatOpened;
+
+    private bool isPlayerStatsOpened;
+
     #endregion
 
     void Start()
@@ -93,7 +112,7 @@ public class Survivor : MonoBehaviour
         //survivorBody = GetComponent<Transform>();
         controller = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
-        rect = new Rect(Screen.width / 2, Screen.height / 2, 2, 2);
+        crouchingAndWalkingIconPosition = new Rect(100, Screen.height - 50, crouchingTexture.width, crouchingTexture.height);
 
     }
 
@@ -102,7 +121,7 @@ public class Survivor : MonoBehaviour
 
     void LateUpdate()
     {
-        if (pausedGameInput.gamePaused)
+        if (pausedGameInput.gamePaused || isChatOpened)
         {
             return;
         }
@@ -126,7 +145,6 @@ public class Survivor : MonoBehaviour
         transform.Rotate(Vector3.up * mouseX);
         survivorCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
         flashlight.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-        //survivorBody.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
     }
 
     void Update()
@@ -141,7 +159,7 @@ public class Survivor : MonoBehaviour
 
         CheckForTraps();
 
-        if (pausedGameInput.gamePaused)
+        if (pausedGameInput.gamePaused || isChatOpened)
         {
             return;
         }
@@ -200,6 +218,43 @@ public class Survivor : MonoBehaviour
 
         }
 
+        else if (Keybinds.GetKey(Action.GuiAccept))
+        {
+            if (!pausedGameInput.gamePaused)
+            {
+                isChatOpened = true;
+                survivorOpenedChatEvent.Invoke();
+            }
+
+            else if (isChatOpened)
+            {
+                survivorSendChatEvent.Invoke();
+            }
+
+        }
+
+        else if (Keybinds.GetKey(Action.GUiReturn))
+        {
+            if (!pausedGameInput.gamePaused && isChatOpened)
+            {
+                survivorClosedChatEvent.Invoke();
+                isChatOpened = false;
+            }
+        }
+
+
+        else if (Keybinds.Get(Action.PlayerStats))
+        {
+            survivorOpenedPlayerStats.Invoke();
+            isPlayerStatsOpened = true;
+        }
+
+        else if (Keybinds.GetKey(Action.PlayerStats, true))
+        {
+            survivorClosedPlayerStats.Invoke();
+            isPlayerStatsOpened = false;
+        }
+        
         Vector3 secondmove = transform.right * x + transform.forward * z;
         controller.Move(secondmove * speed * Time.deltaTime);
 
@@ -296,19 +351,23 @@ public class Survivor : MonoBehaviour
             return;
         }
 
-        GUI.DrawTexture(rect, crosshair);
-        inventory.Draw();
+        if (!isPlayerStatsOpened)
+        {
+            inventory.Draw();
+        }
+
+        // TO DO: Optimize this!
+        GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
 
         if (walking)
         {
-
-            // TO DO. Find a crouching walking icon and draw it here.
+            GUI.DrawTexture(crouchingAndWalkingIconPosition, walkingTexture);
         }
 
         if (crouched)
         {
 
-            // TO DO. Find a crouching icon and draw it here.
+            GUI.DrawTexture(crouchingAndWalkingIconPosition, crouchingTexture);
         }
     }
 }

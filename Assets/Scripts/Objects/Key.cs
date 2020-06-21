@@ -3,10 +3,20 @@
 [System.Serializable]
 public class Key
 {
+    public enum KeyType : int
+    {
+        Rusty = 0,
+        Metal,
+        Old,
+        Silver,
+        Code,
+        Hammer,
+        Crowbar
+    }
     public string name = "Rusty Key";
     public int mask;
 
-    public int id;
+    public KeyType type;
 
     public int group;
     public AudioSource pickupSound;
@@ -16,7 +26,7 @@ public class Key
     {
         this.name = key.name;
         this.mask = key.mask;
-        this.id = key.id;
+        this.type = key.type;
         this.group = key.group;
         this.pickupSound = key.pickupSound;
         this.textureIcon = key.textureIcon;

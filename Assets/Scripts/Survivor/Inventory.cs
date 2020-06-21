@@ -8,7 +8,6 @@ public class Inventory : MonoBehaviour
     private List<Key> keys;
     private Rect currentPosition;
 
-
     void Start()
     {
         // TO DO: Get the size of the Keylist and 
@@ -16,19 +15,12 @@ public class Inventory : MonoBehaviour
 
         currentPosition = new Rect
         {
-            height = 50,
-            width = 50
+            height = 30,
+            width = 30
         };
 
 
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
 
     public void Add(Key key)
     {
@@ -93,7 +85,7 @@ public class Inventory : MonoBehaviour
             currentPosition.x = currentX;
             currentPosition.y = currentY;
             GUI.DrawTexture(currentPosition, itemIcon);
-            currentY += 55;
+            currentY += 35;
 
         }
 

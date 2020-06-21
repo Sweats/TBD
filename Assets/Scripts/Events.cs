@@ -36,6 +36,28 @@ public class SurvivorTriggeredTrapEvent: UnityEvent<Survivor, Trap>{}
 [System.Serializable]
 public class SurvivorAlreadyHaveKeyEvent: UnityEvent {}
 
+[System.Serializable]
+public class SurvivorOpenedChatEvent: UnityEvent {}
+
+[System.Serializable]
+public class SurvivorClosedChat: UnityEvent {}
+
+[System.Serializable]
+public class SurvivorSendChatMessage: UnityEvent {}
+
+[System.Serializable]
+public class SurvivorOpenedPlayerStats: UnityEvent {}
+
+[System.Serializable]
+public class SurvivorClosedPlayerStats: UnityEvent {}
+
+#endregion
+
+#region INSANITY
+
+[System.Serializable]
+public class InsanityEffectEvent: UnityEvent {}
+
 #endregion
 
 
