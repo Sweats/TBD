@@ -88,6 +88,5 @@ public class Inventory : MonoBehaviour
             currentY += 35;
 
         }
-
     }
 }

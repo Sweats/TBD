@@ -15,7 +15,6 @@ public class MainMenuUI : MonoBehaviour
 
     }
 
-
     public void OnMouseLeftButton(Button button)
     {
         button.GetComponentInChildren<Text>().color = Color.white;
@@ -54,5 +53,5 @@ public class MainMenuUI : MonoBehaviour
     {
 
     }
-
 }
+
