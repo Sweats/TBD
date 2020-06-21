@@ -28,7 +28,7 @@ public class Keybinds : MonoBehaviour
 {
     public static Dictionary<Action, KeyCode> actions;
 
-    private void Start()
+    void Start()
     {
         actions = new Dictionary<Action, KeyCode>();
     }
@@ -46,6 +46,29 @@ public class Keybinds : MonoBehaviour
         }
     }
 
+    public static void SetDefaults()
+    {
+        Keybinds.actions[Action.MoveForward] = KeyCode.W;
+        Keybinds.actions[Action.MoveBack] = KeyCode.S;
+        Keybinds.actions[Action.MoveLeft] = KeyCode.A;
+        Keybinds.actions[Action.MoveRight] = KeyCode.D;
+        Keybinds.actions[Action.Sprint] = KeyCode.LeftShift;
+        Keybinds.actions[Action.Transform] = KeyCode.E;
+        Keybinds.actions[Action.Walk] = KeyCode.LeftAlt;
+        Keybinds.actions[Action.Crouch] = KeyCode.LeftControl;
+        Keybinds.actions[Action.Start] = KeyCode.KeypadEnter;
+        Keybinds.actions[Action.Pause] = KeyCode.Escape;
+        Keybinds.actions[Action.PlayerStats] = KeyCode.Tab;
+        Keybinds.actions[Action.Grab] = KeyCode.Mouse0;
+        Keybinds.actions[Action.SwitchFlashlight] = KeyCode.Mouse1;
+        Keybinds.actions[Action.Attack] = KeyCode.Mouse0;
+        Keybinds.actions[Action.Teleport] = KeyCode.Mouse1;
+        Keybinds.actions[Action.SpectateNext] = KeyCode.Mouse0;
+        Keybinds.actions[Action.VoiceChat] = KeyCode.C;
+        Keybinds.actions[Action.GuiAccept] = KeyCode.Mouse0;
+        Keybinds.actions[Action.GUiReturn] = KeyCode.Escape;
+    }
+
 
     public static bool Get(Action action)
     {
@@ -55,11 +78,6 @@ public class Keybinds : MonoBehaviour
     public static void Set(Action action, KeyCode keyCode)
     {
         actions[action] = keyCode;
-    }
-
-    private static void testfunction()
-    {
-
     }
 }
 

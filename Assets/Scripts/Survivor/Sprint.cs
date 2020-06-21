@@ -27,19 +27,6 @@ public class Sprint : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Keybinds.Get(Action.Sprint))
-        {
-            if (energy >= energyNeededToSprint)
-            {
-                sprinting = true;
-            }
-        }
-
-        else if (Keybinds.GetKey(Action.Sprint, true))
-        {
-            sprinting = false;
-        }
-
         if (sprinting)
         {
             energy -= dischargeRate * Time.deltaTime;

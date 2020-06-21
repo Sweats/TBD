@@ -51,6 +51,13 @@ public class SurvivorOpenedPlayerStats: UnityEvent {}
 [System.Serializable]
 public class SurvivorClosedPlayerStats: UnityEvent {}
 
+
+[System.Serializable]
+public class SurvivorMovingEvent: UnityEvent<bool> {}
+
+[System.Serializable]
+public class SurvivorStopMovingEvent: UnityEvent {}
+
 #endregion
 
 #region INSANITY

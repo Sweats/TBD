@@ -18,14 +18,6 @@ public class Survivor : MonoBehaviour
     private Texture crosshair;
 
     [SerializeField]
-    private Texture walkingTexture;
-    
-    [SerializeField]
-    private Texture crouchingTexture;
-
-    //private Transform survivorBody;
-
-    [SerializeField]
     private Camera survivorCamera;
 
     private CharacterController controller;
@@ -101,9 +93,16 @@ public class Survivor : MonoBehaviour
 
     public SurvivorClosedPlayerStats survivorClosedPlayerStats;
 
+
+    public SurvivorMovingEvent survivorMoving;
+
+    public SurvivorStopMovingEvent survivorStopMoving;
+
     private bool isChatOpened;
 
     private bool isPlayerStatsOpened;
+
+    private Vector3 moving;
 
     #endregion
 
@@ -112,8 +111,7 @@ public class Survivor : MonoBehaviour
         //survivorBody = GetComponent<Transform>();
         controller = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
-        crouchingAndWalkingIconPosition = new Rect(100, Screen.height - 50, crouchingTexture.width, crouchingTexture.height);
-
+        moving = new Vector3();
     }
 
     // We will try to handle as much input as possible here. If not that is okay I think.
@@ -156,7 +154,13 @@ public class Survivor : MonoBehaviour
         {
             velocity.y = -2f;
         }
-
+//
+//        else if (controller.isGrounded && controller.velocity.x > 0f || controller.velocity.z > 0f)
+//        {
+//            survivorMoving.Invoke(sprint.sprinting);
+//            Debug.Log("Survivor is moving!");
+//        }
+//
         CheckForTraps();
 
         if (pausedGameInput.gamePaused || isChatOpened)
@@ -166,11 +170,18 @@ public class Survivor : MonoBehaviour
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
-
+        Vector3 secondmove = transform.right * x + transform.forward * z;
+        bool isMoving = moving != secondmove;
         float speed;
 
         if (sprint.sprinting)
         {
+            if (!isMoving)
+            {
+                sprint.sprinting = false;
+                speed = defaultSpeed;
+            }
+
             speed = sprintSpeed;
 
         }
@@ -192,6 +203,23 @@ public class Survivor : MonoBehaviour
             crouched = true;
 
         }
+
+
+        else if (Keybinds.GetKey(Action.Sprint))
+        {
+            if (isMoving)
+            {
+                sprint.sprinting = true;
+            }
+
+        }
+
+        else if (Keybinds.GetKey(Action.Sprint, true))
+        {
+            sprint.sprinting = false;
+        }
+
+
 
         else if (Keybinds.GetKey(Action.Crouch, true))
         {
@@ -255,10 +283,10 @@ public class Survivor : MonoBehaviour
             isPlayerStatsOpened = false;
         }
         
-        Vector3 secondmove = transform.right * x + transform.forward * z;
         controller.Move(secondmove * speed * Time.deltaTime);
 
     }
+    // TO DO. Give a tiny bit of delay to this function because we don't need to spam this function on every frame.
     private void CheckForTraps()
     {
         RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, trapDistance, transform.forward, trapDistance);
@@ -358,16 +386,6 @@ public class Survivor : MonoBehaviour
 
         // TO DO: Optimize this!
         GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
-
-        if (walking)
-        {
-            GUI.DrawTexture(crouchingAndWalkingIconPosition, walkingTexture);
-        }
-
-        if (crouched)
-        {
-
-            GUI.DrawTexture(crouchingAndWalkingIconPosition, crouchingTexture);
-        }
+        
     }
 }

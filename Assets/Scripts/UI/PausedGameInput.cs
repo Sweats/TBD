@@ -216,6 +216,14 @@ public class PausedGameInput : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
     }
 
+    public void OnMiscButtonClicked()
+    {
+        openedMenus[(int)Menu.Misc] = true;
+        openedMenus[(int)Menu.Options] = false;
+        miscUI.Show();
+        optionsUI.Hide();
+    }
+
     public void OnSoundsBackButtonClicked()
     {
         openedMenus[(int)Menu.Sound] = false;
@@ -259,6 +267,14 @@ public class PausedGameInput : MonoBehaviour
         openedMenus[(int)Menu.Pause] = true;
         optionsUI.Hide();
         pauseUI.Show();
+    }
+
+    public void OnMiscBackButtonClicked()
+    {
+        openedMenus[(int)Menu.Misc] = false;
+        openedMenus[(int)Menu.Options] = true;
+        miscUI.Hide();
+        optionsUI.Show();
     }
 
 

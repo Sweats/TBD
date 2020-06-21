@@ -4224,6 +4224,65 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &454513226
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 454513227}
+  - component: {fileID: 454513228}
+  - component: {fileID: 454513229}
+  m_Layer: 0
+  m_Name: Feet Collision
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &454513227
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454513226}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.07, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1916031736}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &454513228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454513226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4101acec1406164d8e4022a703078ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultWalkingSound: {fileID: 1803718676}
+  defaultSprintingSound: {fileID: 1518077630}
+--- !u!65 &454513229
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 454513226}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 1, y: 0.1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &476707035
 GameObject:
   m_ObjectHideFlags: 0
@@ -9069,7 +9128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 780208650}
-  - component: {fileID: 780208651}
+  - component: {fileID: 780208652}
   m_Layer: 0
   m_Name: Stage
   m_TagString: Untagged
@@ -9095,7 +9154,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &780208651
+--- !u!114 &780208652
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9104,7 +9163,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 780208649}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aea7368347f4150439ffc9e2a9ad9b15, type: 3}
+  m_Script: {fileID: 11500000, guid: 6a776d3ddf065d541a0cf033b87a6b49, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   survivors:
@@ -21240,6 +21299,7 @@ Transform:
   - {fileID: 712653840}
   - {fileID: 223974227}
   - {fileID: 509944469}
+  - {fileID: 454513227}
   m_Father: {fileID: 780208650}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -21263,11 +21323,9 @@ MonoBehaviour:
   sprint: {fileID: 1785676747}
   pausedGameInput: {fileID: 509944470}
   crosshair: {fileID: 2800000, guid: 4a5d688cd5f4d9b4ab0679e8e4bddd74, type: 3}
-  walkingTexture: {fileID: 2800000, guid: 729650079cad54b409b0b1ae7671a61d, type: 3}
-  crouchingTexture: {fileID: 2800000, guid: 729650079cad54b409b0b1ae7671a61d, type: 3}
   survivorCamera: {fileID: 963194227}
-  defaultSpeed: 4
-  sprintSpeed: 10
+  defaultSpeed: 15
+  sprintSpeed: 25
   walkSpeed: 2
   crouchSpeed: 2
   minimumX: -90
@@ -21278,7 +21336,7 @@ MonoBehaviour:
   survivorDeathEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 780208651}
+      - m_Target: {fileID: 780208652}
         m_MethodName: OnSurviorDeath
         m_Mode: 0
         m_Arguments:
@@ -21303,7 +21361,7 @@ MonoBehaviour:
   survivorFailedToUnlockDoorEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 780208651}
+      - m_Target: {fileID: 780208652}
         m_MethodName: OnSurvivorFailedToUnlockDoor
         m_Mode: 0
         m_Arguments:
@@ -21317,7 +21375,7 @@ MonoBehaviour:
   survivorPickedUpKeyEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 780208651}
+      - m_Target: {fileID: 780208652}
         m_MethodName: OnSurvivorPickedUpKey
         m_Mode: 0
         m_Arguments:
@@ -21353,9 +21411,31 @@ MonoBehaviour:
   survivorStartSprintingEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 780208651}
+      - m_Target: {fileID: 780208652}
         m_MethodName: OnSurvivorStartSprintingEvent
         m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1785676747}
+        m_MethodName: OnSurvivorStartSprinting
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 454513228}
+        m_MethodName: OnSurvivorSprinting
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -21367,9 +21447,31 @@ MonoBehaviour:
   survivorStopSprintingEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 780208651}
+      - m_Target: {fileID: 780208652}
         m_MethodName: OnSurvivorStopSprintingEvent
         m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1785676747}
+        m_MethodName: OnSurvivorStopSprinting
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 454513228}
+        m_MethodName: OnSurviorWalking
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -21381,7 +21483,7 @@ MonoBehaviour:
   survivorUnlockDoorEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 780208651}
+      - m_Target: {fileID: 780208652}
         m_MethodName: OnSurvivorUnlockedDoorEvent
         m_Mode: 0
         m_Arguments:
@@ -21406,7 +21508,7 @@ MonoBehaviour:
   survivorTriggeredTrapEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 780208651}
+      - m_Target: {fileID: 780208652}
         m_MethodName: OnSurvivorTriggeredTrap
         m_Mode: 0
         m_Arguments:
@@ -21420,7 +21522,7 @@ MonoBehaviour:
   survivorPickedUpBatteryEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 780208651}
+      - m_Target: {fileID: 780208652}
         m_MethodName: OnSurvivorPickedUpBattery
         m_Mode: 0
         m_Arguments:
@@ -21531,6 +21633,34 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2135684961}
         m_MethodName: OnSurvivorClosePlayerStats
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  survivorMoving:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 454513228}
+        m_MethodName: OnSurvivorMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  survivorStopMoving:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 454513228}
+        m_MethodName: OnSurvivorStopMoving
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
