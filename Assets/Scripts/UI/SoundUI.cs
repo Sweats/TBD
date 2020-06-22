@@ -23,23 +23,6 @@ public class SoundUI : MonoBehaviour
     private Slider voiceActivationLevelSlider;
 
     [SerializeField]
-    private AudioSource walkingSound;
-
-    [SerializeField]
-    private AudioSource sprintingSound;
-
-    [SerializeField]
-    private AudioSource flashlightToggleSound;
-
-    [SerializeField]
-    private AudioSource trapSound;
-
-    private AudioSource[] soundEffects;
-
-    [SerializeField]
-    private AudioSource ambience;
-
-    [SerializeField]
     private Canvas soundMenu;
 
     [SerializeField]
@@ -71,16 +54,11 @@ public class SoundUI : MonoBehaviour
     private const string MONSTER_VOICE_PITCH_VOLUME_KEY_STRING = "monster_voice_pitch_volume";
     private const string VOICE_ACTIVATION_LEVEL_KEY_STRING = "voice_activation_level";
 
+    [SerializeField]
+    private Sounds gameSounds;
+
     void Start()
     {
-        soundEffects = new AudioSource[]
-        {
-                walkingSound,
-                sprintingSound,
-                flashlightToggleSound,
-                trapSound,
-        };
-
         LoadSoundsFromConfig();
     }
 
@@ -109,21 +87,19 @@ public class SoundUI : MonoBehaviour
 
     private void LoadSoundsFromConfig()
     {
-        soundEffectVolume = PlayerPrefs.GetFloat(SOUND_EFFECT_VOLUME_KEY_STRING, 1.0f);
-        musicVolume = PlayerPrefs.GetFloat(GAME_MUSIC_VOLUME_KEY_STRING, 1.0f);
-        voiceChatVolume = PlayerPrefs.GetFloat(VOICE_CHAT_VOLUME_KEY_STRING, 1.0f);
-        voiceActivationLevel = PlayerPrefs.GetFloat(VOICE_ACTIVATION_LEVEL_KEY_STRING, 0.5f);
-        monsterVoicePitchVolume = PlayerPrefs.GetFloat(MONSTER_VOICE_PITCH_VOLUME_KEY_STRING, 0.5f);
+        soundEffectVolume = PlayerPrefs.GetFloat(SOUND_EFFECT_VOLUME_KEY_STRING, soundEffectsVolumeDefault);
+        musicVolume = PlayerPrefs.GetFloat(GAME_MUSIC_VOLUME_KEY_STRING, musicVolumeDefault);
+        voiceChatVolume = PlayerPrefs.GetFloat(VOICE_CHAT_VOLUME_KEY_STRING, voiceChatVolumeDefault);
+        voiceActivationLevel = PlayerPrefs.GetFloat(VOICE_ACTIVATION_LEVEL_KEY_STRING, voiceActivationLevelDefault);
+        monsterVoicePitchVolume = PlayerPrefs.GetFloat(MONSTER_VOICE_PITCH_VOLUME_KEY_STRING, monsterPitchVolumeDefault);
 
-        foreach (AudioSource sound in soundEffects)
-        {
-            sound.volume = soundEffectVolume;
-        }
-
-        ambience.volume = musicVolume;
+        gameSounds.SetVolume(soundEffectVolume, SoundType.Effects);
+        gameSounds.SetVolume(musicVolume, SoundType.Music);
+        gameSounds.SetVolume(voiceChatVolume, SoundType.VoiceChat);
+        gameSounds.SetVolume(voiceActivationLevel, SoundType.VoiceActivation);
+        gameSounds.SetVolume(monsterVoicePitchVolume, SoundType.MonsterPitch);
 
         UpdateUI();
-
     }
 
     private void UpdateUI()
@@ -135,29 +111,23 @@ public class SoundUI : MonoBehaviour
         voiceChatMonsterPitchSlider.value = monsterVoicePitchVolume;
     }
 
-
-
-
     public void OnGameEffectsVolumeSliderChanged(float value)
     {
         soundEffectVolume = value;
-        for (var i = 0; i < soundEffects.Length; i++)
-        {
-            soundEffects[i].volume = value;
-        }
+        gameSounds.SetVolume(soundEffectVolume, SoundType.Effects);
     }
 
 
     public void OnGameMusicVolumeSliderChanged(float value)
     {
         musicVolume = value;
-        ambience.volume = value;
-
+        gameSounds.SetVolume(musicVolume, SoundType.Music);
     }
 
     public void OnMonsterVoicePitchVolumeChanged(float value)
     {
         monsterVoicePitchVolume = value;
+        gameSounds.SetVolume(monsterVoicePitchVolume, SoundType.MonsterPitch);
 
     }
 
@@ -165,6 +135,7 @@ public class SoundUI : MonoBehaviour
     public void OnVoiceChatVolumeChanged(float value)
     {
         voiceChatVolume = value;
+        gameSounds.SetVolume(voiceChatVolume, SoundType.VoiceChat);
 
     }
 
@@ -175,6 +146,7 @@ public class SoundUI : MonoBehaviour
     public void OnVoiceActivationLevelChanged(float value)
     {
         voiceActivationLevel = value;
+        gameSounds.SetVolume(voiceActivationLevel, SoundType.VoiceActivation);
     }
 
     public void OnMoveEnterButton(Button button)
@@ -199,10 +171,10 @@ public class SoundUI : MonoBehaviour
         voiceActivationLevel = voiceActivationLevelDefault;
         soundEffectVolume = soundEffectsVolumeDefault;
 
-        for (var i = 0; i < soundEffects.Length; i++)
-        {
-            soundEffects[i].volume = soundEffectsVolumeDefault;
-        }
+        gameSounds.SetVolume(soundEffectVolume, SoundType.Effects);
+        gameSounds.SetVolume(musicVolume, SoundType.Music);
+        gameSounds.SetVolume(voiceChatVolume, SoundType.VoiceChat);
+        gameSounds.SetVolume(voiceActivationLevel, SoundType.VoiceActivation);
 
         UpdateUI();
     }

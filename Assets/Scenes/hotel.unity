@@ -519,11 +519,6 @@ MonoBehaviour:
   voiceChatVolumeSlider: {fileID: 980640566}
   voiceChatMonsterPitchSlider: {fileID: 1779126618}
   voiceActivationLevelSlider: {fileID: 1250212988}
-  walkingSound: {fileID: 1803718676}
-  sprintingSound: {fileID: 1518077630}
-  flashlightToggleSound: {fileID: 747005328}
-  trapSound: {fileID: 482142247}
-  ambience: {fileID: 1695528678}
   soundMenu: {fileID: 295840831}
   buttonColor: {r: 1, g: 0.65882355, b: 0.14901961, a: 1}
   soundEffectsVolumeDefault: 1
@@ -531,6 +526,7 @@ MonoBehaviour:
   voiceChatVolumeDefault: 1
   monsterPitchVolumeDefault: 0.5
   voiceActivationLevelDefault: 0.5
+  gameSounds: {fileID: 0}
 --- !u!1 &54348463
 GameObject:
   m_ObjectHideFlags: 0
@@ -10735,15 +10731,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e6af4499c22de343ba32e9621b9830f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  survivorSounds:
-  - {fileID: 1695528678}
-  - {fileID: 1571190057}
-  - {fileID: 647465372}
-  - {fileID: 747005328}
-  - {fileID: 1128834375}
-  - {fileID: 482142247}
-  - {fileID: 1518077630}
-  - {fileID: 1803718676}
+  sounds:
+  - sound: {fileID: 1518077630}
+    soundtype: 1
+  - sound: {fileID: 1803718676}
+    soundtype: 1
+  - sound: {fileID: 747005328}
+    soundtype: 1
+  - sound: {fileID: 1128834375}
+    soundtype: 1
+  - sound: {fileID: 40253313}
+    soundtype: 1
+  - sound: {fileID: 647465372}
+    soundtype: 1
+  - sound: {fileID: 1571190057}
+    soundtype: 1
+  - sound: {fileID: 1695528678}
+    soundtype: 0
+  - sound: {fileID: 482142247}
+    soundtype: 1
 --- !u!1 &941447286
 GameObject:
   m_ObjectHideFlags: 0

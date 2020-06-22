@@ -1,27 +1,31 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+
+public enum SoundType
+{
+    Music,
+    Effects,
+    VoiceChat,
+    VoiceActivation,
+    MonsterPitch,
+
+}
 
 public class Sounds : MonoBehaviour
 {
 
     [SerializeField]
-    private AudioSource[] survivorSounds;
+    private Sound[] sounds;
 
-    public enum SurvivorSound
+    public void SetVolume(float volume, SoundType type)
     {
-        None = 0,
-        Walking,
-        Sprinting,
-        FlashlightClick,
-        MaleGasp
-    }
-
-    public void SetVolume(float volume)
-    {
-        for (var i  = 0; i < survivorSounds.Length; i++)
+        for (var i = 0; i < sounds.Length; i++)
         {
-            survivorSounds[i].volume = volume;
+            Sound sound = sounds[i];
+
+            if (sound.soundtype == type)
+            {
+                sound.SetVolume(volume);
+            }
         }
     }
 }
