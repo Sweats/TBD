@@ -4,8 +4,6 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
-[System.Serializable]
-public class OnSurvivorTriggeredTrapEvent: UnityEvent<Survivor, Trap>{}
 
 public class Trap : MonoBehaviour
 {

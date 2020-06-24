@@ -1,6 +1,16 @@
 ﻿using UnityEngine;
 
-//public class InsranityEvent : UnityEvent<Insanity> { }
+public enum InsanityEffects
+{
+    None = 0,
+    Gamma,
+    Deaf,
+    FlashlightFlicker,
+    BlackAndWhite,
+    FakeTrapSound,
+    Jumpscare
+
+}
 
 public class Insanity : MonoBehaviour
 {
@@ -8,52 +18,19 @@ public class Insanity : MonoBehaviour
     public float insanityRate;
     public float insanityValue;
     public bool insanityEnabled;
-
-    [SerializeField]
     private bool maxed;
-
-    [SerializeField]
-     public enum InsanityEffects
-     {
-        None = 0,
-        Gamma,
-        Deaf,
-        FlashlightFlicker,
-        BlackAndWhite,
-        FakeTrapSound,
-        Jumpscare
-
-    }
-
-    private const int GAMMA = 0;
-
-    private const int DEAF = 1;
-
-    private const int FLASHLIGHTFLICKER = 2;
-
-    private const int BLACK_AND_WHITE = 3;
-
-    private const int FAKE_TRAP_SOUND = 4;
-
-    private const int JUMP_SCARE = 5;
-
     public float insanityHitTrapAmount;
     public float insanitySurvivorDeathAmount;
 
     [SerializeField]
     private InsanityEffect[] insanityEffects;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
     void Update()
     {
         if (insanityEnabled && !maxed)
         {
-            insanityValue += insanityRate * Time.deltaTime; 
+            insanityValue += insanityRate * Time.deltaTime;
+
             if (insanityRate >= maxInsanity)
             {
                 maxed = true;
@@ -62,20 +39,33 @@ public class Insanity : MonoBehaviour
 
             for (var i = 0; i < insanityEffects.Length; i++)
             {
+                if (insanityEffects[i].enabled)
+                {
+                    insanityEffects[i].timer -= Time.deltaTime * insanityEffects[i].timerDischargeRate;
+                }
+
                 if (insanityValue >= insanityEffects[i].insanityNeededToStart)
                 {
-                    insanityEffects[i].Enable();
+                    insanityEffects[i].enabled = true;
+                }
+
+                if (insanityEffects[i].timer <= 0)
+                {
+                    insanityEffects[i].insanitySoundEffect.Play();
+                    insanityEffects[i].insanityEffectEvent.Invoke();
+                    // TO DO. Make this a little bit random. Easy to do but I don't know what values I want to use yet.
+                    insanityEffects[i].timer = 100;
                 }
             }
         }
-        
+
     }
 
     public void Reset()
     {
         for (var i = 0; i < insanityEffects.Length; i++)
         {
-            insanityEffects[i].Disable();
+            insanityEffects[i].enabled = false;
         }
 
         insanityEnabled = false;

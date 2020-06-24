@@ -4,12 +4,9 @@ using UnityEngine.Events;
 public class Door : MonoBehaviour
 {
     // Start is called before the first frame update
+    public int unlockMask = -1;
 
-    [SerializeField]
-    private int unlockMask = -1;
-
-    [SerializeField]
-    private string doorName = "door";
+    public string doorName = "door";
 
     [SerializeField]
     private AudioSource unlockedSound;
@@ -25,9 +22,6 @@ public class Door : MonoBehaviour
 
     [SerializeField]
     private Color outlineColor = Color.yellow;
-
-    //[SerializeField]
-    //private float distanceToUnlock = 20f;
 
     public bool locked;
     private Renderer doorRenderer;
@@ -53,6 +47,7 @@ public class Door : MonoBehaviour
     }
 
 
+/*
     private bool Locked()
     {
         return locked;
@@ -76,6 +71,7 @@ public class Door : MonoBehaviour
 
         return unlockable;
     }
+    */
 }
 
 

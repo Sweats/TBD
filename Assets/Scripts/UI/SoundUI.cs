@@ -1,8 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Audio;
+//using System.Math;
 
 public class SoundUI : MonoBehaviour
 {
+
+    [SerializeField]
+    private Slider masterVolumeSlider;
 
     [SerializeField]
     private Slider musicVolumeSlider;
@@ -30,6 +35,8 @@ public class SoundUI : MonoBehaviour
 
 
     [SerializeField]
+    private float masterVolumeDefault;
+    [SerializeField]
     private float soundEffectsVolumeDefault;
     [SerializeField]
     private float musicVolumeDefault;
@@ -46,16 +53,27 @@ public class SoundUI : MonoBehaviour
     private float voiceChatVolume;
     private float monsterVoicePitchVolume;
     private float voiceActivationLevel;
+    private float masterVolume;
 
 
+    private const string MASTER_VOLUME_KEY_STRING = "master_volume";
     private const string SOUND_EFFECT_VOLUME_KEY_STRING = "sound_effect_volume";
     private const string GAME_MUSIC_VOLUME_KEY_STRING = "music_volume";
     private const string VOICE_CHAT_VOLUME_KEY_STRING = "voice_chat_volume";
     private const string MONSTER_VOICE_PITCH_VOLUME_KEY_STRING = "monster_voice_pitch_volume";
     private const string VOICE_ACTIVATION_LEVEL_KEY_STRING = "voice_activation_level";
 
-    [SerializeField]
-    private Sounds gameSounds;
+    public static string MASTER_SOUND_MIXER_STRING = "Master";
+    public static string EFFECTS_SOUND_MIXER_STRING = "Effects";
+    public static string MUSIC_SOUND_MIXER_STRING = "Music";
+    public static string MONSTER_PITCH_MIXER_STRING = "Monster Pitch";
+    public static string VOICE_ACTIVATION_MIXER_STRING = "Voice Activation Level";
+    public static string VOICE_MIXER_STRING = "Voice";
+
+    public static string INSANITY_MIXER_STRING = "Insanity";
+
+
+    public AudioMixer audioMixer;
 
     void Start()
     {
@@ -81,29 +99,40 @@ public class SoundUI : MonoBehaviour
 
     public void OnMasterVolumeSliderChanged(float value)
     {
-
+        masterVolume = value;
+        audioMixer.SetFloat(MASTER_SOUND_MIXER_STRING, Mathf.Log(masterVolume) * 20);
     }
 
 
     private void LoadSoundsFromConfig()
     {
+        masterVolume = PlayerPrefs.GetFloat(MASTER_VOLUME_KEY_STRING, masterVolumeDefault); 
         soundEffectVolume = PlayerPrefs.GetFloat(SOUND_EFFECT_VOLUME_KEY_STRING, soundEffectsVolumeDefault);
         musicVolume = PlayerPrefs.GetFloat(GAME_MUSIC_VOLUME_KEY_STRING, musicVolumeDefault);
         voiceChatVolume = PlayerPrefs.GetFloat(VOICE_CHAT_VOLUME_KEY_STRING, voiceChatVolumeDefault);
         voiceActivationLevel = PlayerPrefs.GetFloat(VOICE_ACTIVATION_LEVEL_KEY_STRING, voiceActivationLevelDefault);
         monsterVoicePitchVolume = PlayerPrefs.GetFloat(MONSTER_VOICE_PITCH_VOLUME_KEY_STRING, monsterPitchVolumeDefault);
+        
+        audioMixer.SetFloat(MASTER_SOUND_MIXER_STRING, Mathf.Log(masterVolume) * 20);
+        audioMixer.SetFloat(EFFECTS_SOUND_MIXER_STRING, Mathf.Log(soundEffectVolume) * 20);
+        audioMixer.SetFloat(MUSIC_SOUND_MIXER_STRING, Mathf.Log(musicVolume) * 20);
+        audioMixer.SetFloat(VOICE_MIXER_STRING, Mathf.Log(voiceChatVolume) * 20);
+        audioMixer.SetFloat(VOICE_ACTIVATION_MIXER_STRING, Mathf.Log(voiceActivationLevel) * 20);
+        audioMixer.SetFloat(MONSTER_PITCH_MIXER_STRING, Mathf.Log(monsterVoicePitchVolume) * 20);
+        audioMixer.SetFloat(INSANITY_MIXER_STRING, Mathf.Log(soundEffectVolume) * 20);
 
-        gameSounds.SetVolume(soundEffectVolume, SoundType.Effects);
-        gameSounds.SetVolume(musicVolume, SoundType.Music);
-        gameSounds.SetVolume(voiceChatVolume, SoundType.VoiceChat);
-        gameSounds.SetVolume(voiceActivationLevel, SoundType.VoiceActivation);
-        gameSounds.SetVolume(monsterVoicePitchVolume, SoundType.MonsterPitch);
-
+//        gameSounds.SetVolume(soundEffectVolume, SoundType.Effects);
+//        gameSounds.SetVolume(musicVolume, SoundType.Music);
+//        gameSounds.SetVolume(voiceChatVolume, SoundType.VoiceChat);
+//        gameSounds.SetVolume(voiceActivationLevel, SoundType.VoiceActivation);
+//        gameSounds.SetVolume(monsterVoicePitchVolume, SoundType.MonsterPitch);
+//
         UpdateUI();
     }
 
     private void UpdateUI()
     {
+        masterVolumeSlider.value = masterVolume;
         musicVolumeSlider.value = musicVolume;
         gameEffectsSlider.value = soundEffectVolume;
         voiceActivationLevelSlider.value = voiceActivationLevel;
@@ -114,20 +143,24 @@ public class SoundUI : MonoBehaviour
     public void OnGameEffectsVolumeSliderChanged(float value)
     {
         soundEffectVolume = value;
-        gameSounds.SetVolume(soundEffectVolume, SoundType.Effects);
+        audioMixer.SetFloat(EFFECTS_SOUND_MIXER_STRING, Mathf.Log(soundEffectVolume) * 20);
+        audioMixer.SetFloat(INSANITY_MIXER_STRING, Mathf.Log(soundEffectVolume) * 20);
+        //gameSounds.SetVolume(soundEffectVolume, SoundType.Effects);
     }
 
 
     public void OnGameMusicVolumeSliderChanged(float value)
     {
         musicVolume = value;
-        gameSounds.SetVolume(musicVolume, SoundType.Music);
+        audioMixer.SetFloat(MUSIC_SOUND_MIXER_STRING, Mathf.Log(musicVolume) * 20);
+        //gameSounds.SetVolume(musicVolume, SoundType.Music);
     }
 
     public void OnMonsterVoicePitchVolumeChanged(float value)
     {
         monsterVoicePitchVolume = value;
-        gameSounds.SetVolume(monsterVoicePitchVolume, SoundType.MonsterPitch);
+        audioMixer.SetFloat(MONSTER_PITCH_MIXER_STRING, Mathf.Log(monsterVoicePitchVolume) * 20);
+        //gameSounds.SetVolume(monsterVoicePitchVolume, SoundType.MonsterPitch);
 
     }
 
@@ -135,7 +168,8 @@ public class SoundUI : MonoBehaviour
     public void OnVoiceChatVolumeChanged(float value)
     {
         voiceChatVolume = value;
-        gameSounds.SetVolume(voiceChatVolume, SoundType.VoiceChat);
+        audioMixer.SetFloat(VOICE_MIXER_STRING, Mathf.Log(voiceChatVolume) * 20);
+        //gameSounds.SetVolume(voiceChatVolume, SoundType.VoiceChat);
 
     }
 
@@ -146,7 +180,8 @@ public class SoundUI : MonoBehaviour
     public void OnVoiceActivationLevelChanged(float value)
     {
         voiceActivationLevel = value;
-        gameSounds.SetVolume(voiceActivationLevel, SoundType.VoiceActivation);
+        audioMixer.SetFloat(VOICE_ACTIVATION_MIXER_STRING, Mathf.Log(voiceActivationLevel) * 20);
+        //gameSounds.SetVolume(voiceActivationLevel, SoundType.VoiceActivation);
     }
 
     public void OnMoveEnterButton(Button button)
@@ -165,22 +200,33 @@ public class SoundUI : MonoBehaviour
 
     public void OnDefaultsButtonClicked()
     {
+        masterVolume = masterVolumeDefault;
         voiceChatVolume = voiceChatVolumeDefault;
         musicVolume = musicVolumeDefault;
         monsterVoicePitchVolume = monsterPitchVolumeDefault;
         voiceActivationLevel = voiceActivationLevelDefault;
         soundEffectVolume = soundEffectsVolumeDefault;
 
-        gameSounds.SetVolume(soundEffectVolume, SoundType.Effects);
-        gameSounds.SetVolume(musicVolume, SoundType.Music);
-        gameSounds.SetVolume(voiceChatVolume, SoundType.VoiceChat);
-        gameSounds.SetVolume(voiceActivationLevel, SoundType.VoiceActivation);
+        audioMixer.SetFloat(MASTER_SOUND_MIXER_STRING, Mathf.Log(masterVolume) * 20);
+        audioMixer.SetFloat(EFFECTS_SOUND_MIXER_STRING, Mathf.Log(soundEffectVolume) * 20);
+        audioMixer.SetFloat(MUSIC_SOUND_MIXER_STRING, Mathf.Log(musicVolume) * 20);
+        audioMixer.SetFloat(VOICE_MIXER_STRING, Mathf.Log(voiceChatVolume) * 20);
+        audioMixer.SetFloat(VOICE_ACTIVATION_MIXER_STRING, Mathf.Log(voiceActivationLevel) * 20);
+        audioMixer.SetFloat(MONSTER_PITCH_MIXER_STRING, Mathf.Log(monsterVoicePitchVolume) * 20);
+        audioMixer.SetFloat(INSANITY_MIXER_STRING, Mathf.Log(soundEffectVolume) * 20);
+
+
+        //gameSounds.SetVolume(soundEffectVolume, SoundType.Effects);
+        //gameSounds.SetVolume(musicVolume, SoundType.Music);
+        //gameSounds.SetVolume(voiceChatVolume, SoundType.VoiceChat);
+        //gameSounds.SetVolume(voiceActivationLevel, SoundType.VoiceActivation);
 
         UpdateUI();
     }
 
     private void SaveSoundConfig()
     {
+        PlayerPrefs.SetFloat(MASTER_VOLUME_KEY_STRING, masterVolume);
         PlayerPrefs.SetFloat(SOUND_EFFECT_VOLUME_KEY_STRING, soundEffectVolume);
         PlayerPrefs.SetFloat(GAME_MUSIC_VOLUME_KEY_STRING, musicVolume);
         PlayerPrefs.SetFloat(VOICE_CHAT_VOLUME_KEY_STRING, voiceChatVolume);

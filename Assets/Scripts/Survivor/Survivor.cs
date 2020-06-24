@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 public class Survivor : MonoBehaviour
 {
+
     public string survivorName = "player";
     public Insanity insanity;
     public Inventory inventory;
@@ -61,50 +61,35 @@ public class Survivor : MonoBehaviour
     private float trapDistance;
 
     private float xRotation;
-
-    #region EVENTS
-    public SurvivorDeathEvent survivorDeathEvent;
-
-    public SurvivorFailedToUnlockDoorEvent survivorFailedToUnlockDoorEvent;
-
-    public SurvivorPickedUpKeyEvent survivorPickedUpKeyEvent;
-
-    public SurvivorStartSprintingEvent survivorStartSprintingEvent;
-
-    public SurvivorStopSprintingEvent survivorStopSprintingEvent;
-
-    public SurvivorUnlockDoorEvent survivorUnlockDoorEvent;
-    public SurvivorTriggeredTrapEvent survivorTriggeredTrapEvent;
-
-    public SurvivorPickedUpBatteryEvent survivorPickedUpBatteryEvent;
-
-    public SurvivorFailedToPickUpbBatteryEvent survivorFailedToPickUpBatteryEvent;
-
-    public SurvivorAlreadyHaveKeyEvent survivorAlreadyHaveKeyEvent;
-
-    public SurvivorOpenedChatEvent survivorOpenedChatEvent;
-
-    public SurvivorClosedChat survivorClosedChatEvent;
-
-    public SurvivorSendChatMessage survivorSendChatEvent;
-
-
-    public SurvivorOpenedPlayerStats survivorOpenedPlayerStats;
-
-    public SurvivorClosedPlayerStats survivorClosedPlayerStats;
-
-
-    public SurvivorMovingEvent survivorMoving;
-
-    public SurvivorStopMovingEvent survivorStopMoving;
-
     private bool isChatOpened;
 
     private bool isPlayerStatsOpened;
 
-    private Vector3 moving;
+    public bool isInEscapeRoom;
+
+    #region EVENTS
+    public SurvivorDeathEvent survivorDeathEvent;
+    public SurvivorStartSprintingEvent survivorStartSprintingEvent;
+    public SurvivorStopSprintingEvent survivorStopSprintingEvent;
+    public SurvivorTriggeredTrapEvent survivorTriggeredTrapEvent;
+    public SurvivorOpenedChatEvent survivorOpenedChatEvent;
+    public SurvivorClosedChat survivorClosedChatEvent;
+    public SurvivorSendChatMessage survivorSendChatEvent;
+    public SurvivorOpenedPlayerStats survivorOpenedPlayerStats;
+    public SurvivorClosedPlayerStats survivorClosedPlayerStats;
+    public SurvivorMovingEvent survivorMoving;
+    public SurvivorStopMovingEvent survivorStopMoving;
+    public SurvivorClickedOnDoorEvent survivorClickedOnDoorEvent;
+    public SurvivorClickedOnKeyEvent survivorClickedOnKeyEvent;
+    public SurvivorClickedOnBatteryEvent survivorClickedOnBatteryEvent;
 
     #endregion
+
+
+    public bool dead;
+
+    private Vector3 moving;
+
 
     void Start()
     {
@@ -112,6 +97,7 @@ public class Survivor : MonoBehaviour
         controller = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
         moving = new Vector3();
+
     }
 
     // We will try to handle as much input as possible here. If not that is okay I think.
@@ -322,52 +308,25 @@ public class Survivor : MonoBehaviour
 
             if (name.Contains("Key"))
             {
-                KeyObject key = gameObject.GetComponent<KeyObject>();
-
-                if (!inventory.HasKey(key.key))
-                {
-                    survivorPickedUpKeyEvent.Invoke(this, key);
-                }
-
-                else
-                {
-                    survivorAlreadyHaveKeyEvent.Invoke();
-                }
+                KeyObject keyObject = gameObject.GetComponent<KeyObject>();
+                survivorClickedOnKeyEvent.Invoke(this, keyObject);
             }
 
             else if (name.Contains("Door"))
             {
                 Door door = gameObject.GetComponent<Door>();
-                Key key;
-
-                // TO DO: There may be a better way to do this.
-                if (door.Unlockable(inventory, out key))
-                {
-                    survivorUnlockDoorEvent.Invoke(this, key, door);
-
-                }
-
-                else
-                {
-                    survivorFailedToUnlockDoorEvent.Invoke(door);
-                }
-
+                survivorClickedOnDoorEvent.Invoke(this, door);
             }
 
             else if (name.Contains("Battery"))
             {
                 Battery battery = gameObject.GetComponent<Battery>();
+                survivorClickedOnBatteryEvent.Invoke(this, battery);
+            }
 
-                if (flashlight.charge <= battery.chargeNeededToGrab)
-                {
-                    survivorPickedUpBatteryEvent.Invoke(this, battery);
-                }
-                
-                else
-                {
-                    survivorFailedToPickUpBatteryEvent.Invoke();
-                }
-
+            else
+            {
+                // TO DO: add in non important objects in here.
             }
         }
     }

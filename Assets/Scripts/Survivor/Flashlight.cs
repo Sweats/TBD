@@ -15,8 +15,6 @@ public class Flashlight : MonoBehaviour
     [SerializeField]
     private float dischargeRate;
 
-    public float chargeNeededToGrab;
-
     [SerializeField]
     private AudioSource flashlightToggleSound;
 

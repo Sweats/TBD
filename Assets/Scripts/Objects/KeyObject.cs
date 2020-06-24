@@ -76,7 +76,6 @@ public class KeyObject : MonoBehaviour
     }
     public void Delete()
     {
-        key.pickupSound.Play();
         Destroy(this.gameObject);
    }
 

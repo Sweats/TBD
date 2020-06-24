@@ -43,10 +43,10 @@ public class PlayerStatsUI : MonoBehaviour
 
 
     // TO DO: Make this a lot better?
-    public void OnSurvivorPickedUpKey(Survivor survivor, KeyObject key)
+    public void OnSurvivorPickedUpKey(Survivor survivor, Key key)
     {
         int id = survivor.survivorID;
-        int keyType = (int)key.key.type;
+        int keyType = (int)key.type;
         Key[] keys = survivor.inventory.Keys();
         int rustyKeyCount = 0, metalKeyCount = 0, oldKeyCount = 0, silverKeyCount = 0;
         int crowbarCount = 0, hammerCount = 0, codeCount = 0;
@@ -58,25 +58,25 @@ public class PlayerStatsUI : MonoBehaviour
 
             switch (keyType)
             {
-                case (int)Key.KeyType.Rusty:
+                case (int)KeyType.Rusty:
                 rustyKeyCount++;
                 break;
-                case (int)Key.KeyType.Old:
+                case (int)KeyType.Old:
                 oldKeyCount++;
                 break;
-                case (int)Key.KeyType.Silver:
+                case (int)KeyType.Silver:
                 silverKeyCount++;
                 break;
-                case (int)Key.KeyType.Metal:
+                case (int)KeyType.Metal:
                 metalKeyCount++;
                 break;
-                case (int)Key.KeyType.Crowbar:
+                case (int)KeyType.Crowbar:
                 crowbarCount++;
                 break;
-                case (int)Key.KeyType.Hammer:
+                case (int)KeyType.Hammer:
                 hammerCount++;
                 break;
-                case (int)Key.KeyType.Code:
+                case (int)KeyType.Code:
                 codeCount++;
                 break;
             }

@@ -27,6 +27,7 @@ public class Inventory : MonoBehaviour
         keys.Add(key);
     }
 
+/*
     public bool HasKey(Key key)
     {
         bool found = false;
@@ -42,6 +43,7 @@ public class Inventory : MonoBehaviour
 
         return found;
     }
+    */
 
     public Key[] Keys()
     {

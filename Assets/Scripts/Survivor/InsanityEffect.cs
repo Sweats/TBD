@@ -1,51 +1,29 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
+using System.Collections;
+using UnityEngine.Audio;
 
 // will be used to show spectating players the insaniy effect that the player is currently seeing.
 //public class InsanityEffectEvent : UnityEvent<InsanityEffect> { }
 
 public class InsanityEffect : MonoBehaviour
 {
-    private bool enabled;
+    public bool enabled;
     public float insanityNeededToStart;
 
-    [SerializeField]
-    private float timerDischargeRate;
+    public float timerDischargeRate;
 
-    [SerializeField]
-    private float timer = 100;
+    public float timer = 100;
 
-    [SerializeField]
-    private AudioSource insanitySoundEffect;
-
+    public AudioSource insanitySoundEffect;
     public InsanityEffectEvent insanityEffectEvent;
+
+    public AudioMixer audioMixer;
 
     public bool Enabled()
     {
         return enabled;
     }
-
-    void Update()
-    {
-        if (enabled)
-        {
-            timer -= timerDischargeRate * Time.deltaTime;
-
-            if (timer <= 0)
-            {
-                Trigger();
-                timer = 100;
-            }
-        }
-    }
-
-
-    public void Trigger()
-    {
-        insanitySoundEffect.Play();
-        insanityEffectEvent.Invoke();
-    }
-
 
     public void OnGammaInsanityEffectTriggered()
     {
@@ -55,8 +33,35 @@ public class InsanityEffect : MonoBehaviour
 
     public void OnDeafInsanityEffectTriggered()
     {
-
+        StartCoroutine(AdjustVolume());
     }
+
+    private IEnumerator AdjustVolume()
+    {
+        float oldSoundEffectVolume, oldMusicVolume, oldVoiceVolume;
+        audioMixer.GetFloat(SoundUI.EFFECTS_SOUND_MIXER_STRING, out oldSoundEffectVolume);
+        audioMixer.GetFloat(SoundUI.MUSIC_SOUND_MIXER_STRING, out oldMusicVolume);
+        audioMixer.GetFloat(SoundUI.VOICE_MIXER_STRING, out oldVoiceVolume);
+
+        audioMixer.SetFloat(SoundUI.EFFECTS_SOUND_MIXER_STRING, Mathf.Log(0.001f) * 20);
+        audioMixer.SetFloat(SoundUI.MUSIC_SOUND_MIXER_STRING, Mathf.Log(0.001f) * 20);
+        audioMixer.SetFloat(SoundUI.VOICE_MIXER_STRING, Mathf.Log(0.001f) * 20);
+
+        insanitySoundEffect.Play();
+
+        yield return new WaitForSeconds(5f);
+
+        audioMixer.SetFloat(SoundUI.EFFECTS_SOUND_MIXER_STRING, Mathf.Log(oldSoundEffectVolume) * 20);
+        audioMixer.SetFloat(SoundUI.MUSIC_SOUND_MIXER_STRING, Mathf.Log(oldMusicVolume) * 20);
+        audioMixer.SetFloat(SoundUI.VOICE_MIXER_STRING, Mathf.Log(oldVoiceVolume) * 20);
+    }
+
+//
+//    private IEnumerator AdjustGamma()
+//    {
+//
+//    }
+//    
 
 
     public void OnFlashlightFlickerInsanityEffectTriggered()
@@ -80,18 +85,6 @@ public class InsanityEffect : MonoBehaviour
     public void OnJumpScareInsanityEffectTriggered()
     {
 
-    }
-
-
-    public void Enable()
-    {
-        enabled = true;
-
-    }
-
-    public void Disable()
-    {
-        enabled = false;
     }
 
 }

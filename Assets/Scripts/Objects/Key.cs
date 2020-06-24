@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
 
-[System.Serializable]
-public class Key
-{
-    public enum KeyType : int
+    public enum KeyType
     {
         Rusty = 0,
         Metal,
@@ -13,9 +10,12 @@ public class Key
         Hammer,
         Crowbar
     }
-    public string name = "Rusty Key";
-    public int mask;
 
+ [System.Serializable]
+public class Key
+{
+    public string keyName = "Rusty Key";
+    public int mask;
     public KeyType type;
 
     public int group;
@@ -24,7 +24,7 @@ public class Key
     
     public Key(Key key)
     {
-        this.name = key.name;
+        this.keyName = key.keyName;
         this.mask = key.mask;
         this.type = key.type;
         this.group = key.group;

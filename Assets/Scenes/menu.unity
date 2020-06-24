@@ -790,7 +790,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 1, g: 0, b: 0, a: 1}
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
     m_HighlightedColor: {r: 1, g: 0.65882355, b: 0.14901961, a: 1}
     m_PressedColor: {r: 1, g: 0.65882355, b: 0.14901961, a: 1}
     m_SelectedColor: {r: 1, g: 0.65882355, b: 0.14901961, a: 1}
@@ -813,10 +813,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 1659599602}
   m_HandleRect: {fileID: 618816859}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -2477,10 +2477,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 1902771586}
   m_HandleRect: {fileID: 1048728211}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -2596,50 +2596,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 286350442}
   m_CullTransparentMesh: 0
---- !u!1 &294650708
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 294650710}
-  - component: {fileID: 294650709}
-  m_Layer: 0
-  m_Name: Sounds
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &294650709
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 294650708}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e6af4499c22de343ba32e9621b9830f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sounds: []
---- !u!4 &294650710
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 294650708}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 217.71681, y: 266.908, z: -7.051533}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 15
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &302796054
 GameObject:
   m_ObjectHideFlags: 0
@@ -2774,6 +2730,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bc3f0db8fa93d24e8657decb333772f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  masterVolumeSlider: {fileID: 89901149}
   musicVolumeSlider: {fileID: 684479037}
   gameEffectsSlider: {fileID: 947140414}
   voiceChatVolumeSlider: {fileID: 2065699344}
@@ -2781,12 +2738,13 @@ MonoBehaviour:
   voiceActivationLevelSlider: {fileID: 2119556398}
   soundMenu: {fileID: 492230217}
   buttonColor: {r: 1, g: 0.65882355, b: 0.14901961, a: 1}
+  masterVolumeDefault: 0
   soundEffectsVolumeDefault: 1
   musicVolumeDefault: 0.5
   voiceChatVolumeDefault: 1
   monsterPitchVolumeDefault: 0.5
   voiceActivationLevelDefault: 0.5
-  gameSounds: {fileID: 294650709}
+  audioMixer: {fileID: 24100000, guid: 04b938e2d95d83a4fb3dd75e00966e3f, type: 2}
 --- !u!1 &311683107
 GameObject:
   m_ObjectHideFlags: 0
@@ -4976,10 +4934,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 135130785}
   m_HandleRect: {fileID: 1358314551}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -7868,10 +7826,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 1291182796}
   m_HandleRect: {fileID: 2134167599}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -19052,10 +19010,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 688529347}
   m_HandleRect: {fileID: 1479735394}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -19654,10 +19612,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 1426951041}
   m_HandleRect: {fileID: 154710012}
   m_Direction: 0
-  m_MinValue: 0
+  m_MinValue: 0.001
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 0
+  m_Value: 0.001
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []

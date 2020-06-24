@@ -1,13 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 public class MainMenuUI : MonoBehaviour
 {
 
     [SerializeField]
     private Color buttonTextColor;
-    private const string HOTEL_SCENE = "hotel";
 
     [SerializeField]
     private Canvas mainMenuCanvas;
@@ -217,7 +215,7 @@ public class MainMenuUI : MonoBehaviour
     }
     public void OnPlayButtonClicked()
     {
-        SceneManager.LoadScene(HOTEL_SCENE);
+        Stages.Load(StageName.Hotel);
     }
 
     public void OnOptionsButtonClicked()

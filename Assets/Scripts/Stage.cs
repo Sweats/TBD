@@ -5,61 +5,168 @@ public class Stage : MonoBehaviour
 
     [SerializeField]
     private Survivor[] survivors;
+    private Lurker lurker;
 
-    public void OnSurviorDeath(Survivor survivor)
+    public SurvivorsEscapedStageEvent survivorsEscapedStageEvent;
+    public SurvivorUnlockDoorEvent survivorUnlockDoorEvent;
+    public SurvivorPickedUpBatteryEvent survivorPickedUpBatteryEvent;
+    public SurvivorFailedToPickUpbBatteryEvent survivorFailedToPickUpBatteryEvent;
+
+    public SurviorGrabbedKeyEvent survivorGrabbedKeyEvent;
+    public SurvivorAlreadyHaveKeyEvent survivorAlreadyHaveKeyEvent;
+
+    public void OnSurviorDeath(Survivor who)
     {
         for (var i = 0; i < survivors.Length; i++)
         {
-            if (survivors[i].survivorID == survivor.survivorID)
+            if (survivors[i].survivorID == who.survivorID)
             {
-                // We will mark this survivor as dead later.
-                survivor.insanity.Reset();
+                who.dead = true;
+                who.insanity.Reset();
                 continue;
             }
 
             survivors[i].insanity.insanityValue += survivors[i].insanity.insanitySurvivorDeathAmount;
         }
-
     }
 
 
-    public void OnSurvivorTriggeredTrap(Survivor survivor, Trap trap)
+    public void OnSurvivorTriggeredTrap(Survivor who, Trap trap)
     {
-        survivor.insanity.insanityValue += survivor.insanity.insanityHitTrapAmount;
+        who.insanity.insanityValue += who.insanity.insanityHitTrapAmount;
         trap.Trigger();
     }
 
-    public void OnSurvivorPickedUpBattery(Survivor survivor, Battery battery)
+    public void OnSurvivorClickedOnBatteryEvent(Survivor who, Battery battery)
     {
-        survivor.flashlight.Recharge();
-        battery.Delete();
-    }
-    public void OnSurvivorPickedUpKey(Survivor survivor, KeyObject keyObject)
-    {
-        survivor.inventory.Add(new Key(keyObject.key));
-        keyObject.Delete();
-    }
+        if (who.flashlight.charge <= battery.chargeNeededToGrab)
+        {
+            survivorPickedUpBatteryEvent.Invoke(who, battery);
+            who.flashlight.Recharge();
+            battery.Delete();
+        }
 
-    public void OnSurvivorUnlockedDoorEvent(Survivor survivor, Key key, Door door)
-    {
-        door.Unlock();
-    }
+        else
+        {
+            survivorFailedToPickUpBatteryEvent.Invoke();
 
-
-    public void OnSurvivorFailedToUnlockDoor(Door door)
-    {
-        door.PlayLockedSound();
+        }
     }
 
+    public void OnSurvivorClickedOnDoorEvent(Survivor who, Door door)
+    {
+        Key[] keys = who.inventory.Keys();
+        bool found = false;
 
-    public void OnSurvivorStartSprintingEvent(Survivor survivor)
+        for (var i = 0; i < keys.Length; i++)
+        {
+            int unlockMask = keys[i].mask;
+
+            if (door.unlockMask == unlockMask)
+            {
+                Key key = keys[i];
+                survivorUnlockDoorEvent.Invoke(who, key, door);
+                door.Unlock();
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            door.PlayLockedSound();
+        }
+    }
+
+
+    public void OnSurvivorClickedOnKeyEvent(Survivor who, KeyObject keyObject)
+    {
+        Key[] keys = who.inventory.Keys();
+
+        bool found = false;
+
+        for (var i = 0; i < keys.Length; i++)
+        {
+            Key key = keys[i];
+            int foundKeyMask = keyObject.key.mask;
+            int currentInventoryKeyMask = key.mask;
+
+            if (foundKeyMask == currentInventoryKeyMask)
+            {
+                found = true;
+                survivorAlreadyHaveKeyEvent.Invoke();
+                break;
+            }
+        }
+
+
+        if (!found)
+        {
+            Key newKey = new Key(keyObject.key);
+            who.inventory.Add(newKey);
+            newKey.pickupSound.Play();
+            survivorGrabbedKeyEvent.Invoke(who, newKey);
+            keyObject.Delete();
+        }
+    }
+
+
+    public void OnSurvivorStartSprintingEvent(Survivor who)
     {
 
     }
 
 
-    public void OnSurvivorStopSprintingEvent(Survivor survivor)
+    public void OnSurvivorStopSprintingEvent(Survivor who)
     {
+
+    }
+
+
+    public void OnSurvivorEnteredEscapeRoom(Survivor who)
+    {
+        who.isInEscapeRoom = true;
+
+        bool canEscape = true;
+
+        for (var i = 0; i < survivors.Length; i++)
+        {
+            if (who.dead)
+            {
+                continue;
+            }
+
+            if (!who.isInEscapeRoom)
+            {
+                canEscape = false;
+                break;
+
+            }
+        }
+
+        if (canEscape)
+        {
+            survivorsEscapedStageEvent.Invoke();
+        }
+    }
+
+    public void OnSurviorLeftEscapeRoom(Survivor who)
+    {
+        who.isInEscapeRoom = false;
+    }
+
+
+    public void OnLurkerTransform(bool ghostForm)
+    {
+        if (ghostForm)
+        {
+            //lurker.transform.position
+        }
+
+        else
+        {
+
+        }
 
     }
 }

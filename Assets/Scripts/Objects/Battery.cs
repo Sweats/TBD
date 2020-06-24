@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Battery : MonoBehaviour
 {
@@ -29,9 +26,7 @@ public class Battery : MonoBehaviour
     [SerializeField]
     private Color glowColor = Color.white;
 
-
     public float chargeNeededToGrab;
-
 
     [SerializeField]
     private float maxTimerForGlow = 100;

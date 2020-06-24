@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,7 +7,7 @@ using UnityEngine.UI;
 public class GameMessages : MonoBehaviour
 {
 
-    private List<GameMessage> messages;
+    private List<string> messages;
 
     // How long should a chat message appear for? 
     [SerializeField]
@@ -17,188 +18,91 @@ public class GameMessages : MonoBehaviour
 
     [SerializeField]
     private Canvas gameMessagesCanvas;
-
-    private int nextMessageID;
     private StringBuilder stringBuilder;
     // Start is called before the first frame update
     void Start()
     {
         stringBuilder = new StringBuilder();
-        messages = new List<GameMessage>();
+        messages = new List<string>();
     }
 
-    void Update()
+    private void UpdateChatText()
     {
-        bool messagesfound = true;
+        stringBuilder.Clear();
 
-        if (gameMessagesCanvas.enabled)
+        for (var i = 0; i < messages.Count; i++)
         {
-            for (var i = 0; i < messages.Count; i++)
-            {
-                if (messages[i].length <= 0)
-                {
-                    messages.RemoveAt(i);
-                }
-
-
-                else
-                {
-                    messages[i].length -= Time.deltaTime;
-                    messagesfound = true;
-                }
-            }
-
-            UpdateChatText();
-
-            if (!messagesfound)
-            {
-                Hide();
-            }
+            stringBuilder.AppendLine(messages[i]);
         }
+
+        messagesBox.text = stringBuilder.ToString();
+    }
+    public void OnSurvivorGrabbedKey(Survivor who, Key key)
+    {
+        string newMessage = $"{who.survivorName} picked up a {key.keyName}!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    public void OnSurvivorUnlockedDoor(Survivor who, Key key, Door door)
+    {
+        string newMessage = $"{who.survivorName} used a {key.keyName} to unlock a {door.doorName}!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+
+    }
+
+    public void OnSurvivorDeath(Survivor who)
+    {
+        string newMessage = $"{who.survivorName} died!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+
     }
 
 
-public void Hide()
-{
-    gameMessagesCanvas.enabled = false;
-}
-
-public void Show()
-{
-    gameMessagesCanvas.enabled = true;
-}
-
-private void UpdateChatText()
-{
-    stringBuilder.Clear();
-
-    for (var i = 0; i < messages.Count; i++)
+    public void OnFailedToPickUpBatteryEvent()
     {
-        stringBuilder.AppendLine(messages[i].message);
+        string newMessage = "Your flashlight is already charged!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    messagesBox.text = stringBuilder.ToString();
-}
-
-private void Add(GameMessage message)
-{
-    Show();
-    this.messages.Add(message);
-}
-public void OnSurvivorGrabbedKey(Survivor survivor, KeyObject key)
-{
-    GameMessage newMessage = new GameMessage()
+    public void OnPickedUpBatteryEvent()
     {
-        message = $"{survivor.survivorName} picked up a {key.key.name}!",
-        id = nextMessageID,
-        length = chatMessageAppearanceLength
-    };
+        string newMessage = "You picked up a battery!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
 
 
-    messages.Add(newMessage);
-}
-
-public void OnSurvivorUnlockedDoor(Survivor survivor, Key key, Door door)
-{
-    GameMessage newMessage = new GameMessage()
+    public void OnPickupKeySurvivorAlreadyHasEvent()
     {
-        message = $"{survivor.survivorName} used a {key.name} to unlock a {door.name}!",
-        id = nextMessageID,
-        length = chatMessageAppearanceLength
-    };
+        string newMessage = "You already have this key!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
 
-    messages.Add(newMessage);
-
-}
-
-public void OnSurvivorDeath(Survivor survivor)
-{
-    GameMessage newMessage = new GameMessage()
+    public void OnSurvivorDisconnect(Survivor who)
     {
-        message = $"{survivor.survivorName} died!",
-        id = nextMessageID,
-        length = chatMessageAppearanceLength
-    };
+        string newMessage = $"Player {who.survivorName} has left the game!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
 
-    messages.Add(newMessage);
-
-}
-
-
-public void OnFailedToPickUpBatteryEvent()
-{
-    GameMessage newMessage = new GameMessage()
+    public void OnSurvivorConnect(Survivor who)
     {
-        message = "Your flashlight is already charged!",
-        id = nextMessageID,
-        length = chatMessageAppearanceLength
-    };
+        string newMessage = $"Player {who.survivorName} has connected!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
-    messages.Add(newMessage);
-}
+    }
 
-public void OnPickedUpBatteryEvent()
-{
-    GameMessage newMessage = new GameMessage()
+    public void OnHostStartedTheGame()
     {
-        message = "You picked up a battery!",
-        id = nextMessageID,
-        length = chatMessageAppearanceLength
-    };
+        string newMessage = "The host has started the game!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
 
-    messages.Add(newMessage);
-}
-
-
-public void OnPickupKeySurvivorAlreadyHasEvent()
-{
-    GameMessage newMesasge = new GameMessage()
+    private IEnumerator AddAndRemoveGameMessage(string newMessage)
     {
-        message = "You already have this key!",
-        id = nextMessageID,
-        length = chatMessageAppearanceLength
-    };
-
-
-    messages.Add(newMesasge);
-}
-
-public void OnSurvivorDisconnect(Survivor survivor)
-{
-    GameMessage newMessage = new GameMessage()
-    {
-        message = $"Player {survivor.survivorName} has left the game!",
-        id = nextMessageID,
-        length = chatMessageAppearanceLength
-    };
-
-    messages.Add(newMessage);
-
-}
-
-public void OnSurvivorConnect(Survivor survivor)
-{
-    GameMessage newMessage = new GameMessage()
-    {
-        message = $"Player {survivor.survivorName} has connected!",
-        id = nextMessageID,
-        length = chatMessageAppearanceLength
-    };
-
-    messages.Add(newMessage);
-
-}
-
-public void OnHostStartedTheGame()
-{
-    GameMessage newMessage = new GameMessage()
-    {
-        message = "The host has started the game!",
-        id = nextMessageID,
-        length = chatMessageAppearanceLength
-    };
-
-    messages.Add(newMessage);
-}
+        messages.Add(newMessage);
+        UpdateChatText();
+        yield return new WaitForSeconds(chatMessageAppearanceLength);
+        messages.Remove(newMessage);
+        UpdateChatText();
+    }
 
 }
