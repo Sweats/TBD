@@ -26,7 +26,7 @@ public class Stages
 
         else
         {
-            Debug.Log($"Failed to load the stage {stagesDict[StageName.Hotel]}!");
+            Debug.Log($"Failed to load the stage {stagesDict[stageName]}!");
         }
 
     }
