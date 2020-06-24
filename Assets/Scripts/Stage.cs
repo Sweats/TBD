@@ -15,6 +15,7 @@ public class Stage : MonoBehaviour
     public SurviorGrabbedKeyEvent survivorGrabbedKeyEvent;
     public SurvivorAlreadyHaveKeyEvent survivorAlreadyHaveKeyEvent;
 
+
     public void OnSurviorDeath(Survivor who)
     {
         for (var i = 0; i < survivors.Length; i++)
@@ -123,20 +124,19 @@ public class Stage : MonoBehaviour
     }
 
 
-    public void OnSurvivorEnteredEscapeRoom(Survivor who)
+    public void OnSurvivorEnteredExitZone(Survivor who)
     {
         who.isInEscapeRoom = true;
-
         bool canEscape = true;
 
         for (var i = 0; i < survivors.Length; i++)
         {
-            if (who.dead)
+            if (survivors[i].dead)
             {
                 continue;
             }
 
-            if (!who.isInEscapeRoom)
+            if (!survivors[i].isInEscapeRoom)
             {
                 canEscape = false;
                 break;
@@ -146,15 +146,19 @@ public class Stage : MonoBehaviour
 
         if (canEscape)
         {
+            for (var i = 0; i < survivors.Length; i++)
+            {
+                survivors[i].matchOver = true;
+            }
+
             survivorsEscapedStageEvent.Invoke();
         }
     }
 
-    public void OnSurviorLeftEscapeRoom(Survivor who)
+    public void OnSurvivorLeftExitZone(Survivor who)
     {
         who.isInEscapeRoom = false;
     }
-
 
     public void OnLurkerTransform(bool ghostForm)
     {

@@ -65,6 +65,9 @@ public class Survivor : MonoBehaviour
 
     private bool isPlayerStatsOpened;
 
+
+    public bool matchOver;
+
     public bool isInEscapeRoom;
 
     #region EVENTS
@@ -105,7 +108,7 @@ public class Survivor : MonoBehaviour
 
     void LateUpdate()
     {
-        if (pausedGameInput.gamePaused || isChatOpened)
+        if (pausedGameInput.gamePaused || isChatOpened || matchOver)
         {
             return;
         }
@@ -149,7 +152,7 @@ public class Survivor : MonoBehaviour
 //
         CheckForTraps();
 
-        if (pausedGameInput.gamePaused || isChatOpened)
+        if (pausedGameInput.gamePaused || isChatOpened || matchOver)
         {
             return;
         }
@@ -280,9 +283,9 @@ public class Survivor : MonoBehaviour
         for (var i = 0; i < objectsHit.Length; i++)
         {
             GameObject hitObject = objectsHit[i].collider.gameObject;
-            string objectName = hitObject.name;
+            string tagName = hitObject.tag;
 
-            if (objectName.Contains("Trap"))
+            if (tagName == "Trap")
             {
                 Trap trap = hitObject.GetComponent<Trap>();
 
@@ -304,21 +307,21 @@ public class Survivor : MonoBehaviour
         if (Physics.Raycast(ray, out hit, grabDistance))
         {
             var gameObject = hit.collider.gameObject;
-            var name = gameObject.name;
+            var tagName = gameObject.tag;
 
-            if (name.Contains("Key"))
+            if (tagName == "Key")
             {
                 KeyObject keyObject = gameObject.GetComponent<KeyObject>();
                 survivorClickedOnKeyEvent.Invoke(this, keyObject);
             }
 
-            else if (name.Contains("Door"))
+            else if (tagName == "Door")
             {
                 Door door = gameObject.GetComponent<Door>();
                 survivorClickedOnDoorEvent.Invoke(this, door);
             }
 
-            else if (name.Contains("Battery"))
+            else if (tagName == "Battery")
             {
                 Battery battery = gameObject.GetComponent<Battery>();
                 survivorClickedOnBatteryEvent.Invoke(this, battery);

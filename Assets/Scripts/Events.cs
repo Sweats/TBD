@@ -97,6 +97,12 @@ public class MonsterArmedTrapEvent: UnityEvent<Trap> {}
 [System.Serializable]
 public class SurvivorsEscapedStageEvent: UnityEvent {}
 
+[System.Serializable]
+public class SurvivorEnteredExitZone: UnityEvent<Survivor> {}
+
+[System.Serializable]
+public class SurvivorLeftExitZone: UnityEvent<Survivor> {}
+
 #endregion
 
 #region LURKER_EVENTS
@@ -104,7 +110,12 @@ public class SurvivorsEscapedStageEvent: UnityEvent {}
 [System.Serializable]
 public class LurkerChangedFormEvent: UnityEvent<bool> {}
 
-
 #endregion
 
 
+#region LOBBY_EVENTS
+
+//[System.Serializable]
+//public class ReturnToLobbyEvent: UnityEvent {}
+
+#endregion

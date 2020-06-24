@@ -67,6 +67,7 @@ public class MainMenuUI : MonoBehaviour
     {
         openedMenus = new bool[ARRAY_SIZE];
         openedMenus[(int)Menu.Main] = true;
+        Cursor.lockState = CursorLockMode.Confined;
     }
 
     void Update()

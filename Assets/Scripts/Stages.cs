@@ -4,7 +4,8 @@ using UnityEngine.SceneManagement;
 
 public enum StageName
 {
-    Hotel = 0
+    Hotel = 0,
+    Menu
 }
 
 public class Stages
@@ -12,6 +13,8 @@ public class Stages
     private static Dictionary<StageName, string> stagesDict = new Dictionary<StageName, string>()
     {
         {StageName.Hotel, "hotel"},
+        {StageName.Menu, "menu"}
+
     };
 
     public static void Load(StageName stageName)
