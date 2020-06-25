@@ -8,6 +8,7 @@ TagManager:
   - Escape
   - Door
   - Key
+  - Item
   layers:
   - Default
   - TransparentFX

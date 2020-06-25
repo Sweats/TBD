@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System;
+
 
 
 
 public class Trap : MonoBehaviour
 {
-
     [SerializeField]
     private AudioSource trapSound;
 
@@ -20,8 +21,12 @@ public class Trap : MonoBehaviour
     public float trapTimer;
     public float trapTimerRate;
 
-
     public bool armed;
+
+    private void Start()
+    {
+        EventManager.survivorTriggeredTrapEvent.AddListener(OnSurvivorTriggeredTrap);
+    }
 
     void Update()
     {
@@ -41,14 +46,12 @@ public class Trap : MonoBehaviour
     public void Trigger()
     {
         trapSound.Play();
-        Reset();
-    }
-
-    private void Reset()
-    {
         armed = false;
         trapTimer = maxTimer;
     }
 
-
+    private void OnSurvivorTriggeredTrap(Survivor survivor, Trap trap)
+    {
+        trap.Trigger();
+    }
 }

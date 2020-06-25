@@ -27,6 +27,9 @@ public class Lurker : MonoBehaviour
     private float speed;
 
 
+
+
+
     private bool ghostForm = true;
 
     [SerializeField]
@@ -41,6 +44,8 @@ public class Lurker : MonoBehaviour
     [SerializeField]
     private AudioSource footstepSound;
 
+    private Camera lurkerCamera;
+
     #region EVENTS
 
     public LurkerChangedFormEvent lurkerChangedFormEvent;
@@ -50,6 +55,7 @@ public class Lurker : MonoBehaviour
     void Start()
     {
         lurkerController = GetComponent<CharacterController>();
+        lurkerCamera = GetComponent<Camera>();
     }
 
     void Update()
@@ -106,9 +112,10 @@ public class Lurker : MonoBehaviour
     }
 
 
-    public void OnLurkerFormChanged(bool ghostForm)
+    private void OnLurkerFormChanged()
     {
         lurkerChangeFormSound.Play();
+        ghostForm = !ghostForm;
 
         if (ghostForm)
         {
@@ -123,4 +130,31 @@ public class Lurker : MonoBehaviour
             lurkerPhysicalFormMusic.Play();
         }
     }
+
+
+    private void OnAttack()
+    {
+        Ray ray = lurkerCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, attackDistance))
+        {
+            GameObject hitGameObject = hit.collider.gameObject;
+
+            if (hitGameObject.tag == "Survivor")
+            {
+                Survivor survivor = hitGameObject.GetComponent<Survivor>();
+                survivor.Die();
+            }
+        }
+
+    }
+
+
+    private void OnArmTrap(Trap trap)
+    {
+
+    }
+
+
 }

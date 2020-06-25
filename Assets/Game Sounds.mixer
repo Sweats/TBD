@@ -219,7 +219,7 @@ AudioMixerController:
   - guids:
     - 8f367bd248e9e674ead0fd7b74f28e44
     name: Insanity
-  m_CurrentViewIndex: 4
+  m_CurrentViewIndex: 2
   m_TargetSnapshot: {fileID: 24500006}
 --- !u!243 &24300002
 AudioMixerGroupController:

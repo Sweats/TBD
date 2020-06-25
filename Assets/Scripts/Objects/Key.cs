@@ -19,7 +19,9 @@ public class Key
     public KeyType type;
 
     public int group;
-    public AudioSource pickupSound;
+
+    [SerializeField]
+    private AudioSource pickupSound;
     public Texture textureIcon;
     
     public Key(Key key)
@@ -30,6 +32,12 @@ public class Key
         this.group = key.group;
         this.pickupSound = key.pickupSound;
         this.textureIcon = key.textureIcon;
+    }
+
+
+    public void PlayPickupSound()
+    {
+        pickupSound.Play();
     }
 }
 

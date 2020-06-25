@@ -7,14 +7,19 @@ public class GameOverUI : MonoBehaviour
     [SerializeField]
     private Text gameOverText;
 
-
     [SerializeField]
     private Canvas gameOverCanvas;
-    private const string SURVIVORS_WON_TEXT = "The survivors have escaped! ...";
-    private const string MONSTER_WON_TEXT = "The monster has won! ...";
 
-    public void OnSurvivorsEscapedStageEvent()
+
+    private void Start()
     {
+        EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
+        EventManager.monsterWonEvent.AddListener(OnSurvivorsLost);
+    }
+
+    private void OnSurvivorsEscapedStageEvent()
+    {
+        const string SURVIVORS_WON_TEXT = "The survivors have escaped...";
         StartCoroutine(CountDown(SURVIVORS_WON_TEXT));
     }
 
@@ -35,8 +40,9 @@ public class GameOverUI : MonoBehaviour
 
 
 
-    public void OnSurvivorsLost()
+    private void OnSurvivorsLost()
     {
-        StartCoroutine(CountDown(MONSTER_WON_TEXT));
+        const string MONSTER_WON_TEXT = "The monster has won...";
+         StartCoroutine(CountDown(MONSTER_WON_TEXT));
     }
  }

@@ -29,7 +29,8 @@ public class Chat : MonoBehaviour
     {
         chatMessages = new List<ChatMessage>();
         chatMessageBox.text = string.Empty;
-
+        EventManager.survivorClosedChatEvent.AddListener(OnSurvivorClosedChat);
+        EventManager.survivorOpenedChatEvent.AddListener(OnSurvivorOpenedChat);
     }
 
     void Update()
@@ -48,18 +49,20 @@ public class Chat : MonoBehaviour
         }
     }
 
-    public void OnSurvivorOpenedChat()
+    private void OnSurvivorOpenedChat()
     {
         Show();
         isChatOpened = true;
+        chatMessageBox.enabled = true;
         chatMessageBox.Select();
         chatMessageBox.ActivateInputField();
     }
 
-    public void OnSurvivorClosedChat()
+    private void OnSurvivorClosedChat()
     {
         isChatOpened = false;
         UnselectChatMessageBox();
+        chatMessageBox.enabled = false;
         chatMessageBox.text = string.Empty;
     }
 
@@ -87,7 +90,7 @@ public class Chat : MonoBehaviour
     }
 
 
-    public void OnSurviorRecievedChat(Survivor who, string messageText)
+    private void OnSurviorRecievedChat(Survivor who, string messageText)
     {
         ChatMessage chatMessage = new ChatMessage
         {

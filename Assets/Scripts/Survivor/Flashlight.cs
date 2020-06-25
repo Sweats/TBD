@@ -28,6 +28,7 @@ public class Flashlight : MonoBehaviour
     void Start()
     {
         flashlightSource = GetComponent<Light>();
+        EventManager.survivorPickedUpBatteryEvent.AddListener(OnSurvivorPickedUpBattery);
     }
 
     void Update()
@@ -58,5 +59,11 @@ public class Flashlight : MonoBehaviour
         charge = maxCharge;
         flashlightSource.intensity = 4;
         flashlightDead = false;
+    }
+
+
+    private void OnSurvivorPickedUpBattery(Survivor survivor, Battery battery)
+    {
+        survivor.flashlight.Recharge();
     }
 }

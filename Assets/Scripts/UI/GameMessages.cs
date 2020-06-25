@@ -19,11 +19,20 @@ public class GameMessages : MonoBehaviour
     [SerializeField]
     private Canvas gameMessagesCanvas;
     private StringBuilder stringBuilder;
-    // Start is called before the first frame update
+    
     void Start()
     {
         stringBuilder = new StringBuilder();
         messages = new List<string>();
+
+        EventManager.survivorDeathEvent.AddListener(OnSurvivorDeath);
+        EventManager.survivorFailedToPickUpBatteryEvent.AddListener(OnFailedToPickUpBatteryEvent);
+        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorGrabbedKey);
+        EventManager.survivorPickedUpBatteryEvent.AddListener(OnPickedUpBatteryEvent);
+        EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
+        EventManager.playerConnectedEvent.AddListener(OnPlayerConnect);
+        EventManager.playerDisconnectedEvent.AddListener(OnPlayerDisconnect);
+
     }
 
     private void UpdateChatText()
@@ -37,20 +46,19 @@ public class GameMessages : MonoBehaviour
 
         messagesBox.text = stringBuilder.ToString();
     }
-    public void OnSurvivorGrabbedKey(Survivor who, Key key)
+    private void OnSurvivorGrabbedKey(Survivor who, Key key)
     {
         string newMessage = $"{who.survivorName} picked up a {key.keyName}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
-
-    public void OnSurvivorUnlockedDoor(Survivor who, Key key, Door door)
+    private void OnSurvivorUnlockedDoor(Survivor who, Key key, Door door)
     {
         string newMessage = $"{who.survivorName} used a {key.keyName} to unlock a {door.doorName}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
 
-    public void OnSurvivorDeath(Survivor who)
+    private void OnSurvivorDeath(Survivor who)
     {
         string newMessage = $"{who.survivorName} died!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
@@ -58,39 +66,39 @@ public class GameMessages : MonoBehaviour
     }
 
 
-    public void OnFailedToPickUpBatteryEvent()
+    private void OnFailedToPickUpBatteryEvent()
     {
         string newMessage = "Your flashlight is already charged!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    public void OnPickedUpBatteryEvent()
+    private void OnPickedUpBatteryEvent(Survivor survivor, Battery battery)
     {
         string newMessage = "You picked up a battery!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
 
-    public void OnPickupKeySurvivorAlreadyHasEvent()
+    private void OnPickupKeySurvivorAlreadyHasEvent()
     {
         string newMessage = "You already have this key!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    public void OnSurvivorDisconnect(Survivor who)
+    private void OnPlayerDisconnect(Survivor who)
     {
         string newMessage = $"Player {who.survivorName} has left the game!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    public void OnSurvivorConnect(Survivor who)
+    private void OnPlayerConnect(Survivor who)
     {
         string newMessage = $"Player {who.survivorName} has connected!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
 
-    public void OnHostStartedTheGame()
+    private void OnHostStartedTheGame()
     {
         string newMessage = "The host has started the game!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));

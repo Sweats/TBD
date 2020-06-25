@@ -20,30 +20,13 @@ public class Inventory : MonoBehaviour
         };
 
 
+        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
     }
 
     public void Add(Key key)
     {
         keys.Add(key);
     }
-
-/*
-    public bool HasKey(Key key)
-    {
-        bool found = false;
-
-        for (var i = 0; i < keys.Count; i++)
-        {
-            if (keys[i].mask == key.mask)
-            {
-                found = true;
-                break;
-            }
-        }
-
-        return found;
-    }
-    */
 
     public Key[] Keys()
     {
@@ -90,5 +73,10 @@ public class Inventory : MonoBehaviour
             currentY += 35;
 
         }
+    }
+
+    private void OnSurvivorPickedUpKey(Survivor survivor, Key key)
+    {
+        survivor.inventory.Add(key);
     }
 }

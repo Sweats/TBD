@@ -108,34 +108,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64918e909aa5a314895ca832255d7e9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  survivorEnteredExitZone:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8264458859665828926}
-        m_MethodName: OnSurvivorEnteredExitZone
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorLeftExitZone:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8264458859665828926}
-        m_MethodName: OnSurvivorLeftExitZone
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!64 &6674273910830549209
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -150,6 +122,49 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1002308179153567273
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6365213529279203105}
+  - component: {fileID: 5647260378899213680}
+  m_Layer: 0
+  m_Name: Game Events
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6365213529279203105
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002308179153567273}
+  m_LocalRotation: {x: -0.40821788, y: 0.23456968, z: -0.10938163, w: 0.8754261}
+  m_LocalPosition: {x: 0.4359992, y: 0.99853104, z: -0.015162408}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8264458859665828920}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5647260378899213680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002308179153567273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6b96e49d199258478acc78a661c377c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1156195335128995420
 GameObject:
   m_ObjectHideFlags: 0
@@ -11079,6 +11094,7 @@ MonoBehaviour:
   inventory: {fileID: 5356624095491200271}
   flashlight: {fileID: 5356624094757380038}
   survivorID: 0
+  deathSound: {fileID: 5586652088207896385}
   sprint: {fileID: 5356624094239985497}
   pausedGameInput: {fileID: 5356624094977814020}
   crosshair: {fileID: 2800000, guid: 4a5d688cd5f4d9b4ab0679e8e4bddd74, type: 3}
@@ -11094,169 +11110,6 @@ MonoBehaviour:
   trapDistance: 3
   matchOver: 0
   isInEscapeRoom: 0
-  survivorDeathEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8264458859665828926}
-        m_MethodName: OnSurviorDeath
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 5356624094882695403}
-        m_MethodName: OnSurvivorDeath
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorStartSprintingEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  survivorStopSprintingEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  survivorTriggeredTrapEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8264458859665828926}
-        m_MethodName: OnSurvivorTriggeredTrap
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorOpenedChatEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5356624094465106487}
-        m_MethodName: OnSurvivorOpenedChat
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorClosedChatEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5356624094465106487}
-        m_MethodName: OnSurvivorClosedChat
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorSendChatEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5356624094465106487}
-        m_MethodName: OnSurvivorSendChat
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorOpenedPlayerStats:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5356624094456298483}
-        m_MethodName: OnSurvivorOpenPlayerStats
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorClosedPlayerStats:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5356624094456298483}
-        m_MethodName: OnSurvivorClosePlayerStats
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorMoving:
-    m_PersistentCalls:
-      m_Calls: []
-  survivorStopMoving:
-    m_PersistentCalls:
-      m_Calls: []
-  survivorClickedOnDoorEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8264458859665828926}
-        m_MethodName: OnSurvivorClickedOnDoorEvent
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorClickedOnKeyEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8264458859665828926}
-        m_MethodName: OnSurvivorClickedOnKeyEvent
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorClickedOnBatteryEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8264458859665828926}
-        m_MethodName: OnSurvivorClickedOnBatteryEvent
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   dead: 0
 --- !u!1 &5356624094373177315
 GameObject:
@@ -23039,6 +22892,7 @@ Transform:
   - {fileID: 5356624095281686813}
   - {fileID: 5356624093583960538}
   - {fileID: 5356624094558776698}
+  - {fileID: 838737074305488132}
   m_Father: {fileID: 5356624094368505450}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -23443,6 +23297,134 @@ MonoBehaviour:
   m_InputActionsPerSecond: 10
   m_RepeatDelay: 0.5
   m_ForceModuleActive: 0
+--- !u!1 &8029885915584116912
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 838737074305488132}
+  - component: {fileID: 5586652088207896385}
+  m_Layer: 0
+  m_Name: Death Sound
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &838737074305488132
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8029885915584116912}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 5356624095619084724}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &5586652088207896385
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8029885915584116912}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: -5647871597309268043, guid: 04b938e2d95d83a4fb3dd75e00966e3f,
+    type: 2}
+  m_audioClip: {fileID: 8300000, guid: 3ea29c59a61dbdf4f9991f4f4d1bc861, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &8140041024397612463
 GameObject:
   m_ObjectHideFlags: 0
@@ -23507,6 +23489,7 @@ Transform:
   - {fileID: 1221350464893931206}
   - {fileID: 4479118724397976382}
   - {fileID: 5614103599737427650}
+  - {fileID: 6365213529279203105}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -23524,101 +23507,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   survivors:
   - {fileID: 5356624094368505448}
-  survivorsEscapedStageEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2817674949897306401}
-        m_MethodName: OnSurvivorsEscapedStageEvent
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorUnlockDoorEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5356624094882695403}
-        m_MethodName: OnSurvivorUnlockedDoor
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorPickedUpBatteryEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5356624094882695403}
-        m_MethodName: OnPickedUpBatteryEvent
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorFailedToPickUpBatteryEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5356624094882695403}
-        m_MethodName: OnFailedToPickUpBatteryEvent
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorGrabbedKeyEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5356624094882695403}
-        m_MethodName: OnSurvivorGrabbedKey
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 5356624094456298483}
-        m_MethodName: OnSurvivorPickedUpKey
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  survivorAlreadyHaveKeyEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 5356624094882695403}
-        m_MethodName: OnPickupKeySurvivorAlreadyHasEvent
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!1 &8264458860245581027
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,22 +2,45 @@
 
 public class Escape : MonoBehaviour
 {
-
-    public SurvivorEnteredExitZone survivorEnteredExitZone;
-    public SurvivorLeftExitZone survivorLeftExitZone;
-
-    void OnTriggerEnter(Collider collision)
+    void OnTriggerEnter(Collider collider)
     {
-        GameObject gameObject = collision.gameObject;
+        GameObject gameObject = collider.gameObject;
 
         if (gameObject.tag == "Survivor")
         {
             Survivor survivor = gameObject.GetComponent<Survivor>();
-            survivorEnteredExitZone.Invoke(survivor);
+            survivor.isInEscapeRoom = true;
 
         }
-    }
 
+        GameObject[] survivors = GameObject.FindGameObjectsWithTag("Survivor");
+
+        bool canEscape = true;
+
+        for (var i = 0; i < survivors.Length; i++)
+        {
+            Survivor survivor = survivors[i].GetComponent<Survivor>();
+
+            if (survivor.dead)
+            {
+                continue;
+            }
+
+
+            if (!survivor.isInEscapeRoom)
+            {
+                canEscape = false;
+                break;
+            }
+        }
+
+
+        if (canEscape)
+        {
+            UpdateSurvivorVariable(survivors);
+            EventManager.survivorsEscapedStageEvent.Invoke();
+        }
+    }
 
     void OnTriggerExit(Collider collision)
     {
@@ -26,7 +49,17 @@ public class Escape : MonoBehaviour
         if (gameObject.tag == "Survivor")
         {
             Survivor survivor = gameObject.GetComponent<Survivor>();
-            survivorLeftExitZone.Invoke(survivor);
+            survivor.isInEscapeRoom = false;
+        }
+    }
+
+
+    private void UpdateSurvivorVariable(GameObject[] survivors)
+    {
+        for (var i = 0; i < survivors.Length; i++)
+        {
+            Survivor survivor = survivors[i].GetComponent<Survivor>();
+            survivor.matchOver = true;
         }
     }
 

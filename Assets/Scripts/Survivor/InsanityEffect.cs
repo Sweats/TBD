@@ -8,7 +8,7 @@ using UnityEngine.Audio;
 
 public class InsanityEffect : MonoBehaviour
 {
-    public bool enabled;
+    public bool insanityEnabled;
     public float insanityNeededToStart;
 
     public float timerDischargeRate;
@@ -19,11 +19,6 @@ public class InsanityEffect : MonoBehaviour
     public InsanityEffectEvent insanityEffectEvent;
 
     public AudioMixer audioMixer;
-
-    public bool Enabled()
-    {
-        return enabled;
-    }
 
     public void OnGammaInsanityEffectTriggered()
     {

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
+
 // this class stores the stuff we need to update the mesh itself. The actual key information will be stored in the class key.
 public class KeyObject : MonoBehaviour
 {
@@ -33,13 +33,12 @@ public class KeyObject : MonoBehaviour
 
     private Renderer keyRenderer;
 
-
     void Start()
     {
         noGlowTimer = maxTimerForGlow;
         keyRenderer = GetComponent<Renderer>();
         keyRenderer.material.SetColor("_Color", glowOutlineColor);
-
+        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
     }
 
     void Update()
@@ -74,10 +73,16 @@ public class KeyObject : MonoBehaviour
         keyRenderer.material.SetColor("_Color", glowOutlineColor);
 
     }
-    public void Delete()
+
+    public void Pickup()
     {
         Destroy(this.gameObject);
-   }
+    }
+
+    private void OnSurvivorPickedUpKey(Survivor survivor, Key key)
+    {
+        key.PlayPickupSound();
+    }
 
 }
 

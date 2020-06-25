@@ -9,6 +9,9 @@ public class Survivor : MonoBehaviour
     public int survivorID;
 
     [SerializeField]
+    private AudioSource deathSound;
+
+    [SerializeField]
     private Sprint sprint;
 
     [SerializeField]
@@ -70,25 +73,6 @@ public class Survivor : MonoBehaviour
 
     public bool isInEscapeRoom;
 
-    #region EVENTS
-    public SurvivorDeathEvent survivorDeathEvent;
-    public SurvivorStartSprintingEvent survivorStartSprintingEvent;
-    public SurvivorStopSprintingEvent survivorStopSprintingEvent;
-    public SurvivorTriggeredTrapEvent survivorTriggeredTrapEvent;
-    public SurvivorOpenedChatEvent survivorOpenedChatEvent;
-    public SurvivorClosedChat survivorClosedChatEvent;
-    public SurvivorSendChatMessage survivorSendChatEvent;
-    public SurvivorOpenedPlayerStats survivorOpenedPlayerStats;
-    public SurvivorClosedPlayerStats survivorClosedPlayerStats;
-    public SurvivorMovingEvent survivorMoving;
-    public SurvivorStopMovingEvent survivorStopMoving;
-    public SurvivorClickedOnDoorEvent survivorClickedOnDoorEvent;
-    public SurvivorClickedOnKeyEvent survivorClickedOnKeyEvent;
-    public SurvivorClickedOnBatteryEvent survivorClickedOnBatteryEvent;
-
-    #endregion
-
-
     public bool dead;
 
     private Vector3 moving;
@@ -143,13 +127,7 @@ public class Survivor : MonoBehaviour
         {
             velocity.y = -2f;
         }
-//
-//        else if (controller.isGrounded && controller.velocity.x > 0f || controller.velocity.z > 0f)
-//        {
-//            survivorMoving.Invoke(sprint.sprinting);
-//            Debug.Log("Survivor is moving!");
-//        }
-//
+
         CheckForTraps();
 
         if (pausedGameInput.gamePaused || isChatOpened || matchOver)
@@ -231,7 +209,7 @@ public class Survivor : MonoBehaviour
 
         else if (Keybinds.GetKey(Action.Grab))
         {
-            AttemptToGrabObject();
+            OnActionGrab();
 
         }
 
@@ -239,22 +217,16 @@ public class Survivor : MonoBehaviour
         {
             if (!pausedGameInput.gamePaused)
             {
+                EventManager.survivorOpenedChatEvent.Invoke();
                 isChatOpened = true;
-                survivorOpenedChatEvent.Invoke();
             }
-
-            else if (isChatOpened)
-            {
-                survivorSendChatEvent.Invoke();
-            }
-
         }
 
         else if (Keybinds.GetKey(Action.GUiReturn))
         {
             if (!pausedGameInput.gamePaused && isChatOpened)
             {
-                survivorClosedChatEvent.Invoke();
+                EventManager.survivorClosedChatEvent.Invoke();
                 isChatOpened = false;
             }
         }
@@ -262,13 +234,11 @@ public class Survivor : MonoBehaviour
 
         else if (Keybinds.Get(Action.PlayerStats))
         {
-            survivorOpenedPlayerStats.Invoke();
             isPlayerStatsOpened = true;
         }
 
         else if (Keybinds.GetKey(Action.PlayerStats, true))
         {
-            survivorClosedPlayerStats.Invoke();
             isPlayerStatsOpened = false;
         }
         
@@ -291,14 +261,14 @@ public class Survivor : MonoBehaviour
 
                 if (trap.armed)
                 {
-                    survivorTriggeredTrapEvent.Invoke(this, trap);
+                    EventManager.survivorTriggeredTrapEvent.Invoke(this, trap);
                 }
             }
         }
     }
 
 
-    private void AttemptToGrabObject()
+    private void OnActionGrab()
     {
         RaycastHit hit;
 
@@ -309,22 +279,22 @@ public class Survivor : MonoBehaviour
             var gameObject = hit.collider.gameObject;
             var tagName = gameObject.tag;
 
-            if (tagName == "Key")
+            if (tagName == "Item")
             {
                 KeyObject keyObject = gameObject.GetComponent<KeyObject>();
-                survivorClickedOnKeyEvent.Invoke(this, keyObject);
+                OnClickedOnKey(keyObject);
             }
 
             else if (tagName == "Door")
             {
                 Door door = gameObject.GetComponent<Door>();
-                survivorClickedOnDoorEvent.Invoke(this, door);
+                OnClickedOnDoor(door);
             }
 
             else if (tagName == "Battery")
             {
                 Battery battery = gameObject.GetComponent<Battery>();
-                survivorClickedOnBatteryEvent.Invoke(this, battery);
+                OnSurvivorClickedOnBattery(battery);
             }
 
             else
@@ -348,6 +318,86 @@ public class Survivor : MonoBehaviour
 
         // TO DO: Optimize this!
         GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
-        
     }
+        
+ 
+    private void OnClickedOnKey(KeyObject foundKey)
+    {
+        Key[] keysInInventory = inventory.Keys();
+        bool found = false;
+
+        for (var i = 0; i < keysInInventory.Length; i++)
+        {
+            Key key = keysInInventory[i];
+            int foundKeyMask = foundKey.key.mask;
+            int currentInventoryKeyMask = key.mask;
+
+            if (foundKeyMask == currentInventoryKeyMask)
+            {
+                found = true;
+                EventManager.SurvivorAlreadyHaveKeyEvent.Invoke();
+
+            }
+        }
+
+        if (!found)
+        {
+            Key key = foundKey.key;
+            foundKey.Pickup();
+            EventManager.survivorPickedUpKeyEvent.Invoke(this, key);
+        }
+    }
+
+    private void OnClickedOnDoor(Door door)
+    {
+        Key[] keys = inventory.Keys();
+        bool found = false;
+
+        for (var i = 0; i < keys.Length; i++)
+        {
+            int unlockMask = keys[i].mask;
+
+            if (door.unlockMask == unlockMask)
+            {
+                Key key = keys[i];
+                found = true;
+                EventManager.survivorUnlockDoorEvent.Invoke(this, key, door);
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            EventManager.survivorFailedToUnlockDoorEvent.Invoke(door);
+        }
+    }
+
+
+//    private void OnClickOnObject(DarnedObject object)
+//    {
+//
+//    }
+//
+    private void OnSurvivorClickedOnBattery(Battery battery)
+    {
+        if (flashlight.charge <= battery.chargeNeededToGrab)
+        {
+            EventManager.survivorPickedUpBatteryEvent.Invoke(this, battery);
+        }
+
+        else
+        {
+            EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
+
+        }
+    }
+
+    public void Die()
+    {
+        dead = true;
+        insanity.Reset();
+        deathSound.Play();
+        EventManager.survivorDeathEvent.Invoke(this);
+    }
+
 }

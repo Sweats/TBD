@@ -19,11 +19,21 @@ public class Insanity : MonoBehaviour
     public float insanityValue;
     public bool insanityEnabled;
     private bool maxed;
-    public float insanityHitTrapAmount;
-    public float insanitySurvivorDeathAmount;
+
+    [SerializeField]
+    private float insanityHitTrapAmount;
+
+    [SerializeField]
+    private float insanitySurvivorDeathAmount;
 
     [SerializeField]
     private InsanityEffect[] insanityEffects;
+    
+    private void Start()
+    {
+        EventManager.survivorDeathEvent.AddListener(OnSurvivorDeath);
+        EventManager.survivorTriggeredTrapEvent.AddListener(OnSurvivorTriggeredTrap);
+    }
 
     void Update()
     {
@@ -39,14 +49,14 @@ public class Insanity : MonoBehaviour
 
             for (var i = 0; i < insanityEffects.Length; i++)
             {
-                if (insanityEffects[i].enabled)
+                if (insanityEffects[i].insanityEnabled)
                 {
                     insanityEffects[i].timer -= Time.deltaTime * insanityEffects[i].timerDischargeRate;
                 }
 
                 if (insanityValue >= insanityEffects[i].insanityNeededToStart)
                 {
-                    insanityEffects[i].enabled = true;
+                    insanityEffects[i].insanityEnabled = true;
                 }
 
                 if (insanityEffects[i].timer <= 0)
@@ -65,11 +75,22 @@ public class Insanity : MonoBehaviour
     {
         for (var i = 0; i < insanityEffects.Length; i++)
         {
-            insanityEffects[i].enabled = false;
+            insanityEffects[i].insanityEnabled = false;
         }
 
         insanityEnabled = false;
         insanityValue = 0;
         maxed = false;
+    }
+
+    private void OnSurvivorDeath(Survivor survivor)
+    {
+        survivor.insanity.insanityValue += insanitySurvivorDeathAmount;
+    }
+
+
+    private void OnSurvivorTriggeredTrap(Survivor survivor, Trap trap)
+    {
+        survivor.insanity.insanityValue += insanityHitTrapAmount;
     }
 }

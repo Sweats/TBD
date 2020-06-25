@@ -47,10 +47,12 @@ public class Battery : MonoBehaviour
     void Start()
     {
         noGlowTimer = maxTimerForGlow;
-
         batteryRenderer = GetComponent<Renderer>();
         //defaultSpecular = batteryRenderer.material.GetFloat("_Shininess");
         //batteryRenderer.material.SetColor("_Color", originalMeshColor);
+
+
+        EventManager.survivorPickedUpBatteryEvent.AddListener(OnSurvivorPickedUpBattery);
 
     }
 
@@ -110,8 +112,14 @@ public class Battery : MonoBehaviour
 
     }
 
-    public void Delete()
+    public void Pickup()
     {
         Destroy(this.gameObject);
+    }
+
+
+    private void OnSurvivorPickedUpBattery(Survivor survivor, Battery battery)
+    {
+        battery.Pickup();
     }
 }

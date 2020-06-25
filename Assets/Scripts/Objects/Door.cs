@@ -30,14 +30,8 @@ public class Door : MonoBehaviour
     {
         locked = false;
         doorRenderer = GetComponent<Renderer>();
-    }
-
-    public void Unlock()
-    {
-        locked = false;
-        unlockedSound.Play();
-        Destroy(this.gameObject);
-
+        EventManager.survivorFailedToUnlockDoorEvent.AddListener(OnSurvivorFailedToUnlockDoor);
+        EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
     }
 
     // for now we will play the locked sound in here. We may want to move it out at some point.
@@ -47,31 +41,23 @@ public class Door : MonoBehaviour
     }
 
 
-/*
-    private bool Locked()
+    private void Unlock()
     {
-        return locked;
+        unlockedSound.Play();
+        locked = false;
+        Destroy(this.gameObject);
     }
 
-    public bool Unlockable(Inventory inventory, out Key correctKey)
+    private void OnSurvivorFailedToUnlockDoor(Door door)
     {
-        Key[] keys = inventory.Keys();
-        bool unlockable = false;
-        correctKey = null;
-
-        for (var i = 0; i < keys.Length; i++)
-        {
-            if (keys[i].mask == unlockMask)
-            {
-                correctKey = keys[i];
-                unlockable = true;
-                break;
-            }
-        }
-
-        return unlockable;
+        door.PlayLockedSound();
     }
-    */
+
+
+    private void OnSurvivorUnlockedDoor(Survivor survivor, Key key, Door door)
+    {
+        door.Unlock();
+    }
 }
 
 
