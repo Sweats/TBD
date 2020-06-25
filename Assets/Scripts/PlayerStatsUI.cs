@@ -31,12 +31,21 @@ public class PlayerStatsUI : MonoBehaviour
 
     [SerializeField]
     private KeyGUI[] keyGUI;
-    public void OnSurvivorOpenPlayerStats()
+
+    private void Start()
+    {
+        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
+        EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenPlayerStats);
+        EventManager.survivorClosedPlayerStats.AddListener(OnSurvivorClosePlayerStats);
+    }
+
+
+    private void OnSurvivorOpenPlayerStats()
     {
         Show();
     }
 
-    public void OnSurvivorClosePlayerStats()
+    private void OnSurvivorClosePlayerStats()
     {
         Hide();
     }

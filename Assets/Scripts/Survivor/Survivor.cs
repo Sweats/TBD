@@ -235,11 +235,13 @@ public class Survivor : MonoBehaviour
         else if (Keybinds.Get(Action.PlayerStats))
         {
             isPlayerStatsOpened = true;
+            EventManager.survivorOpenedPlayerStats.Invoke();
         }
 
         else if (Keybinds.GetKey(Action.PlayerStats, true))
         {
             isPlayerStatsOpened = false;
+            EventManager.survivorClosedPlayerStats.Invoke();
         }
         
         controller.Move(secondmove * speed * Time.deltaTime);

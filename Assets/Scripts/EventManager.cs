@@ -28,6 +28,11 @@ public static class EventManager
     
     public static SurvivorUnlockDoorEvent survivorUnlockDoorEvent = new SurvivorUnlockDoorEvent();
 
+
+    public static SurvivorOpenedPlayerStats survivorOpenedPlayerStats = new SurvivorOpenedPlayerStats();
+
+    public static SurvivorClosedPlayerStats survivorClosedPlayerStats = new SurvivorClosedPlayerStats();
+
     public static PlayerConnectedEvent playerConnectedEvent = new PlayerConnectedEvent();
 
     public static PlayerDisconnectedEvent playerDisconnectedEvent = new PlayerDisconnectedEvent();
