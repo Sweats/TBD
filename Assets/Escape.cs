@@ -37,7 +37,6 @@ public class Escape : MonoBehaviour
 
         if (canEscape)
         {
-            UpdateSurvivorVariable(survivors);
             EventManager.survivorsEscapedStageEvent.Invoke();
         }
     }
@@ -52,15 +51,4 @@ public class Escape : MonoBehaviour
             survivor.isInEscapeRoom = false;
         }
     }
-
-
-    private void UpdateSurvivorVariable(GameObject[] survivors)
-    {
-        for (var i = 0; i < survivors.Length; i++)
-        {
-            Survivor survivor = survivors[i].GetComponent<Survivor>();
-            survivor.matchOver = true;
-        }
-    }
-
 }

@@ -48,7 +48,7 @@ public class PausedGameInput : MonoBehaviour
     [SerializeField]
     private bool[] openedMenus;
 
-    public bool gamePaused;
+    public static bool GAME_PAUSED;
 
     [SerializeField]
     private Color buttonTextColor;
@@ -62,7 +62,6 @@ public class PausedGameInput : MonoBehaviour
     // While this may not look the best, at least the in-game UI will only process the pause key once per frame.
     void Start()
     {
-        gamePaused = false;
         openedMenus = new bool[ARRAY_SIZE];
     }
 
@@ -70,16 +69,21 @@ public class PausedGameInput : MonoBehaviour
     // make it so it closes and goes back to the main options menu.
     void Update()
     {
-        if (Keybinds.GetKey(Action.GUiReturn) && !gamePaused)
+        if (ConsoleUI.OPENED || Chat.OPENED)
+        {
+            return;
+        }
+
+        if (Keybinds.GetKey(Action.GUiReturn) && !GAME_PAUSED)
         {
             openedMenus[(int)Menu.Pause] = true;
-            gamePaused = true;
+            GAME_PAUSED = true;
             pauseUI.Show();
             Cursor.lockState = CursorLockMode.Confined;
         }
 
         // I tried to make this clean but oh well.
-        else if (Keybinds.GetKey(Action.GUiReturn) && gamePaused)
+        else if (Keybinds.GetKey(Action.GUiReturn) && GAME_PAUSED)
         {
             bool openedMenuFound = false;
 
@@ -131,7 +135,7 @@ public class PausedGameInput : MonoBehaviour
                         break;
                     case Menu.Pause:
                         pauseUI.Hide();
-                        gamePaused = false;
+                        GAME_PAUSED = false;
                         openedMenuFound = true;
                         openedMenus[(int)Menu.Pause] = false;
                         Cursor.lockState = CursorLockMode.Locked;
@@ -211,7 +215,7 @@ public class PausedGameInput : MonoBehaviour
     public void OnReturnToGameButtonClicked()
     {
         openedMenus[(int)Menu.Pause] = false;
-        gamePaused = false;
+        GAME_PAUSED = false;
         pauseUI.Hide();
         Cursor.lockState = CursorLockMode.Locked;
     }

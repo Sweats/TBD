@@ -15,13 +15,16 @@ public class Survivor : MonoBehaviour
     private Sprint sprint;
 
     [SerializeField]
-    private PausedGameInput pausedGameInput;
-
-    [SerializeField]
     private Texture crosshair;
 
     [SerializeField]
     private Camera survivorCamera;
+
+    //[SerializeField]
+    //private PausedGameInput pausedGameInput;
+
+    //[SerializeField]
+    //private ConsoleUI consoleUI;
 
     private CharacterController controller;
 
@@ -64,10 +67,7 @@ public class Survivor : MonoBehaviour
     private float trapDistance;
 
     private float xRotation;
-    private bool isChatOpened;
-
     private bool isPlayerStatsOpened;
-
 
     public bool matchOver;
 
@@ -84,15 +84,15 @@ public class Survivor : MonoBehaviour
         controller = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
         moving = new Vector3();
-
+        //EventManager.survivorClosedChatEvent.AddListener(OnSurvivorClosedChatEvent);
+        //EventManager.survivorOpenedChatEvent.AddListener(OnSurvivorOpenedChatEvent);
+        EventManager.survivorClosedPlayerStats.AddListener(OnSurvivorClosedPlayerStats);
+        EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenedPlayerStats);
+        EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
     }
-
-    // We will try to handle as much input as possible here. If not that is okay I think.
-
-
     void LateUpdate()
     {
-        if (pausedGameInput.gamePaused || isChatOpened || matchOver)
+        if (IsAnotherWindowOpen() || matchOver)
         {
             return;
         }
@@ -130,7 +130,7 @@ public class Survivor : MonoBehaviour
 
         CheckForTraps();
 
-        if (pausedGameInput.gamePaused || isChatOpened || matchOver)
+        if (IsAnotherWindowOpen() || matchOver)
         {
             return;
         }
@@ -210,40 +210,13 @@ public class Survivor : MonoBehaviour
         else if (Keybinds.GetKey(Action.Grab))
         {
             OnActionGrab();
-
         }
-
-        else if (Keybinds.GetKey(Action.GuiAccept))
-        {
-            if (!pausedGameInput.gamePaused)
-            {
-                EventManager.survivorOpenedChatEvent.Invoke();
-                isChatOpened = true;
-            }
-        }
-
-        else if (Keybinds.GetKey(Action.GUiReturn))
-        {
-            if (!pausedGameInput.gamePaused && isChatOpened)
-            {
-                EventManager.survivorClosedChatEvent.Invoke();
-                isChatOpened = false;
-            }
-        }
-
 
         else if (Keybinds.Get(Action.PlayerStats))
         {
-            isPlayerStatsOpened = true;
             EventManager.survivorOpenedPlayerStats.Invoke();
         }
 
-        else if (Keybinds.GetKey(Action.PlayerStats, true))
-        {
-            isPlayerStatsOpened = false;
-            EventManager.survivorClosedPlayerStats.Invoke();
-        }
-        
         controller.Move(secondmove * speed * Time.deltaTime);
 
     }
@@ -308,12 +281,12 @@ public class Survivor : MonoBehaviour
 
     void OnGUI()
     {
-        if (pausedGameInput.gamePaused)
+        if (PausedGameInput.GAME_PAUSED)
         {
             return;
         }
 
-        if (!isPlayerStatsOpened)
+        if (!isPlayerStatsOpened && !ConsoleUI.OPENED)
         {
             inventory.Draw();
         }
@@ -390,7 +363,6 @@ public class Survivor : MonoBehaviour
         else
         {
             EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
-
         }
     }
 
@@ -402,4 +374,26 @@ public class Survivor : MonoBehaviour
         EventManager.survivorDeathEvent.Invoke(this);
     }
 
+    private void OnSurvivorsEscapedStageEvent()
+    {
+        matchOver = true;
+    }
+
+    private void OnSurvivorOpenedPlayerStats()
+    {
+        isPlayerStatsOpened = true;
+    }
+
+
+    private void OnSurvivorClosedPlayerStats()
+    {
+        isPlayerStatsOpened = false;
+    }
+
+
+    private bool IsAnotherWindowOpen()
+    {
+        return  (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
+
+    }
 }

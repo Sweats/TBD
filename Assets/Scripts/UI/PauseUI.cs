@@ -1,7 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-
 public class PauseUI : MonoBehaviour
 {
     private const string MAIN_MENU_SCENE = "menu";
@@ -32,6 +29,6 @@ public class PauseUI : MonoBehaviour
 
      public void OnBackToTitleScreenButtonClicked()
      {
-         SceneManager.LoadScene(MAIN_MENU_SCENE);
+         Stages.Load(StageName.Menu);
      }
 }

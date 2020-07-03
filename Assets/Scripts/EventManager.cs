@@ -18,7 +18,7 @@ public static class EventManager
     
     public static SurvivorPickedUpKeyEvent survivorPickedUpKeyEvent = new SurvivorPickedUpKeyEvent();
     
-    public static SurvivorSendChatMessageEvent survivorSendChatMessageEvent;
+    public static SurvivorSendChatMessageEvent survivorSendChatMessageEvent = new SurvivorSendChatMessageEvent();
     
     public static SurvivorOpenedChatEvent survivorOpenedChatEvent = new SurvivorOpenedChatEvent();
     
@@ -35,8 +35,19 @@ public static class EventManager
 
     public static PlayerConnectedEvent playerConnectedEvent = new PlayerConnectedEvent();
 
+    public static PlayerOpenedConsoleEvent playerOpenedConsoleEvent = new PlayerOpenedConsoleEvent();
+
     public static PlayerDisconnectedEvent playerDisconnectedEvent = new PlayerDisconnectedEvent();
     public static MonsterWonEvent monsterWonEvent = new MonsterWonEvent();
+
+    public static FailedToLoadStageEvent failedToLoadStageEvent = new FailedToLoadStageEvent();
+
+    public static PlayerClosedConsoleEvent playerClosedConsoleEvent = new PlayerClosedConsoleEvent();
+
+    public static PlayerOpenedPauseMenuEvent playerOpenedPauseMenuEvent = new PlayerOpenedPauseMenuEvent();
+
+    public static PlayerClosedPauseMenuEvent playerClosedPauseMenuEvent = new PlayerClosedPauseMenuEvent();
+
 }
 
 
@@ -75,19 +86,8 @@ public class SurvivorToggleFlashlightEvent: UnityEvent<Survivor> {}
 public class SurvivorAlreadyHaveKeyEvent: UnityEvent {}
 
 [System.Serializable]
-public class SurvivorOpenedChatEvent: UnityEvent {}
+public class SurvivorSendChatMessageEvent: UnityEvent<ChatMessage> {}
 
-[System.Serializable]
-public class SurvivorClosedChatEvent: UnityEvent {}
-
-[System.Serializable]
-public class SurvivorSendChatMessageEvent: UnityEvent<Survivor> {}
-
-[System.Serializable]
-public class SurvivorOpenedPlayerStats: UnityEvent {}
-
-[System.Serializable]
-public class SurvivorClosedPlayerStats: UnityEvent {}
 
 
 [System.Serializable]
@@ -128,6 +128,10 @@ public class MonsterArmedTrapEvent: UnityEvent<Trap> {}
 [System.Serializable]
 public class SurvivorsEscapedStageEvent: UnityEvent {}
 
+
+[System.Serializable]
+public class FailedToLoadStageEvent: UnityEvent<string> {}
+
 public class MonsterWonEvent: UnityEvent {}
 
 
@@ -155,8 +159,29 @@ public class LurkerChangedFormEvent: UnityEvent<bool> {}
 [System.Serializable]
 public class PlayerConnectedEvent: UnityEvent<Survivor> {}
 
-
 [System.Serializable]
 public class PlayerDisconnectedEvent: UnityEvent<Survivor> {}
+
+#endregion
+
+
+
+#region WINDOW_EVENTS
+
+public class PlayerOpenedConsoleEvent: UnityEvent {}
+
+public class PlayerClosedConsoleEvent: UnityEvent {}
+
+public class PlayerOpenedPauseMenuEvent: UnityEvent {}
+
+public class PlayerClosedPauseMenuEvent: UnityEvent {}
+
+public class SurvivorOpenedChatEvent: UnityEvent {}
+
+public class SurvivorClosedChatEvent: UnityEvent {}
+
+public class SurvivorOpenedPlayerStats: UnityEvent {}
+
+public class SurvivorClosedPlayerStats: UnityEvent {}
 
 #endregion

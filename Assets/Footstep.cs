@@ -60,6 +60,7 @@ public class Footstep : MonoBehaviour
         }
 
     }
+}
 
 
     // TO DO: Give a tiny bit of a delay to this function because we don't need to spam it every frame.
@@ -114,5 +115,6 @@ public class Footstep : MonoBehaviour
 //        
 //        }
 //
-    //}
-}
+//  //}
+//
+//

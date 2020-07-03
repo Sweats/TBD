@@ -112,5 +112,4 @@ public class GameMessages : MonoBehaviour
         messages.Remove(newMessage);
         UpdateChatText();
     }
-
 }

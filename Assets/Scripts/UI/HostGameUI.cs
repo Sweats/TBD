@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
+﻿using UnityEngine;
 public class HostGameUI : MonoBehaviour
 {
     // Start is called before the first frame update
@@ -25,7 +22,6 @@ public class HostGameUI : MonoBehaviour
     public void Hide()
     {
         hostgameCanvas.enabled = false;
-
     }
 
     

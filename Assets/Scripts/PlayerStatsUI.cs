@@ -40,6 +40,17 @@ public class PlayerStatsUI : MonoBehaviour
     }
 
 
+    private void Update()
+    {
+        if (playerStatsCanvas.enabled)
+        {
+            if (Keybinds.GetKey(Action.PlayerStats, true))
+            {
+                EventManager.survivorClosedPlayerStats.Invoke();
+            }
+        }
+    }
+                
     private void OnSurvivorOpenPlayerStats()
     {
         Show();
@@ -68,29 +79,29 @@ public class PlayerStatsUI : MonoBehaviour
             switch (keyType)
             {
                 case (int)KeyType.Rusty:
-                rustyKeyCount++;
-                break;
+                    rustyKeyCount++;
+                    break;
                 case (int)KeyType.Old:
-                oldKeyCount++;
-                break;
+                    oldKeyCount++;
+                    break;
                 case (int)KeyType.Silver:
-                silverKeyCount++;
-                break;
+                    silverKeyCount++;
+                    break;
                 case (int)KeyType.Metal:
-                metalKeyCount++;
-                break;
+                    metalKeyCount++;
+                    break;
                 case (int)KeyType.Crowbar:
-                crowbarCount++;
-                break;
+                    crowbarCount++;
+                    break;
                 case (int)KeyType.Hammer:
-                hammerCount++;
-                break;
+                    hammerCount++;
+                    break;
                 case (int)KeyType.Code:
-                codeCount++;
-                break;
+                    codeCount++;
+                    break;
             }
         }
- 
+
         if (rustyKeyCount > 0)
         {
             keyGUI[id].rustyKeyImage.enabled = true;
@@ -140,7 +151,7 @@ public class PlayerStatsUI : MonoBehaviour
             keyGUI[id].crowbarImage.enabled = true;
             keyGUI[id].crowbarCountText.text = $"{crowbarCount}";
             keyGUI[id].crowbarCountText.enabled = true;
-       }
+        }
     }
 
 

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 public class Sprint : MonoBehaviour
 {
     public bool sprinting;
@@ -23,6 +22,8 @@ public class Sprint : MonoBehaviour
     private AudioSource outOfBreath;
 
     private float energy;
+    pr
+    kddk
 
     // Update is called once per frame
     void Update()

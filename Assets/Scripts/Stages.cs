@@ -17,17 +17,22 @@ public class Stages
 
     };
 
+
     public static void Load(StageName stageName)
     {
         if (stagesDict.ContainsKey(stageName))
         {
+            PausedGameInput.GAME_PAUSED = false;
+            ConsoleUI.OPENED = false;
+            Chat.OPENED = false;
             SceneManager.LoadScene(stagesDict[stageName]);
         }
 
         else
         {
-            Debug.Log($"Failed to load the stage {stagesDict[stageName]}!");
+            string stageNameFailedToLoad = stagesDict[stageName];
+            EventManager.failedToLoadStageEvent.Invoke(stageNameFailedToLoad);
+            //Debug.Log($"Failed to load the stage {stagesDict[stageName]}!");
         }
-
     }
 }

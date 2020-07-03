@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ChatMessage : MonoBehaviour
+public class ChatMessage
 {
     public string survivorName;
     public int survivorID;
