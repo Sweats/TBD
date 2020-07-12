@@ -22,8 +22,6 @@ public class Sprint : MonoBehaviour
     private AudioSource outOfBreath;
 
     private float energy;
-    pr
-    kddk
 
     // Update is called once per frame
     void Update()
