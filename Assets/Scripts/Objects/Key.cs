@@ -11,7 +11,7 @@
         Crowbar
     }
 
- [System.Serializable]
+[System.Serializable]
 public class Key
 {
     public string keyName = "Rusty Key";

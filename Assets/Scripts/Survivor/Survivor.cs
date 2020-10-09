@@ -254,7 +254,7 @@ public class Survivor : MonoBehaviour
             var gameObject = hit.collider.gameObject;
             var tagName = gameObject.tag;
 
-            if (tagName == "Item")
+            if (tagName == "Key")
             {
                 KeyObject keyObject = gameObject.GetComponent<KeyObject>();
                 OnClickedOnKey(keyObject);

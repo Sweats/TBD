@@ -81,6 +81,7 @@ public class Insanity : MonoBehaviour
         insanityEnabled = false;
         insanityValue = 0;
         maxed = false;
+
     }
 
     private void OnSurvivorDeath(Survivor survivor)
@@ -93,4 +94,5 @@ public class Insanity : MonoBehaviour
     {
         survivor.insanity.insanityValue += insanityHitTrapAmount;
     }
+
 }
