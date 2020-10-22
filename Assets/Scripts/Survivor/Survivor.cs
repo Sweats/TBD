@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections;
+
 public class Survivor : MonoBehaviour
 {
 
@@ -84,7 +86,7 @@ public class Survivor : MonoBehaviour
     {
         //survivorBody = GetComponent<Transform>();
         controller = GetComponent<CharacterController>();
-	animator = GetComponent<Animator>();
+        animator = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         moving = new Vector3();
         //EventManager.survivorClosedChatEvent.AddListener(OnSurvivorClosedChatEvent);
@@ -92,6 +94,7 @@ public class Survivor : MonoBehaviour
         EventManager.survivorClosedPlayerStats.AddListener(OnSurvivorClosedPlayerStats);
         EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenedPlayerStats);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
+        StartCoroutine(CheckForTraps());
     }
 
     void LateUpdate()
@@ -132,8 +135,6 @@ public class Survivor : MonoBehaviour
             velocity.y = -2f;
         }
 
-        CheckForTraps();
-
         if (IsAnotherWindowOpen() || matchOver)
         {
             return;
@@ -161,7 +162,7 @@ public class Survivor : MonoBehaviour
         {
             speed = defaultSpeed;
         }
-  
+
         if (Keybinds.GetKey(Action.SwitchFlashlight))
         {
             flashlight.Toggle();
@@ -224,26 +225,40 @@ public class Survivor : MonoBehaviour
         controller.Move(secondmove * speed * Time.deltaTime);
 
     }
-    // TO DO. Give a tiny bit of delay to this function because we don't need to spam this function on every frame.
-    private void CheckForTraps()
+
+    private IEnumerator CheckForTraps()
     {
-        RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, trapDistance, transform.forward, trapDistance);
-
-        for (var i = 0; i < objectsHit.Length; i++)
+        while (true)
         {
-            GameObject hitObject = objectsHit[i].collider.gameObject;
-            string tagName = hitObject.tag;
 
-            if (tagName == "Trap")
+            RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, trapDistance, transform.forward, trapDistance);
+
+            for (var i = 0; i < objectsHit.Length; i++)
             {
-                Trap trap = hitObject.GetComponent<Trap>();
+                GameObject hitObject = objectsHit[i].collider.gameObject;
+                string tagName = hitObject.tag;
 
-                if (trap.armed)
+                if (tagName == "Trap")
                 {
-                    EventManager.survivorTriggeredTrapEvent.Invoke(this, trap);
+                    Trap trap = hitObject.GetComponent<Trap>();
+
+                    if (trap.armed)
+                    {
+                        EventManager.survivorTriggeredTrapEvent.Invoke(this, trap);
+                    }
                 }
             }
+
+	    if (matchOver || dead)
+	    {
+		    break;
+	    }
+
+            yield return new WaitForSeconds(0.5f);
+
         }
+
+	StopCoroutine(CheckForTraps());
     }
 
 
@@ -298,8 +313,8 @@ public class Survivor : MonoBehaviour
         // TO DO: Optimize this!
         GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
     }
-        
- 
+
+
     private void OnClickedOnKey(KeyObject foundKey)
     {
         Key[] keysInInventory = inventory.Keys();
@@ -352,11 +367,11 @@ public class Survivor : MonoBehaviour
     }
 
 
-//    private void OnClickOnObject(DarnedObject object)
-//    {
-//
-//    }
-//
+    //    private void OnClickOnObject(DarnedObject object)
+    //    {
+    //
+    //    }
+    //
     private void OnSurvivorClickedOnBattery(Battery battery)
     {
         if (flashlight.charge <= battery.chargeNeededToGrab)
@@ -376,6 +391,7 @@ public class Survivor : MonoBehaviour
         insanity.Reset();
         deathSound.Play();
         EventManager.survivorDeathEvent.Invoke(this);
+        StopCoroutine(CheckForTraps());
     }
 
     private void OnSurvivorsEscapedStageEvent()
@@ -397,6 +413,6 @@ public class Survivor : MonoBehaviour
 
     private bool IsAnotherWindowOpen()
     {
-        return  (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
+        return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
     }
 }

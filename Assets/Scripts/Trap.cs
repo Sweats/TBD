@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Trap : MonoBehaviour
 {
@@ -19,21 +20,7 @@ public class Trap : MonoBehaviour
     private void Start()
     {
         EventManager.survivorTriggeredTrapEvent.AddListener(OnSurvivorTriggeredTrap);
-    }
-
-    void Update()
-    {
-        if (!armed)
-        {
-            trapTimer -= Time.deltaTime * trapTimerRate;
-
-            if (trapTimer <= minTimer)
-            {
-                armed = true;
-                trapTimer = minTimer;
-            }
-        }
-        
+	StartCoroutine(TrapTimer());
     }
 
     public void Trigger()
@@ -41,10 +28,31 @@ public class Trap : MonoBehaviour
         trapSound.Play();
         armed = false;
         trapTimer = maxTimer;
+	StartCoroutine(TrapTimer());
     }
+
 
     private void OnSurvivorTriggeredTrap(Survivor survivor, Trap trap)
     {
         trap.Trigger();
+    }
+
+    private IEnumerator TrapTimer()
+    {
+	    while (true)
+	    {
+		   trapTimer -= 1;
+
+		   if (trapTimer <= minTimer)
+		   {
+			   armed = true;
+			   trapTimer = minTimer;
+			   break;
+		   }
+
+		   yield return new WaitForSeconds(1);
+	    }
+
+	    StopCoroutine(TrapTimer());
     }
 }
