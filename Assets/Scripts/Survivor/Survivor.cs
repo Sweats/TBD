@@ -28,6 +28,8 @@ public class Survivor : MonoBehaviour
 
     private CharacterController controller;
 
+    private Animator animator;
+
     [SerializeField]
     private float defaultSpeed;
 
@@ -82,6 +84,7 @@ public class Survivor : MonoBehaviour
     {
         //survivorBody = GetComponent<Transform>();
         controller = GetComponent<CharacterController>();
+	animator = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         moving = new Vector3();
         //EventManager.survivorClosedChatEvent.AddListener(OnSurvivorClosedChatEvent);
@@ -90,6 +93,7 @@ public class Survivor : MonoBehaviour
         EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenedPlayerStats);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
     }
+
     void LateUpdate()
     {
         if (IsAnotherWindowOpen() || matchOver)
@@ -394,6 +398,5 @@ public class Survivor : MonoBehaviour
     private bool IsAnotherWindowOpen()
     {
         return  (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
-
     }
 }
