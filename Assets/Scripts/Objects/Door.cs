@@ -24,12 +24,16 @@ public class Door : MonoBehaviour
     private Color outlineColor = Color.yellow;
 
     public bool locked;
+
     private Renderer doorRenderer;
+
+    private BoxCollider doorCollider;
 
     void Start()
     {
         locked = false;
         doorRenderer = GetComponent<Renderer>();
+	doorCollider = GetComponent<BoxCollider>();
         EventManager.survivorFailedToUnlockDoorEvent.AddListener(OnSurvivorFailedToUnlockDoor);
         EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
     }
@@ -45,7 +49,8 @@ public class Door : MonoBehaviour
     {
         unlockedSound.Play();
         locked = false;
-        Destroy(this.gameObject);
+	doorRenderer.enabled = false;
+	doorCollider.enabled = false;
     }
 
     private void OnSurvivorFailedToUnlockDoor(Door door)
