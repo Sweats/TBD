@@ -95,6 +95,7 @@ public class Survivor : MonoBehaviour
         EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenedPlayerStats);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
         StartCoroutine(CheckForTraps());
+        StartCoroutine(HandleStamina());
     }
 
     void LateUpdate()
@@ -162,7 +163,7 @@ public class Survivor : MonoBehaviour
         {
             speed = defaultSpeed;
         }
-
+  
         if (Keybinds.GetKey(Action.SwitchFlashlight))
         {
             flashlight.Toggle();
@@ -179,18 +180,20 @@ public class Survivor : MonoBehaviour
 
         else if (Keybinds.GetKey(Action.Sprint))
         {
-            if (isMoving)
+            if (isMoving && (sprint.GetEnergy()>=sprint.GetEnergyNeededToSprint()))
             {
                 sprint.sprinting = true;
+                //immediately consume energy
+                sprint.SetEnergy(-3.0f);
             }
 
         }
-
+        /* Not needed since Sprint triggers on tapping Shift key and works as long as you are moving
         else if (Keybinds.GetKey(Action.Sprint, true))
         {
             sprint.sprinting = false;
         }
-
+        */
 
 
         else if (Keybinds.GetKey(Action.Crouch, true))
@@ -259,6 +262,40 @@ public class Survivor : MonoBehaviour
         }
 
 	StopCoroutine(CheckForTraps());
+    }
+    private IEnumerator HandleStamina()
+    {
+        while (true)
+        {
+
+            RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, trapDistance, transform.forward, trapDistance);
+
+            for (var i = 0; i < objectsHit.Length; i++)
+            {
+                GameObject hitObject = objectsHit[i].collider.gameObject;
+                string tagName = hitObject.tag;
+
+                if (tagName == "Trap")
+                {
+                    Trap trap = hitObject.GetComponent<Trap>();
+
+                    if (trap.armed)
+                    {
+                        EventManager.survivorTriggeredTrapEvent.Invoke(this, trap);
+                    }
+                }
+            }
+
+            if (matchOver || dead)
+            {
+                break;
+            }
+
+            yield return new WaitForSeconds(0.5f);
+
+        }
+
+        StopCoroutine(HandleStamina());
     }
 
 
