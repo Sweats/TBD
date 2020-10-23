@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class FallenMusic : MonoBehaviour
@@ -31,10 +30,10 @@ public class FallenMusic : MonoBehaviour
 
     private IEnumerator Detect()
     {
-	    bool fallenClose = Music.ShouldPlayMusic()
+	    bool fallenClose = Music.ShouldPlayMusic();
 
     }
 
-    private void 
+    //private void ()
 
 }
