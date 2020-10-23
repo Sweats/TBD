@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 public class Sprint : MonoBehaviour
 {
-    public bool sprinting;
+    private bool isSprinting;
 
     [SerializeField]
     private float maxEnergy;
@@ -19,50 +20,61 @@ public class Sprint : MonoBehaviour
     private float energyNeededToSprint;
 
     [SerializeField]
+    private float tickRate;
+
+    [SerializeField]
     private AudioSource outOfBreath;
 
-    private float energy;
+    //This points back to Chad in the Editor, is this shit even right? i just need fucking shit from the fucking Survivor fucking class fuck also fuck debugger doesn't work fuck
+    //on second though, it's probably right, since chad /would/ be the only local player. handling stamina for other dummies isn't necessary and gasping sound will be handled by network events anyway
+    [SerializeField]
+    private Survivor localSurvivor;
 
+    private float energy;
+    
     private void Start()
     {
         //Survs start with Full Energy
         energy = maxEnergy;
-        InvokeRepeating("calcSprint", 0, 1);
+        StartCoroutine(calcStamina());
+        //InvokeRepeating("calcSprint", 0, 1);
     }
-
-    // Update is called once per frame
-    /*
-    void Update()
+    
+private IEnumerator calcStamina()
     {
-        
-    }
-    */
-    //move Sprint Calc to custom function, attempting 9heads-like way for Stamina
-    void calcSprint()
-    {
-        Debug.Log("Energy: " + energy);
-
-        if (sprinting)
+        while (true)
         {
-            if (energy > minEnergy)
+            //don't need to do any calcs if Match is over or Char is dead, so check first.
+            if (localSurvivor.GetMatchOver() || localSurvivor.GetDead())
             {
-                energy -= dischargeRate;
-                //* Time.deltaTime;
+                break;
+            }
+
+            if (isSprinting)
+            {
+                if (energy > minEnergy)
+                {
+                    energy -= dischargeRate;
+                }
+                else
+                {
+                    outOfBreath.Play();
+                    isSprinting = false;
+                }
             }
             else
             {
-                outOfBreath.Play();
-                sprinting = false;
+                if (energy < maxEnergy)
+                {
+                    energy += rechargeRate;
+                }
             }
+
+            yield return new WaitForSeconds(tickRate);
+
         }
-        else
-        {
-            if (energy < maxEnergy)
-            {
-                energy += rechargeRate;
-                //* Time.deltaTime;
-            }
-        }
+
+        StopCoroutine(calcStamina());
     }
     public float GetEnergy()
     {
@@ -75,5 +87,17 @@ public class Sprint : MonoBehaviour
     public void SetEnergy(float input_energy)
     {
         energy += input_energy;
+    }
+    public bool GetSprinting()
+    {
+        return isSprinting;
+    }
+    public void SetSprinting(bool input_sprinting)
+    {
+        isSprinting = input_sprinting;
+    }
+    public float GetTickRate()
+    {
+        return tickRate;
     }
 }

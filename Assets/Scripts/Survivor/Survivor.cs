@@ -99,7 +99,6 @@ public class Survivor : MonoBehaviour
         EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenedPlayerStats);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
         StartCoroutine(CheckForTraps());
-        StartCoroutine(HandleStamina());
     }
 
     void LateUpdate()
@@ -152,11 +151,11 @@ public class Survivor : MonoBehaviour
         bool isMoving = moving != secondmove;
         float speed;
 
-        if (sprint.sprinting)
+        if (sprint.GetSprinting())
         {
             if (!isMoving)
             {
-                sprint.sprinting = false;
+                sprint.SetSprinting(false);
                 speed = defaultSpeed;
             }
 
@@ -185,11 +184,14 @@ public class Survivor : MonoBehaviour
 
         else if (Keybinds.GetKey(Action.Sprint))
         {
+            //To make it more 9heads-like, needs to check if player attemps to sprint while moving diagonally
+            //while sprinting, diagonal movement is impossible
+            //needs to check if player is backpaddling
             if (isMoving && (sprint.GetEnergy()>=sprint.GetEnergyNeededToSprint()))
             {
-                sprint.sprinting = true;
+                sprint.SetSprinting(true);
                 //immediately consume energy
-                sprint.SetEnergy(-3.0f);
+                sprint.SetEnergy(-3.0f/sprint.GetTickRate());
             }
 
         }
@@ -266,41 +268,6 @@ public class Survivor : MonoBehaviour
 
         }
     }
-    private IEnumerator HandleStamina()
-    {
-        while (true)
-        {
-
-            RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, trapDistance, transform.forward, trapDistance);
-
-            for (var i = 0; i < objectsHit.Length; i++)
-            {
-                GameObject hitObject = objectsHit[i].collider.gameObject;
-                string tagName = hitObject.tag;
-
-                if (tagName == "Trap")
-                {
-                    Trap trap = hitObject.GetComponent<Trap>();
-
-                    if (trap.armed)
-                    {
-                        EventManager.survivorTriggeredTrapEvent.Invoke(this, trap);
-                    }
-                }
-            }
-
-            if (matchOver || dead)
-            {
-                break;
-            }
-
-            yield return new WaitForSeconds(0.5f);
-
-        }
-
-        StopCoroutine(HandleStamina());
-    }
-
 
     private void OnActionGrab()
     {
@@ -453,5 +420,14 @@ public class Survivor : MonoBehaviour
     private bool IsAnotherWindowOpen()
     {
         return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
+    }
+
+    public bool GetMatchOver()
+    {
+        return matchOver;
+    }
+    public bool GetDead()
+    {
+        return dead;
     }
 }
