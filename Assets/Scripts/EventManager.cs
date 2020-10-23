@@ -52,6 +52,8 @@ public static class EventManager
 
     public static LurkerReadyToGoIntoPhysicalFormEvent lurkerReadyToGoIntoPhysicalFormEvent = new LurkerReadyToGoIntoPhysicalFormEvent();
 
+    public static MonsterSpawnedInStageEvent monsterSpawnedInStageEvent = new MonsterSpawnedInStageEvent();
+
 }
 
 
@@ -137,6 +139,9 @@ public class SurvivorsEscapedStageEvent : UnityEvent { }
 public class FailedToLoadStageEvent : UnityEvent<string> { }
 
 public class MonsterWonEvent : UnityEvent { }
+
+
+public class MonsterSpawnedInStageEvent: UnityEvent<int> {}
 
 
 #endregion

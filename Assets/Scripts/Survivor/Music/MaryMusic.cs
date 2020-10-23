@@ -21,6 +21,10 @@ public class MaryMusic : MonoBehaviour
     void Start()
     {
         survivorPosition = GetComponent<Transform>();
+    }
+
+    public void Detect()
+    {
         StartCoroutine(Detect());
     }
 
@@ -70,11 +74,5 @@ public class MaryMusic : MonoBehaviour
         }
 
 	yield return new WaitForSeconds(0.5f);
-    }
-
-    // TODO: Have an event call this when everyone spawns in the stage at the same time.
-    private void OnMarySpawnedInStage()
-    {
-
     }
 }

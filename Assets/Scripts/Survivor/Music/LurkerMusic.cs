@@ -40,6 +40,11 @@ public class LurkerMusic : MonoBehaviour
         }
     }
 
+    public void Detect()
+    {
+	    StartCoroutine(Detect());
+    }
+
     private IEnumerator Detect()
     {
         bool lurkerClose, lurkerFar;
@@ -92,13 +97,6 @@ public class LurkerMusic : MonoBehaviour
 
             yield return new WaitForSeconds(1);
         }
-    }
-
-
-    // TODO: Have an event call this when everyone spawns in the stage at the same time.
-    private void OnLurkerSpawnedInStage()
-    {
-
     }
 
 }

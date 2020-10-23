@@ -70,10 +70,4 @@ public class PhantomMusic : MonoBehaviour
 
 	yield return new WaitForSeconds(1);
     }
-
-    // TODO: Have an event call this when everyone spawns in the stage at the same time.
-    private void OnPhantomSpawnInStage()
-    {
-
-    }
 }

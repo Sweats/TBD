@@ -6,24 +6,48 @@ using UnityEngine;
 //
 public class Music : MonoBehaviour
 {
-    [SerializeField]
-    private AudioSource fallenAmbientMusic;
 
-    [SerializeField]
-    private AudioSource fallenCloseMusic;
+    private LurkerMusic lurkerMusic;
 
-    [SerializeField]
-    private AudioSource fallenAmbientMusicDistance;
+    private PhantomMusic phantomMusic;
 
-    [SerializeField]
-    private AudioSource fallenCloseMusicDistance;
+    private MaryMusic maryMusic;
+
+    private FallenMusic fallenMusic;
+
+
+    void Start()
+    {
+        EventManager.monsterSpawnedInStageEvent.AddListener(OnMonsterSpawnInStage());
+    }
+
+    private void OnMonsterSpawnInStage(int monster)
+    {
+        switch (monster)
+        {
+            case 0:
+                lurkerMusic.Detect();
+                break;
+            case 1:
+                phantomMusic.Detect();
+                break;
+            case 2:
+                maryMusic.Detect();
+                break;
+            case 3:
+                fallenMusic.Detect();
+                break;
+            default:
+                break;
+        }
+    }
 
     public static bool ShouldPlayMusic(Transform position, float distance, string monsterTag)
     {
         bool found = false;
         //RaycastHit[] objectsHit = Physics.SphereCastAll(survivorPosition.position, distance, survivorPosition.forward, distance);
 
-	RaycastHit[] objectsHit = Physics.SphereCastAll(position.position, distance, position.forward, distance);
+        RaycastHit[] objectsHit = Physics.SphereCastAll(position.position, distance, position.forward, distance);
 
         for (var i = 0; i < objectsHit.Length; i++)
         {
