@@ -4,7 +4,9 @@ public class Lurker : MonoBehaviour
 {
     private CharacterController lurkerController;
 
+
     public float physicalFormSpeed;
+
 
     public float ghostFormSpeed;
 
@@ -18,15 +20,13 @@ public class Lurker : MonoBehaviour
 
     public float attackDistance;
 
+    public float trapArmDistance;
+
     public float attackSpeed;
 
     public float energy;
 
     private float speed;
-
-
-
-
 
     private bool ghostForm = true;
 
@@ -42,6 +42,12 @@ public class Lurker : MonoBehaviour
     [SerializeField]
     private AudioSource footstepSound;
 
+    [SerializeField]
+    private AudioSource trapArmSound;
+
+    [SerializeField]
+    private AudioSource attackSound;
+
     private Camera lurkerCamera;
 
     #region EVENTS
@@ -54,6 +60,7 @@ public class Lurker : MonoBehaviour
     {
         lurkerController = GetComponent<CharacterController>();
         lurkerCamera = GetComponent<Camera>();
+        //LurkerChangedFormEvent.AddListener(OnLurkerFormChanged());
     }
 
     void Update()
@@ -62,26 +69,55 @@ public class Lurker : MonoBehaviour
 
         if (Keybinds.GetKey(Action.Transform))
         {
-            ghostForm = !ghostForm;
-
             if (ghostForm)
             {
-                lurkerChangedFormEvent.Invoke(ghostForm);
+                if (energy >= maxEnergy)
+                {
+                    OnLurkerFormChanged();
+
+                }
             }
+
+            else
+            {
+                if (energy <= minEnergy)
+                {
+                    OnLurkerFormChanged();
+                }
+            }
+
         }
 
         else if (Keybinds.GetKey(Action.Attack))
         {
-            HandleAttack();
+            OnAttack();
         }
-    }
 
+        else if (Keybinds.GetKey(Action.MoveForward))
+        {
 
-    private void HandleAttack()
-    {
-        RaycastHit hit;
+        }
 
-        //if (Physics.SphereCast(transform.position, 1.))
+        else if (Keybinds.GetKey(Action.MoveLeft))
+        {
+
+        }
+
+        else if (Keybinds.GetKey(Action.MoveRight))
+        {
+
+        }
+
+        else if (Keybinds.GetKey(Action.MoveBack))
+        {
+
+        }
+
+        else if (Keybinds.GetKey(Action.Grab))
+        {
+            HandleGrab();
+
+        }
     }
 
 
@@ -94,6 +130,8 @@ public class Lurker : MonoBehaviour
             if (energy >= maxEnergy)
             {
                 energy = maxEnergy;
+                EventManager.lurkerReadyToGoIntoPhysicalFormEvent.Invoke();
+
             }
         }
 
@@ -104,6 +142,7 @@ public class Lurker : MonoBehaviour
             if (energy <= minEnergy)
             {
                 energy = minEnergy;
+                OnLurkerFormChanged();
             }
         }
 
@@ -114,17 +153,29 @@ public class Lurker : MonoBehaviour
     {
         lurkerChangeFormSound.Play();
         ghostForm = !ghostForm;
+        EventManager.lurkerChangedFormEvent.Invoke(ghostForm);
 
         if (ghostForm)
         {
             speed = ghostFormSpeed;
+
+            if (lurkerPhysicalFormMusic.isPlaying)
+            {
+                lurkerPhysicalFormMusic.Stop();
+            }
+
             lurkerGhostFormMusic.Play();
         }
 
         else
         {
             speed = physicalFormSpeed;
-            lurkerGhostFormMusic.Stop();
+
+            if (lurkerGhostFormMusic.isPlaying)
+            {
+                lurkerGhostFormMusic.Stop();
+            }
+
             lurkerPhysicalFormMusic.Play();
         }
     }
@@ -135,22 +186,47 @@ public class Lurker : MonoBehaviour
         Ray ray = lurkerCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, attackDistance))
+        // TO DO: Play an attack sound or animation here somewhere
+        if (!ghostForm)
         {
-            GameObject hitGameObject = hit.collider.gameObject;
-
-            if (hitGameObject.tag == "Survivor")
+            if (Physics.Raycast(ray, out hit, attackDistance))
             {
-                Survivor survivor = hitGameObject.GetComponent<Survivor>();
-                survivor.Die();
+                GameObject hitGameObject = hit.collider.gameObject;
+                string tag = hitGameObject.tag;
+
+                if (tag == "Survivor")
+                {
+                    Survivor survivor = hitGameObject.GetComponent<Survivor>();
+                    survivor.Die();
+                }
             }
         }
 
+        else
+        {
+            if (Physics.Raycast(ray, out hit, trapArmDistance))
+            {
+                GameObject hitGameObject = hit.collider.gameObject;
+                string tag = hitGameObject.tag;
+
+                if (tag == "Trap")
+                {
+                    Trap trap = hitGameObject.GetComponent<Trap>();
+                    trap.armed = true;
+                    trapArmSound.Play();
+                }
+            }
+        }
     }
 
-
-    private void OnArmTrap(Trap trap)
+    private void HandleGrab()
     {
 
     }
+
+    private void UpdateScreen()
+    {
+        // TO DO: Change what the color of the screen looks like. Not sure how to do this in Unity yet.
+    }
 }
+

@@ -32,6 +32,7 @@ public class GameMessages : MonoBehaviour
         EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
         EventManager.playerConnectedEvent.AddListener(OnPlayerConnect);
         EventManager.playerDisconnectedEvent.AddListener(OnPlayerDisconnect);
+	EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
 
     }
 
@@ -104,6 +105,14 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
+
+    private void OnLurkerReadyToGoIntoPhysicalForm()
+    {
+	    string newMesasge = "You may now transform into physical form.";
+	    StartCoroutine(AddAndRemoveGameMessage(newMesasge));
+    }
+
+
     private IEnumerator AddAndRemoveGameMessage(string newMessage)
     {
         messages.Add(newMessage);
@@ -112,4 +121,6 @@ public class GameMessages : MonoBehaviour
         messages.Remove(newMessage);
         UpdateChatText();
     }
+
+
 }

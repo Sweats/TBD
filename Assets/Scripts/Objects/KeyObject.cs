@@ -33,10 +33,13 @@ public class KeyObject : MonoBehaviour
 
     private Renderer keyRenderer;
 
+    private MeshCollider keyCollider;
+
     void Start()
     {
         noGlowTimer = maxTimerForGlow;
         keyRenderer = GetComponent<Renderer>();
+	keyCollider = GetComponent<MeshCollider>();
         keyRenderer.material.SetColor("_Color", glowOutlineColor);
         EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
     }
@@ -76,7 +79,8 @@ public class KeyObject : MonoBehaviour
 
     public void Pickup()
     {
-        Destroy(this.gameObject);
+	    keyRenderer.enabled = false;
+	    keyCollider.enabled = false;
     }
 
     private void OnSurvivorPickedUpKey(Survivor survivor, Key key)

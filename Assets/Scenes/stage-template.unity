@@ -1157,6 +1157,87 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &1124143456
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1124143457}
+  - component: {fileID: 1124143459}
+  - component: {fileID: 1124143458}
+  - component: {fileID: 1124143460}
+  m_Layer: 0
+  m_Name: Music
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1124143457
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1124143456}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8264294535903999863}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1124143458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1124143456}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b72468c77bd94174b1f455c648a3b98, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  phantomAmbientMusic: {fileID: 0}
+  phantomCloseMusic: {fileID: 0}
+  phantomAmbientMusicDistance: 0
+  phantomCloseMusicDistance: 0
+--- !u!114 &1124143459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1124143456}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39698a1a8a28a69518df31590cbfb508, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lurkerAmbientMusic: {fileID: 0}
+  lurkerCloseMusic: {fileID: 0}
+  lurkerAmbientMusicDistance: 0
+  lurkerCloseMusicDistance: 0
+--- !u!114 &1124143460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1124143456}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e73bc5bb6d9e41c59a328d45ea571c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maryCloseMusic: {fileID: 0}
+  maryFarMusic: {fileID: 0}
+  maryCloseMusicDistance: 0
+  maryFarMusicDistance: 0
 --- !u!1 &1142339750
 GameObject:
   m_ObjectHideFlags: 0
@@ -6737,6 +6818,7 @@ Transform:
   - {fileID: 1144211412}
   - {fileID: 466059708}
   - {fileID: 695726446}
+  - {fileID: 1124143457}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -26815,6 +26897,7 @@ MonoBehaviour:
   inventory: {fileID: 194226524}
   flashlight: {fileID: 466059706}
   survivorID: 0
+  music: {fileID: 0}
   deathSound: {fileID: 1706123782}
   sprint: {fileID: 1144211411}
   crosshair: {fileID: 2800000, guid: 4a5d688cd5f4d9b4ab0679e8e4bddd74, type: 3}

@@ -11,6 +11,9 @@ public class Survivor : MonoBehaviour
     public int survivorID;
 
     [SerializeField]
+    private Music music;
+
+    [SerializeField]
     private AudioSource deathSound;
 
     [SerializeField]
@@ -21,6 +24,7 @@ public class Survivor : MonoBehaviour
 
     [SerializeField]
     private Camera survivorCamera;
+
 
     //[SerializeField]
     //private PausedGameInput pausedGameInput;
@@ -130,6 +134,7 @@ public class Survivor : MonoBehaviour
     {
         velocity.y -= gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+	//controller.attachedRigidbody.
 
         if (controller.isGrounded && velocity.y < 0)
         {
@@ -254,14 +259,12 @@ public class Survivor : MonoBehaviour
 
 	    if (matchOver || dead)
 	    {
-		    break;
+		    yield break;
 	    }
 
             yield return new WaitForSeconds(0.5f);
 
         }
-
-	StopCoroutine(CheckForTraps());
     }
     private IEnumerator HandleStamina()
     {
@@ -428,7 +431,6 @@ public class Survivor : MonoBehaviour
         insanity.Reset();
         deathSound.Play();
         EventManager.survivorDeathEvent.Invoke(this);
-        StopCoroutine(CheckForTraps());
     }
 
     private void OnSurvivorsEscapedStageEvent()

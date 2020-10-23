@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public class Stage : MonoBehaviour
 {
-    
     [SerializeField]
     private Survivor[] survivors;
+
     private Lurker lurker;
 
     private void Start()
@@ -69,19 +67,5 @@ public class Stage : MonoBehaviour
     public void OnSurvivorLeftExitZone(Survivor who)
     {
         who.isInEscapeRoom = false;
-    }
-
-    public void OnLurkerTransform(bool ghostForm)
-    {
-        if (ghostForm)
-        {
-            //lurker.transform.position
-        }
-
-        else
-        {
-
-        }
-
     }
 }

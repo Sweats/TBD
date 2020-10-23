@@ -20,15 +20,15 @@ public class Trap : MonoBehaviour
     private void Start()
     {
         EventManager.survivorTriggeredTrapEvent.AddListener(OnSurvivorTriggeredTrap);
-	StartCoroutine(TrapTimer());
+        StartCoroutine(TrapTimer());
     }
 
     public void Trigger()
-    {
+    {	
         trapSound.Play();
         armed = false;
         trapTimer = maxTimer;
-	StartCoroutine(TrapTimer());
+        StartCoroutine(TrapTimer());
     }
 
 
@@ -39,20 +39,22 @@ public class Trap : MonoBehaviour
 
     private IEnumerator TrapTimer()
     {
-	    while (true)
-	    {
-		   trapTimer -= 1;
+        while (true)
+        {
+            trapTimer -= 1;
 
-		   if (trapTimer <= minTimer)
-		   {
-			   armed = true;
-			   trapTimer = minTimer;
-			   break;
-		   }
+	    // TO DO: Make it so traps behave differently depending on the monster that is on the stage.
 
-		   yield return new WaitForSeconds(1);
-	    }
+            if (trapTimer <= minTimer || armed)
+            {
+                armed = true;
+                trapTimer = minTimer;
+		yield break;
+            }
 
-	    StopCoroutine(TrapTimer());
+            yield return new WaitForSeconds(1);
+        }
+
     }
 }
+

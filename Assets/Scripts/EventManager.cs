@@ -3,29 +3,29 @@ using UnityEngine.Events;
 public static class EventManager
 {
     public static SurvivorPickedUpBatteryEvent survivorPickedUpBatteryEvent = new SurvivorPickedUpBatteryEvent();
-    
+
     public static SurvivorAlreadyHaveKeyEvent SurvivorAlreadyHaveKeyEvent = new SurvivorAlreadyHaveKeyEvent();
-    
+
     public static SurvivorDeathEvent survivorDeathEvent = new SurvivorDeathEvent();
-    
+
     public static SurvivorFailedToPickUpBatteryEvent survivorFailedToPickUpBatteryEvent = new SurvivorFailedToPickUpBatteryEvent();
-    
+
     public static SurvivorsEscapedStageEvent survivorsEscapedStageEvent = new SurvivorsEscapedStageEvent();
-    
+
     public static SurvivorTriggeredTrapEvent survivorTriggeredTrapEvent = new SurvivorTriggeredTrapEvent();
-    
+
     public static SurvivorToggleFlashlightEvent survivorToggledFlashlightEvent;
-    
+
     public static SurvivorPickedUpKeyEvent survivorPickedUpKeyEvent = new SurvivorPickedUpKeyEvent();
-    
+
     public static SurvivorSendChatMessageEvent survivorSendChatMessageEvent = new SurvivorSendChatMessageEvent();
-    
+
     public static SurvivorOpenedChatEvent survivorOpenedChatEvent = new SurvivorOpenedChatEvent();
-    
+
     public static SurvivorClosedChatEvent survivorClosedChatEvent = new SurvivorClosedChatEvent();
-    
+
     public static SurvivorFailedToUnlockDoorEvent survivorFailedToUnlockDoorEvent = new SurvivorFailedToUnlockDoorEvent();
-    
+
     public static SurvivorUnlockDoorEvent survivorUnlockDoorEvent = new SurvivorUnlockDoorEvent();
 
 
@@ -48,60 +48,66 @@ public static class EventManager
 
     public static PlayerClosedPauseMenuEvent playerClosedPauseMenuEvent = new PlayerClosedPauseMenuEvent();
 
+    public static LurkerChangedFormEvent lurkerChangedFormEvent = new LurkerChangedFormEvent();
+
+    public static LurkerReadyToGoIntoPhysicalFormEvent lurkerReadyToGoIntoPhysicalFormEvent = new LurkerReadyToGoIntoPhysicalFormEvent();
+
+    public static MonsterSpawnedInStageEvent monsterSpawnedInStageEvent = new MonsterSpawnedInStageEvent();
+
 }
 
 
-    
+
 #region Survivor_Events
 
 
 [System.Serializable]
-public class SurvivorDeathEvent: UnityEvent<Survivor> {}
+public class SurvivorDeathEvent : UnityEvent<Survivor> { }
 
 [System.Serializable]
-public class SurvivorUnlockDoorEvent: UnityEvent<Survivor, Key, Door> {}
+public class SurvivorUnlockDoorEvent : UnityEvent<Survivor, Key, Door> { }
 
 [System.Serializable]
-public class SurvivorFailedToUnlockDoorEvent: UnityEvent<Door> {}
+public class SurvivorFailedToUnlockDoorEvent : UnityEvent<Door> { }
 
 [System.Serializable]
-public class SurvivorPickedUpKeyEvent: UnityEvent<Survivor, Key> {}
+public class SurvivorPickedUpKeyEvent : UnityEvent<Survivor, Key> { }
 
 [System.Serializable]
-public class SurvivorPickedUpBatteryEvent: UnityEvent<Survivor, Battery> {}
+public class SurvivorPickedUpBatteryEvent : UnityEvent<Survivor, Battery> { }
 
 [System.Serializable]
-public class SurvivorFailedToPickUpBatteryEvent: UnityEvent {}
+public class SurvivorFailedToPickUpBatteryEvent : UnityEvent { }
 
 [System.Serializable]
-public class SurvivorStartSprintingEvent: UnityEvent<Survivor> {}
+public class SurvivorStartSprintingEvent : UnityEvent<Survivor> { }
 
 [System.Serializable]
-public class  SurvivorStopSprintingEvent: UnityEvent<Survivor> {}
+public class SurvivorStopSprintingEvent : UnityEvent<Survivor> { }
 
 [System.Serializable]
-public class SurvivorToggleFlashlightEvent: UnityEvent<Survivor> {}
+public class SurvivorToggleFlashlightEvent : UnityEvent<Survivor> { }
 
 [System.Serializable]
-public class SurvivorAlreadyHaveKeyEvent: UnityEvent {}
+public class SurvivorAlreadyHaveKeyEvent : UnityEvent { }
 
 [System.Serializable]
-public class SurvivorSendChatMessageEvent: UnityEvent<ChatMessage> {}
+public class SurvivorSendChatMessageEvent : UnityEvent<ChatMessage> { }
 
 
 
 [System.Serializable]
-public class SurvivorMovingEvent: UnityEvent<bool> {}
+public class SurvivorMovingEvent : UnityEvent<bool> { }
 
 [System.Serializable]
-public class SurvivorStopMovingEvent: UnityEvent {}
+public class SurvivorStopMovingEvent : UnityEvent { }
 
 #endregion
 
 #region INSANITY
 
 [System.Serializable]
-public class InsanityEffectEvent: UnityEvent {}
+public class InsanityEffectEvent : UnityEvent { }
 
 
 #endregion
@@ -115,10 +121,10 @@ public class InsanityEffectEvent: UnityEvent {}
 
 #region TRAP_EVENTS
 
-public class SurvivorTriggeredTrapEvent: UnityEvent<Survivor, Trap>{}
+public class SurvivorTriggeredTrapEvent : UnityEvent<Survivor, Trap> { }
 
 [System.Serializable]
-public class MonsterArmedTrapEvent: UnityEvent<Trap> {}
+public class MonsterArmedTrapEvent : UnityEvent<Trap> { }
 
 #endregion
 
@@ -126,21 +132,27 @@ public class MonsterArmedTrapEvent: UnityEvent<Trap> {}
 #region STAGE_EVENTS
 
 [System.Serializable]
-public class SurvivorsEscapedStageEvent: UnityEvent {}
+public class SurvivorsEscapedStageEvent : UnityEvent { }
 
 
 [System.Serializable]
-public class FailedToLoadStageEvent: UnityEvent<string> {}
+public class FailedToLoadStageEvent : UnityEvent<string> { }
 
-public class MonsterWonEvent: UnityEvent {}
+public class MonsterWonEvent : UnityEvent { }
+
+
+public class MonsterSpawnedInStageEvent: UnityEvent<int> {}
 
 
 #endregion
 
 #region LURKER_EVENTS
 
-[System.Serializable]
-public class LurkerChangedFormEvent: UnityEvent<bool> {}
+public class LurkerChangedFormEvent : UnityEvent<bool> { }
+
+
+public class LurkerReadyToGoIntoPhysicalFormEvent : UnityEvent { }
+
 
 #endregion
 
@@ -157,10 +169,10 @@ public class LurkerChangedFormEvent: UnityEvent<bool> {}
 
 
 [System.Serializable]
-public class PlayerConnectedEvent: UnityEvent<Survivor> {}
+public class PlayerConnectedEvent : UnityEvent<Survivor> { }
 
 [System.Serializable]
-public class PlayerDisconnectedEvent: UnityEvent<Survivor> {}
+public class PlayerDisconnectedEvent : UnityEvent<Survivor> { }
 
 #endregion
 
@@ -168,20 +180,20 @@ public class PlayerDisconnectedEvent: UnityEvent<Survivor> {}
 
 #region WINDOW_EVENTS
 
-public class PlayerOpenedConsoleEvent: UnityEvent {}
+public class PlayerOpenedConsoleEvent : UnityEvent { }
 
-public class PlayerClosedConsoleEvent: UnityEvent {}
+public class PlayerClosedConsoleEvent : UnityEvent { }
 
-public class PlayerOpenedPauseMenuEvent: UnityEvent {}
+public class PlayerOpenedPauseMenuEvent : UnityEvent { }
 
-public class PlayerClosedPauseMenuEvent: UnityEvent {}
+public class PlayerClosedPauseMenuEvent : UnityEvent { }
 
-public class SurvivorOpenedChatEvent: UnityEvent {}
+public class SurvivorOpenedChatEvent : UnityEvent { }
 
-public class SurvivorClosedChatEvent: UnityEvent {}
+public class SurvivorClosedChatEvent : UnityEvent { }
 
-public class SurvivorOpenedPlayerStats: UnityEvent {}
+public class SurvivorOpenedPlayerStats : UnityEvent { }
 
-public class SurvivorClosedPlayerStats: UnityEvent {}
+public class SurvivorClosedPlayerStats : UnityEvent { }
 
 #endregion
