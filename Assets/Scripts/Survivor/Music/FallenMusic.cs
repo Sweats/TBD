@@ -23,15 +23,16 @@ public class FallenMusic : MonoBehaviour
 
     }
 
-    public void Detect()
+    public void Begin()
     {
 	    StartCoroutine(Detect());
     }
 
     private IEnumerator Detect()
     {
-	    bool fallenClose = Music.ShouldPlayMusic();
+	    //bool fallenClose = Music.ShouldPlayMusic();
 
+	    yield return null;
     }
 
     //private void ()

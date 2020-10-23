@@ -22,6 +22,10 @@ public class PhantomMusic : MonoBehaviour
     void Start()
     {
         position = GetComponent<Transform>();
+    }
+
+    public void Begin()
+    {
         StartCoroutine(Detect());
     }
 
@@ -66,8 +70,9 @@ public class PhantomMusic : MonoBehaviour
                     phantomCloseMusic.Stop();
                 }
             }
+
+		yield return new WaitForSeconds(1);
         }
 
-	yield return new WaitForSeconds(1);
     }
 }

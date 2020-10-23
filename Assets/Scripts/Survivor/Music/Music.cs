@@ -18,7 +18,7 @@ public class Music : MonoBehaviour
 
     void Start()
     {
-        EventManager.monsterSpawnedInStageEvent.AddListener(OnMonsterSpawnInStage());
+        EventManager.monsterSpawnedInStageEvent.AddListener(OnMonsterSpawnInStage);
     }
 
     private void OnMonsterSpawnInStage(int monster)
@@ -26,16 +26,16 @@ public class Music : MonoBehaviour
         switch (monster)
         {
             case 0:
-                lurkerMusic.Detect();
+                lurkerMusic.Begin();
                 break;
             case 1:
-                phantomMusic.Detect();
+                phantomMusic.Begin();
                 break;
             case 2:
-                maryMusic.Detect();
+                maryMusic.Begin();
                 break;
             case 3:
-                fallenMusic.Detect();
+                fallenMusic.Begin();
                 break;
             default:
                 break;

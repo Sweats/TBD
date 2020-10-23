@@ -23,7 +23,7 @@ public class MaryMusic : MonoBehaviour
         survivorPosition = GetComponent<Transform>();
     }
 
-    public void Detect()
+    public void Begin()
     {
         StartCoroutine(Detect());
     }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Phantom : MonoBehaviour
 {
@@ -30,27 +28,27 @@ public class Phantom : MonoBehaviour
 
     void Update()
     {
-	if (Keybinds.GetKey(Actions.MoveForward))
+	if (Keybinds.GetKey(Action.MoveForward))
 	{
 
 	}
 
-	else if (Keybinds.GetKey(Actions.MoveLeft))
+	else if (Keybinds.GetKey(Action.MoveLeft))
 	{
 
 	}
 
-	else if (Keybinds.GetKey(Actions.MoveRight))
+	else if (Keybinds.GetKey(Action.MoveRight))
 	{
 
 	}
 
-	else if (Keybinds.GetKey(Actions.MoveBack))
+	else if (Keybinds.GetKey(Action.MoveBack))
 	{
 
 	}
 
-	else if (Keybinds.GetKey(Actions.Attack))
+	else if (Keybinds.GetKey(Action.Attack))
 	{
 		OnAttack();
 	}

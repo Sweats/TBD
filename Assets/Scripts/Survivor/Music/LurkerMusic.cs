@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LurkerMusic : MonoBehaviour
@@ -40,7 +39,7 @@ public class LurkerMusic : MonoBehaviour
         }
     }
 
-    public void Detect()
+    public void Begin()
     {
 	    StartCoroutine(Detect());
     }
