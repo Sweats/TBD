@@ -20,16 +20,15 @@ public class Sprint : MonoBehaviour
     [SerializeField]
     private float energyNeededToSprint;
 
-    //[SerializeField]
-    //private float tickRate;
+    [SerializeField]
+    private float tickRate;
 
     [SerializeField]
     private AudioSource outOfBreath;
 
-    //This points back to Chad in the Editor, is this shit even right? i just need fucking shit from the fucking Survivor fucking class fuck also fuck debugger doesn't work fuck
-    //on second though, it's probably right, since chad /would/ be the only local player. handling stamina for other dummies isn't necessary and gasping sound will be handled by network events anyway
-    //[SerializeField]
-    //private Survivor localSurvivor;
+    private bool isDead =  false;
+
+    private bool isMatchOver = false;
 
     [SerializeField]
     private float energy;
@@ -38,17 +37,16 @@ public class Sprint : MonoBehaviour
     {
         //Survs start with Full Energy
         energy = maxEnergy;
-        //StartCoroutine(CalcStamina());
+        StartCoroutine(CalcStamina());
         //InvokeRepeating("calcSprint", 0, 1);
     }
 
-    /*
     private IEnumerator CalcStamina()
     {
         while (true)
         {
             //don't need to do any calcs if Match is over or Char is dead, so check first.
-            if (localSurvivor.GetMatchOver() || localSurvivor.GetDead())
+            if (isMatchOver || isDead)
             {
                 yield break;
             }
@@ -84,9 +82,10 @@ public class Sprint : MonoBehaviour
 
         }
     }
-    */
 
 
+
+    /*
     private void Update()
     {
         if (isSprinting)
@@ -122,6 +121,7 @@ public class Sprint : MonoBehaviour
             }
         }
     }
+    */
 
     public float GetEnergy()
     {
@@ -148,10 +148,18 @@ public class Sprint : MonoBehaviour
         isSprinting = input_sprinting;
     }
 
-    /*
     public float GetTickRate()
     {
         return tickRate;
     }
-    */
+
+    public void SetDead(bool dead)
+    {
+	    isDead = dead;
+
+    }
+    public void SetMatchOver(bool matchOver)
+    {
+	    isMatchOver = matchOver;
+    }
 }

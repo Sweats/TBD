@@ -191,8 +191,7 @@ public class Survivor : MonoBehaviour
             {
                 sprint.SetSprinting(true);
                 //immediately consume energy
-		// not sure what the -3 is supposed to mean.
-                //sprint.SetEnergy(-3.0f/sprint.GetTickRate());
+                sprint.SetEnergy(-3.0f/sprint.GetTickRate());
             }
         }
         /* Not needed since Sprint triggers on tapping Shift key and works as long as you are moving
@@ -395,6 +394,7 @@ public class Survivor : MonoBehaviour
     public void Die()
     {
         dead = true;
+	sprint.SetDead(dead);
         insanity.Reset();
         deathSound.Play();
         EventManager.survivorDeathEvent.Invoke(this);
@@ -403,6 +403,7 @@ public class Survivor : MonoBehaviour
     private void OnSurvivorsEscapedStageEvent()
     {
         matchOver = true;
+	sprint.SetMatchOver(true);
     }
 
     private void OnSurvivorOpenedPlayerStats()
@@ -420,14 +421,5 @@ public class Survivor : MonoBehaviour
     private bool IsAnotherWindowOpen()
     {
         return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
-    }
-
-    public bool GetMatchOver()
-    {
-        return matchOver;
-    }
-    public bool GetDead()
-    {
-        return dead;
     }
 }

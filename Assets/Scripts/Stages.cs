@@ -5,7 +5,9 @@ using UnityEngine.SceneManagement;
 public enum StageName
 {
     Hotel = 0,
-    Menu
+    Menu,
+    Template
+
 }
 
 public class Stages
@@ -13,7 +15,8 @@ public class Stages
     private static Dictionary<StageName, string> stagesDict = new Dictionary<StageName, string>()
     {
         {StageName.Hotel, "hotel"},
-        {StageName.Menu, "menu"}
+        {StageName.Menu, "menu"},
+	{StageName.Template, "stage-template"}
 
     };
 
