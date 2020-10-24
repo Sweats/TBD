@@ -191,9 +191,9 @@ public class Survivor : MonoBehaviour
             {
                 sprint.SetSprinting(true);
                 //immediately consume energy
-                sprint.SetEnergy(-3.0f/sprint.GetTickRate());
+		// not sure what the -3 is supposed to mean.
+                //sprint.SetEnergy(-3.0f/sprint.GetTickRate());
             }
-
         }
         /* Not needed since Sprint triggers on tapping Shift key and works as long as you are moving
         else if (Keybinds.GetKey(Action.Sprint, true))
