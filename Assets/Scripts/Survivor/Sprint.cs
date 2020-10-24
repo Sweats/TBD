@@ -114,11 +114,11 @@ public class Sprint : MonoBehaviour
             if (energy < maxEnergy)
             {
                 energy += regenerationRate * Time.deltaTime;
-            }
 
-            else if (energy >= maxEnergy)
-            {
-                energy = maxEnergy;
+		if (energy > maxEnergy)
+		{
+			energy = maxEnergy;
+		}
             }
         }
     }
