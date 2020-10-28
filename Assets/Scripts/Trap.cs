@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class Trap : MonoBehaviour
 {
@@ -13,48 +12,85 @@ public class Trap : MonoBehaviour
     private float minTimer;
 
     public float trapTimer;
+
     public float trapTimerRate;
 
-    public bool armed;
+    private bool armed;
+
+    [SerializeField]
+    private MeshRenderer trapRenderer;
+
+    [SerializeField]
+    private CapsuleCollider capsuleCollider;
+
+    private Color originalColor;
 
     private void Start()
     {
-        EventManager.survivorTriggeredTrapEvent.AddListener(OnSurvivorTriggeredTrap);
-        StartCoroutine(TrapTimer());
+        originalColor = trapRenderer.material.color;
+
+        //EventManager.lurkerChangedFormEvent.AddListener(OnLurkerGoBackToGhostForm);
+        //int monster = 0;
+
+        // get the kind of monster that is in the game and then call the corrisponding trap logic for the monster
+        /*
+        switch (monster)
+        {
+            case 0:
+                StartCoroutine(DoLurkerTraps());
+                break;
+            case 1:
+                StartCoroutine(DoPhantomTraps());
+                break;
+            case 2:
+                StartCoroutine(DoMaryTraps());
+                break;
+            case 3:
+                StartCoroutine(DoFallenTraps());
+                break;
+            default:
+                break;
+
+        }
+        */
+
     }
 
     public void Trigger()
-    {	
+    {
         trapSound.Play();
         armed = false;
-        trapTimer = maxTimer;
-        StartCoroutine(TrapTimer());
     }
 
-
-    private void OnSurvivorTriggeredTrap(Survivor survivor, Trap trap)
+    public void Arm()
     {
-        trap.Trigger();
+        armed = true;
+	Unglow();
     }
 
-    private IEnumerator TrapTimer()
+    public bool Armed()
     {
-        while (true)
-        {
-            trapTimer -= 1;
+        return armed;
+    }
 
-	    // TO DO: Make it so traps behave differently depending on the monster that is on the stage.
+    public void UnArm()
+    {
+        armed = false;
+    }
 
-            if (trapTimer <= minTimer || armed)
-            {
-                armed = true;
-                trapTimer = minTimer;
-		yield break;
-            }
-
-            yield return new WaitForSeconds(1);
-        }
+    // For the Lurker monster.
+    public void Glow()
+    {
+	    Debug.Log("Glowing...");
+        trapRenderer.material.SetColor("_Color", Color.white);
 
     }
+
+    public void Unglow()
+    {
+	    Debug.Log("Unglowing...");
+        trapRenderer.material.SetColor("_Color", originalColor);
+
+    }
+
 }
-

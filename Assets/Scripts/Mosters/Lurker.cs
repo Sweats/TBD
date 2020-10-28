@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Lurker : MonoBehaviour
 {
@@ -14,21 +15,38 @@ public class Lurker : MonoBehaviour
 
     public float minEnergy = 0;
 
-    public float energyDischargeRate;
+    [SerializeField]
+    private float energy;
 
-    public float energyRechargeRate;
+    [SerializeField]
+    private float energyRegenerationRate;
 
-    public float attackDistance;
+    [SerializeField]
+    private float energyConsumptionRate;
 
-    public float trapArmDistance;
+    [SerializeField]
+    private float attackDistance;
 
-    public float attackSpeed;
+    [SerializeField]
+    private float trapArmDistance;
 
-    public float energy;
+    [SerializeField]
+    private float attackSpeed;
 
+
+    [SerializeField]
     private float speed;
 
     private bool ghostForm = true;
+
+    private bool matchOver = false;
+
+
+    [SerializeField]
+    private int secondsBetweenGlows;
+
+    [SerializeField]
+    private int trapGlowTime;
 
     [SerializeField]
     private AudioSource lurkerChangeFormSound;
@@ -48,30 +66,105 @@ public class Lurker : MonoBehaviour
     [SerializeField]
     private AudioSource attackSound;
 
+    [SerializeField]
+    private AudioSource lurkerReadyToTransformSound;
+
+    [SerializeField]
     private Camera lurkerCamera;
 
-    #region EVENTS
+    private bool isReadyToGoIntoPhysicalForm;
 
-    public LurkerChangedFormEvent lurkerChangedFormEvent;
+    // Get the list of objects on the stage and cache them for the match.
+    private GameObject[] traps;
 
-    #endregion
+    private GameObject[] doors;
+
+    private GameObject[] survivors;
+
+    private GameObject[] keys;
+
+    private GameObject[] batteries;
+
+    private float xRotation;
+
+    [SerializeField]
+    private float minimumX;
+
+    [SerializeField]
+    private float maximumX;
+
+    private Vector3 velocity;
+
+    [SerializeField]
+    private float gravity;
+
+    [SerializeField]
+    private Texture crosshair;
+
 
     void Start()
     {
         lurkerController = GetComponent<CharacterController>();
-        lurkerCamera = GetComponent<Camera>();
-        //LurkerChangedFormEvent.AddListener(OnLurkerFormChanged());
+        speed = ghostFormSpeed;
+        Cursor.lockState = CursorLockMode.Locked;
+        doors = GameObject.FindGameObjectsWithTag(Tags.DOOR);
+        keys = GameObject.FindGameObjectsWithTag(Tags.KEY);
+        batteries = GameObject.FindGameObjectsWithTag(Tags.BATTERY);
+        HideImportantObjects();
+        EventManager.survivorsEscapedStageEvent.AddListener(OnMatchOver);
+        StartCoroutine(GhostFormEnergyRoutine());
+        StartCoroutine(GlowRoutine());
+    }
+
+
+    void LateUpdate()
+    {
+        if (IsAnotherWindowOpen() || matchOver)
+        {
+            return;
+        }
+
+        float mouseX = Input.GetAxis("Mouse X") * Settings.MOUSE_SENSITIVITY;
+        float mouseY = Input.GetAxis("Mouse Y") * Settings.MOUSE_SENSITIVITY;
+
+        if (Settings.INVERT_X == 1)
+        {
+            mouseX *= -1;
+        }
+
+        if (Settings.INVERT_Y == 1)
+        {
+            mouseY *= -1;
+        }
+
+
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, minimumX, maximumX);
+        transform.Rotate(Vector3.up * mouseX);
+        lurkerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
 
     void Update()
     {
-        UpdateEnergy();
+        velocity.y -= gravity * Time.deltaTime;
+        lurkerController.Move(velocity * Time.deltaTime);
+
+        if (lurkerController.isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f;
+        }
+
+
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+        Vector3 secondmove = transform.right * x + transform.forward * z;
+        //bool isMoving = moving != secondmove;
 
         if (Keybinds.GetKey(Action.Transform))
         {
             if (ghostForm)
             {
-                if (energy >= maxEnergy)
+                if (isReadyToGoIntoPhysicalForm)
                 {
                     OnLurkerFormChanged();
 
@@ -80,10 +173,7 @@ public class Lurker : MonoBehaviour
 
             else
             {
-                if (energy <= minEnergy)
-                {
-                    OnLurkerFormChanged();
-                }
+                OnLurkerFormChanged();
             }
 
         }
@@ -93,59 +183,13 @@ public class Lurker : MonoBehaviour
             OnAttack();
         }
 
-        else if (Keybinds.GetKey(Action.MoveForward))
-        {
-
-        }
-
-        else if (Keybinds.GetKey(Action.MoveLeft))
-        {
-
-        }
-
-        else if (Keybinds.GetKey(Action.MoveRight))
-        {
-
-        }
-
-        else if (Keybinds.GetKey(Action.MoveBack))
-        {
-
-        }
-
         else if (Keybinds.GetKey(Action.Grab))
         {
             HandleGrab();
 
         }
-    }
 
-
-    private void UpdateEnergy()
-    {
-        if (ghostForm)
-        {
-            energy += energyRechargeRate * Time.deltaTime;
-
-            if (energy >= maxEnergy)
-            {
-                energy = maxEnergy;
-                EventManager.lurkerReadyToGoIntoPhysicalFormEvent.Invoke();
-
-            }
-        }
-
-        else
-        {
-            energy -= energyDischargeRate * Time.deltaTime;
-
-            if (energy <= minEnergy)
-            {
-                energy = minEnergy;
-                OnLurkerFormChanged();
-            }
-        }
-
+        lurkerController.Move(secondmove * speed * Time.deltaTime);
     }
 
 
@@ -157,7 +201,10 @@ public class Lurker : MonoBehaviour
 
         if (ghostForm)
         {
+            StartCoroutine(GhostFormEnergyRoutine());
+	    isReadyToGoIntoPhysicalForm = false;
             speed = ghostFormSpeed;
+            Debug.Log("Now in ghost form...");
 
             if (lurkerPhysicalFormMusic.isPlaying)
             {
@@ -165,11 +212,14 @@ public class Lurker : MonoBehaviour
             }
 
             lurkerGhostFormMusic.Play();
+            HideImportantObjects();
         }
 
         else
         {
             speed = physicalFormSpeed;
+            StartCoroutine(PhysicalFormEnergyRoutine());
+            Debug.Log("Now in physical form...");
 
             if (lurkerGhostFormMusic.isPlaying)
             {
@@ -177,6 +227,7 @@ public class Lurker : MonoBehaviour
             }
 
             lurkerPhysicalFormMusic.Play();
+            ShowImportantObjects();
         }
     }
 
@@ -186,7 +237,6 @@ public class Lurker : MonoBehaviour
         Ray ray = lurkerCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        // TO DO: Play an attack sound or animation here somewhere
         if (!ghostForm)
         {
             if (Physics.Raycast(ray, out hit, attackDistance))
@@ -194,10 +244,25 @@ public class Lurker : MonoBehaviour
                 GameObject hitGameObject = hit.collider.gameObject;
                 string tag = hitGameObject.tag;
 
-                if (tag == "Survivor")
+                if (tag == Tags.SURVIVOR)
                 {
                     Survivor survivor = hitGameObject.GetComponent<Survivor>();
+                    // TODO: Play an animation here.
                     survivor.Die();
+                }
+
+                else if (tag == Tags.TRAP)
+                {
+                    Trap trap = hitGameObject.GetComponent<Trap>();
+
+                    if (trap.Armed())
+                    {
+                        return;
+
+                    }
+
+                    trapArmSound.Play();
+                    trap.Arm();
                 }
             }
         }
@@ -209,11 +274,17 @@ public class Lurker : MonoBehaviour
                 GameObject hitGameObject = hit.collider.gameObject;
                 string tag = hitGameObject.tag;
 
-                if (tag == "Trap")
+                if (tag == Tags.TRAP)
                 {
                     Trap trap = hitGameObject.GetComponent<Trap>();
-                    trap.armed = true;
+
+                    if (trap.Armed())
+                    {
+                        return;
+                    }
+
                     trapArmSound.Play();
+                    trap.Arm();
                 }
             }
         }
@@ -228,5 +299,203 @@ public class Lurker : MonoBehaviour
     {
         // TO DO: Change what the color of the screen looks like. Not sure how to do this in Unity yet.
     }
-}
 
+    private void HideImportantObjects()
+    {
+        if (doors != null)
+        {
+            for (var i = 0; i < doors.Length; i++)
+            {
+                Door door = doors[i].GetComponent<Door>();
+                door.Hide();
+            }
+        }
+
+        if (survivors != null)
+        {
+            for (var i = 0; i < survivors.Length; i++)
+            {
+                Survivor survivor = survivors[i].GetComponent<Survivor>();
+                survivor.Hide();
+            }
+        }
+
+        if (keys != null)
+        {
+            for (var i = 0; i < keys.Length; i++)
+            {
+                KeyObject key = keys[i].GetComponent<KeyObject>();
+                key.Hide();
+            }
+        }
+
+        if (batteries != null)
+        {
+            for (var i = 0; i < batteries.Length; i++)
+            {
+                Battery battery = batteries[i].GetComponent<Battery>();
+                battery.Hide();
+            }
+        }
+    }
+
+    private void ShowImportantObjects()
+    {
+        if (doors != null)
+        {
+            for (var i = 0; i < doors.Length; i++)
+            {
+                Door door = doors[i].GetComponent<Door>();
+                door.Show();
+            }
+        }
+
+        if (survivors != null)
+        {
+            for (var i = 0; i < survivors.Length; i++)
+            {
+                Survivor survivor = survivors[i].GetComponent<Survivor>();
+                survivor.Show();
+            }
+        }
+
+        if (keys != null)
+        {
+            for (var i = 0; i < keys.Length; i++)
+            {
+                KeyObject key = keys[i].GetComponent<KeyObject>();
+                key.Show();
+            }
+        }
+
+        if (batteries != null)
+        {
+            for (var i = 0; i < batteries.Length; i++)
+            {
+                Battery battery = batteries[i].GetComponent<Battery>();
+                battery.Show();
+            }
+        }
+    }
+
+    // TODO. Figure out how the game should pick which traps that the lurker can actually arm.
+    private IEnumerator DoLurkerTraps()
+    {
+        while (true)
+        {
+            if (matchOver)
+            {
+                yield break;
+            }
+
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    // TODO. Rewrite this probably.
+    private IEnumerator GlowRoutine()
+    {
+        bool glowing = false;
+
+        while (true)
+        {
+            if (matchOver)
+            {
+                yield break;
+            }
+
+            if (traps != null)
+            {
+                for (var i = 0; i < traps.Length; i++)
+                {
+                    Trap trap = traps[i].GetComponent<Trap>();
+
+                    if (trap.Armed())
+                    {
+                        continue;
+                    }
+
+                    if (!glowing)
+                    {
+                        Debug.Log("Glowing trap...");
+                        trap.Glow();
+                    }
+
+                    else
+                    {
+                        Debug.Log("Unglowing trap...");
+                        trap.Unglow();
+                    }
+                }
+            }
+
+            if (glowing)
+            {
+                yield return new WaitForSeconds(trapGlowTime);
+            }
+
+            else
+            {
+                yield return new WaitForSeconds(secondsBetweenGlows);
+            }
+        }
+    }
+
+    private IEnumerator PhysicalFormEnergyRoutine()
+    {
+        for (var i = energy; i > minEnergy; i--)
+        {
+            if (matchOver || ghostForm)
+            {
+                yield break;
+            }
+
+	    energy--;
+
+            yield return new WaitForSeconds(energyConsumptionRate);
+        }
+
+
+	OnLurkerFormChanged();
+    }
+
+    private IEnumerator GhostFormEnergyRoutine()
+    {
+        for (var i = energy; i < maxEnergy; i++)
+        {
+            if (matchOver)
+            {
+                yield break;
+            }
+
+            energy++;
+            yield return new WaitForSeconds(energyRegenerationRate);
+        }
+
+        isReadyToGoIntoPhysicalForm = true;
+        EventManager.lurkerReadyToGoIntoPhysicalFormEvent.Invoke();
+        lurkerReadyToTransformSound.Play();
+    }
+
+    private void OnMatchOver()
+    {
+        matchOver = true;
+    }
+
+    private void OnGUI()
+    {
+        if (PausedGameInput.GAME_PAUSED)
+        {
+            return;
+        }
+
+        // TO DO: Optimize this!
+        GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
+    }
+
+    private bool IsAnotherWindowOpen()
+    {
+        return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
+    }
+
+}

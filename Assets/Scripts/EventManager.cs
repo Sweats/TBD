@@ -2,6 +2,7 @@ using UnityEngine.Events;
 
 public static class EventManager
 {
+
     public static SurvivorPickedUpBatteryEvent survivorPickedUpBatteryEvent = new SurvivorPickedUpBatteryEvent();
 
     public static SurvivorAlreadyHaveKeyEvent SurvivorAlreadyHaveKeyEvent = new SurvivorAlreadyHaveKeyEvent();
@@ -141,7 +142,7 @@ public class FailedToLoadStageEvent : UnityEvent<string> { }
 public class MonsterWonEvent : UnityEvent { }
 
 
-public class MonsterSpawnedInStageEvent: UnityEvent<int> {}
+public class MonsterSpawnedInStageEvent : UnityEvent<int> { }
 
 
 #endregion

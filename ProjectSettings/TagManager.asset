@@ -10,6 +10,8 @@ TagManager:
   - Key
   - Item
   - Trap
+  - Battery
+  - Lurker
   layers:
   - Default
   - TransparentFX

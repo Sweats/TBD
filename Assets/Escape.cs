@@ -6,38 +6,35 @@ public class Escape : MonoBehaviour
     {
         GameObject gameObject = collider.gameObject;
 
-        if (gameObject.tag == "Survivor")
+        if (gameObject.tag == Tags.SURVIVOR)
         {
             Survivor survivor = gameObject.GetComponent<Survivor>();
             survivor.isInEscapeRoom = true;
 
-        }
+            GameObject[] survivors = GameObject.FindGameObjectsWithTag(Tags.SURVIVOR);
 
-        GameObject[] survivors = GameObject.FindGameObjectsWithTag("Survivor");
+            bool canEscape = true;
 
-        bool canEscape = true;
-
-        for (var i = 0; i < survivors.Length; i++)
-        {
-            Survivor survivor = survivors[i].GetComponent<Survivor>();
-
-            if (survivor.dead)
+            for (var i = 0; i < survivors.Length; i++)
             {
-                continue;
+                Survivor otherSurvivor = survivors[i].GetComponent<Survivor>();
+
+                if (survivor.dead)
+                {
+                    continue;
+                }
+
+                if (!survivor.isInEscapeRoom)
+                {
+                    canEscape = false;
+                    break;
+                }
             }
 
-
-            if (!survivor.isInEscapeRoom)
+            if (canEscape)
             {
-                canEscape = false;
-                break;
+                EventManager.survivorsEscapedStageEvent.Invoke();
             }
-        }
-
-
-        if (canEscape)
-        {
-            EventManager.survivorsEscapedStageEvent.Invoke();
         }
     }
 
@@ -45,7 +42,7 @@ public class Escape : MonoBehaviour
     {
         GameObject gameObject = collision.gameObject;
 
-        if (gameObject.tag == "Survivor")
+        if (gameObject.tag == Tags.SURVIVOR)
         {
             Survivor survivor = gameObject.GetComponent<Survivor>();
             survivor.isInEscapeRoom = false;

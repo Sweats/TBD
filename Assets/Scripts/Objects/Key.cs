@@ -22,6 +22,7 @@ public class Key
 
     [SerializeField]
     private AudioSource pickupSound;
+
     public Texture textureIcon;
     
     public Key(Key key)
@@ -38,6 +39,12 @@ public class Key
     public void PlayPickupSound()
     {
         pickupSound.Play();
+    }
+
+    public int Mask()
+    {
+	    return mask;
+
     }
 }
 

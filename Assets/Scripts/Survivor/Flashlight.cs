@@ -2,7 +2,7 @@
 using UnityEngine.Events;
 
 // we will use this at some point to tell other clients that we have toggeled the flashlight.
-public class FlashlightEvent: UnityEvent<Flashlight> { }
+public class FlashlightEvent : UnityEvent<Flashlight> { }
 
 public class Flashlight : MonoBehaviour
 {
@@ -22,13 +22,15 @@ public class Flashlight : MonoBehaviour
 
     private Light flashlightSource;
 
-
     private bool flashlightDead = false;
+
+    // May seem like an unneeded variable but this is used for the Lurker. We don't want to accidentally show the flashlight to the Lurker if the survivor has their actual flashlight off.
+    private bool flashlightEnabled = true;
 
     void Start()
     {
         flashlightSource = GetComponent<Light>();
-        EventManager.survivorPickedUpBatteryEvent.AddListener(OnSurvivorPickedUpBattery);
+        //EventManager.survivorPickedUpBatteryEvent.AddListener(OnSurvivorPickedUpBattery);
     }
 
     void Update()
@@ -51,6 +53,7 @@ public class Flashlight : MonoBehaviour
     public void Toggle()
     {
         flashlightSource.enabled = !flashlightSource.enabled;
+        flashlightEnabled = !flashlightEnabled;
         flashlightToggleSound.Play();
     }
 
@@ -61,9 +64,20 @@ public class Flashlight : MonoBehaviour
         flashlightDead = false;
     }
 
-
-    private void OnSurvivorPickedUpBattery(Survivor survivor, Battery battery)
+    // For the Monsters
+    public void Hide()
     {
-        survivor.flashlight.Recharge();
+        flashlightSource.enabled = false;
     }
+
+    // For the Monsters
+    public void Show()
+    {
+        if (flashlightEnabled)
+        {
+            flashlightSource.enabled = true;
+
+        }
+    }
+
 }

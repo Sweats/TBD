@@ -38,7 +38,12 @@ public class Battery : MonoBehaviour
     private float glowTimer = 1.0f;
     private float noGlowTimer = 1.0f;
 
+    [SerializeField]
     private Renderer batteryRenderer;
+
+    [SerializeField]
+    private CapsuleCollider batteryCollider;
+
 
     private float defaultSpecular;
 
@@ -47,12 +52,8 @@ public class Battery : MonoBehaviour
     void Start()
     {
         noGlowTimer = maxTimerForGlow;
-        batteryRenderer = GetComponent<Renderer>();
         //defaultSpecular = batteryRenderer.material.GetFloat("_Shininess");
         //batteryRenderer.material.SetColor("_Color", originalMeshColor);
-
-
-        EventManager.survivorPickedUpBatteryEvent.AddListener(OnSurvivorPickedUpBattery);
 
     }
 
@@ -112,14 +113,25 @@ public class Battery : MonoBehaviour
 
     }
 
+    // For the Monsters.
+    public void Hide()
+    {
+	    batteryCollider.enabled = false;
+	    batteryRenderer.enabled = false;
+
+    }
+
+    // For the Monsters.
+    public void Show()
+    {
+	    batteryCollider.enabled = true;
+	    batteryRenderer.enabled = true;
+    }
+
     public void Pickup()
     {
         Destroy(this.gameObject);
     }
 
 
-    private void OnSurvivorPickedUpBattery(Survivor survivor, Battery battery)
-    {
-        battery.Pickup();
-    }
 }

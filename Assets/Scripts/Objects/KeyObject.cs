@@ -3,7 +3,8 @@
 // this class stores the stuff we need to update the mesh itself. The actual key information will be stored in the class key.
 public class KeyObject : MonoBehaviour
 {
-    public Key key;
+    [SerializeField]
+    private Key key;
 
     [SerializeField]
     private Color groupColor;
@@ -23,6 +24,8 @@ public class KeyObject : MonoBehaviour
     [SerializeField]
     private float glowTimer;
 
+    private bool pickedUp = false;
+
 
     [SerializeField]
     // this is the color that will appear around the key mesh to let the player know they can pick it up
@@ -31,17 +34,16 @@ public class KeyObject : MonoBehaviour
     [SerializeField]
     private Color glowColor = Color.white;
 
+    [SerializeField]
     private Renderer keyRenderer;
 
+    [SerializeField]
     private MeshCollider keyCollider;
 
     void Start()
     {
         noGlowTimer = maxTimerForGlow;
-        keyRenderer = GetComponent<Renderer>();
-	keyCollider = GetComponent<MeshCollider>();
         keyRenderer.material.SetColor("_Color", glowOutlineColor);
-        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
     }
 
     void Update()
@@ -65,6 +67,12 @@ public class KeyObject : MonoBehaviour
 
     }
 
+    public Key Key()
+    {
+        return key;
+
+    }
+
     private void Glow()
     {
         keyRenderer.material.SetColor("_Color", glowColor);
@@ -79,14 +87,24 @@ public class KeyObject : MonoBehaviour
 
     public void Pickup()
     {
+        pickedUp = true;
+        key.PlayPickupSound();
+        Hide();
+    }
+
+    public void Hide()
+    {
 	    keyRenderer.enabled = false;
 	    keyCollider.enabled = false;
     }
 
-    private void OnSurvivorPickedUpKey(Survivor survivor, Key key)
+    public void Show()
     {
-        key.PlayPickupSound();
+        if (!pickedUp)
+        {
+            keyRenderer.enabled = true;
+            keyCollider.enabled = true;
+        }
     }
-
 }
 

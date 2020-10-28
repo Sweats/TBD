@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 
 public class Door : MonoBehaviour
 {
@@ -25,17 +24,15 @@ public class Door : MonoBehaviour
 
     public bool locked;
 
+    [SerializeField]
     private Renderer doorRenderer;
 
+    [SerializeField]
     private BoxCollider doorCollider;
 
     void Start()
     {
-        locked = false;
-        doorRenderer = GetComponent<Renderer>();
-	doorCollider = GetComponent<BoxCollider>();
-        EventManager.survivorFailedToUnlockDoorEvent.AddListener(OnSurvivorFailedToUnlockDoor);
-        EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
+        locked = true;
     }
 
     // for now we will play the locked sound in here. We may want to move it out at some point.
@@ -45,23 +42,28 @@ public class Door : MonoBehaviour
     }
 
 
-    private void Unlock()
+    public void Unlock()
     {
         unlockedSound.Play();
         locked = false;
-	doorRenderer.enabled = false;
-	doorCollider.enabled = false;
-    }
-
-    private void OnSurvivorFailedToUnlockDoor(Door door)
-    {
-        door.PlayLockedSound();
+        doorRenderer.enabled = false;
+        doorCollider.enabled = false;
     }
 
 
-    private void OnSurvivorUnlockedDoor(Survivor survivor, Key key, Door door)
+    // Hide from the Lurker and the Phantom.
+    public void Hide()
     {
-        door.Unlock();
+        doorRenderer.enabled = false;
+        doorCollider.enabled = false;
+    }
+
+
+    // Called for the Lurker monster. Later we will want to change it so doors behave like they do in the other game.
+    public void Show()
+    {
+        doorRenderer.enabled = true;
+        doorCollider.enabled = true;
     }
 }
 

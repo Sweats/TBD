@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public enum StageName
@@ -12,11 +11,14 @@ public enum StageName
 
 public class Stages
 {
+
+    private Stages() { }
+
     private static Dictionary<StageName, string> stagesDict = new Dictionary<StageName, string>()
     {
         {StageName.Hotel, "hotel"},
         {StageName.Menu, "menu"},
-	{StageName.Template, "stage-template"}
+        {StageName.Template, "stage-template"}
 
     };
 

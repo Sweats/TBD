@@ -49,7 +49,9 @@ public class Survivor : MonoBehaviour
     private float crouchSpeed;
 
     private bool crouched;
+
     private bool walking;
+
     private Rect crouchingAndWalkingIconPosition;
 
 
@@ -57,11 +59,6 @@ public class Survivor : MonoBehaviour
     private float minimumX;
     [SerializeField]
     private float maximumX;
-
-    public static int invertX;
-    public static int invertY;
-    public static float mouseSensitivity;
-
 
     [SerializeField]
     private float gravity;
@@ -85,19 +82,19 @@ public class Survivor : MonoBehaviour
 
     private Vector3 moving;
 
+    [SerializeField]
+    private Renderer survivorRenderer;
 
     void Start()
     {
-        //survivorBody = GetComponent<Transform>();
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         moving = new Vector3();
-        //EventManager.survivorClosedChatEvent.AddListener(OnSurvivorClosedChatEvent);
-        //EventManager.survivorOpenedChatEvent.AddListener(OnSurvivorOpenedChatEvent);
         EventManager.survivorClosedPlayerStats.AddListener(OnSurvivorClosedPlayerStats);
         EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenedPlayerStats);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
+
         StartCoroutine(CheckForTraps());
     }
 
@@ -108,15 +105,15 @@ public class Survivor : MonoBehaviour
             return;
         }
 
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        float mouseX = Input.GetAxis("Mouse X") * Settings.MOUSE_SENSITIVITY;
+        float mouseY = Input.GetAxis("Mouse Y") * Settings.MOUSE_SENSITIVITY;
 
-        if (invertX == 1)
+        if (Settings.INVERT_X == 1)
         {
             mouseX *= -1;
         }
 
-        if (invertY == 1)
+        if (Settings.INVERT_Y == 1)
         {
             mouseY *= -1;
         }
@@ -247,13 +244,13 @@ public class Survivor : MonoBehaviour
                 GameObject hitObject = objectsHit[i].collider.gameObject;
                 string tagName = hitObject.tag;
 
-                if (tagName == "Trap")
+                if (tagName == Tags.TRAP)
                 {
                     Trap trap = hitObject.GetComponent<Trap>();
 
-                    if (trap.armed)
+                    if (trap.Armed())
                     {
-                        EventManager.survivorTriggeredTrapEvent.Invoke(this, trap);
+			    trap.Trigger();
                     }
                 }
             }
@@ -279,19 +276,19 @@ public class Survivor : MonoBehaviour
             var gameObject = hit.collider.gameObject;
             var tagName = gameObject.tag;
 
-            if (tagName == "Key")
+            if (tagName == Tags.KEY)
             {
                 KeyObject keyObject = gameObject.GetComponent<KeyObject>();
                 OnClickedOnKey(keyObject);
             }
 
-            else if (tagName == "Door")
+            else if (tagName == Tags.DOOR)
             {
                 Door door = gameObject.GetComponent<Door>();
                 OnClickedOnDoor(door);
             }
 
-            else if (tagName == "Battery")
+            else if (tagName == Tags.BATTERY)
             {
                 Battery battery = gameObject.GetComponent<Battery>();
                 OnSurvivorClickedOnBattery(battery);
@@ -329,8 +326,8 @@ public class Survivor : MonoBehaviour
         for (var i = 0; i < keysInInventory.Length; i++)
         {
             Key key = keysInInventory[i];
-            int foundKeyMask = foundKey.key.mask;
-            int currentInventoryKeyMask = key.mask;
+            int foundKeyMask = foundKey.Key().Mask();
+            int currentInventoryKeyMask = key.Mask();
 
             if (foundKeyMask == currentInventoryKeyMask)
             {
@@ -342,9 +339,9 @@ public class Survivor : MonoBehaviour
 
         if (!found)
         {
-            Key key = foundKey.key;
+            Key key = foundKey.Key();
+	    inventory.Add(key);
             foundKey.Pickup();
-            EventManager.survivorPickedUpKeyEvent.Invoke(this, key);
         }
     }
 
@@ -361,28 +358,22 @@ public class Survivor : MonoBehaviour
             {
                 Key key = keys[i];
                 found = true;
-                EventManager.survivorUnlockDoorEvent.Invoke(this, key, door);
+                door.Unlock();
                 break;
             }
         }
 
         if (!found)
         {
-            EventManager.survivorFailedToUnlockDoorEvent.Invoke(door);
+		door.PlayLockedSound();
         }
     }
 
-
-    //    private void OnClickOnObject(DarnedObject object)
-    //    {
-    //
-    //    }
-    //
     private void OnSurvivorClickedOnBattery(Battery battery)
     {
         if (flashlight.charge <= battery.chargeNeededToGrab)
         {
-            EventManager.survivorPickedUpBatteryEvent.Invoke(this, battery);
+		flashlight.Recharge();
         }
 
         else
@@ -398,6 +389,20 @@ public class Survivor : MonoBehaviour
         insanity.Reset();
         deathSound.Play();
         EventManager.survivorDeathEvent.Invoke(this);
+    }
+
+    // Called if the player is the Lurker.
+    public void Hide()
+    {
+	    survivorRenderer.enabled = false;
+	    flashlight.Hide();
+    }
+
+    // Called if the player is the Lurker.
+    public void Show()
+    {
+	    survivorRenderer.enabled = true;
+	    flashlight.Show();
     }
 
     private void OnSurvivorsEscapedStageEvent()
