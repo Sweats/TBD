@@ -298,7 +298,7 @@ public class Survivor : MonoBehaviour
         }
     }
 
-    void OnGUI()
+    private void OnGUI()
     {
         if (PausedGameInput.GAME_PAUSED)
         {

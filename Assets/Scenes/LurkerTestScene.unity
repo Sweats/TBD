@@ -2987,6 +2987,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Lurker
       objectReference: {fileID: 0}
+    - target: {fileID: 7589796053530327123, guid: df3bdcd613ebe0aba9051d889b3f6973,
+        type: 3}
+      propertyPath: attackCoolDownInSeconds
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7589796053530327127, guid: df3bdcd613ebe0aba9051d889b3f6973,
         type: 3}
       propertyPath: m_LocalPosition.x

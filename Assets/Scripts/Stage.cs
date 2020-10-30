@@ -1,17 +1,16 @@
 ﻿using UnityEngine;
 
+// NOTE: Not sure how this class will be used exactly. Maybe it will handle global events or something.
 public class Stage : MonoBehaviour
 {
     [SerializeField]
     private Survivor[] survivors;
 
-    private Lurker lurker;
-
+    private bool matchOver;
     private void Start()
     {
 
     }
-
 
     public void OnSurviorDeath(Survivor who)
     {
@@ -68,4 +67,5 @@ public class Stage : MonoBehaviour
     {
         who.isInEscapeRoom = false;
     }
+
 }

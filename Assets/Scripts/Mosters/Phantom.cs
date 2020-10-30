@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class Phantom : MonoBehaviour
 {
@@ -9,55 +10,185 @@ public class Phantom : MonoBehaviour
     [SerializeField]
     private float attackDistance;
 
-    private CharacterController phantomController;
-
     [SerializeField]
     private AudioSource ambientMusic;
 
     [SerializeField]
-    private AudioSource attacSound;
+    private AudioSource attackSound;
 
+    [SerializeField]
+    private int attackCoolDownInSeconds;
 
+    [SerializeField]
+    private Camera phantomCamera;
 
+    private Vector3 velocity;
+
+    private CharacterController phantomController;
+
+    [SerializeField]
+    private float gravity;
+
+    private float xRotation;
+
+    [SerializeField]
+    private float minimumX;
+
+    [SerializeField]
+    private float maximumX;
+
+    [SerializeField]
+    private Texture crosshair;
+
+    private bool matchOver;
+
+    private bool canAttack = true;
 
     void Start()
     {
-	    phantomController = GetComponent<CharacterController>();
+        phantomController = GetComponent<CharacterController>();
+	HideImportantObjects();
+        Cursor.lockState = CursorLockMode.Locked;
+    }
 
+    void LateUpdate()
+    {
+        if (IsAnotherWindowOpen() || matchOver)
+        {
+            return;
+        }
+
+        float mouseX = Input.GetAxis("Mouse X") * Settings.MOUSE_SENSITIVITY;
+        float mouseY = Input.GetAxis("Mouse Y") * Settings.MOUSE_SENSITIVITY;
+
+        if (Settings.INVERT_X == 1)
+        {
+            mouseX *= -1;
+        }
+
+        if (Settings.INVERT_Y == 1)
+        {
+            mouseY *= -1;
+        }
+
+
+        xRotation -= mouseY;
+        xRotation = Mathf.Clamp(xRotation, minimumX, maximumX);
+        transform.Rotate(Vector3.up * mouseX);
+	phantomCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
 
     void Update()
     {
-	if (Keybinds.GetKey(Action.MoveForward))
-	{
+        velocity.y -= gravity * Time.deltaTime;
+        phantomController.Move(velocity * Time.deltaTime);
 
-	}
+        if (phantomController.isGrounded && velocity.y < 0)
+        {
+            velocity.y = -2f;
+        }
 
-	else if (Keybinds.GetKey(Action.MoveLeft))
-	{
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
+        Vector3 secondmove = transform.right * x + transform.forward * z;
 
-	}
+        if (Keybinds.GetKey(Action.Attack) && canAttack)
+        {
+            OnAttack();
+        }
 
-	else if (Keybinds.GetKey(Action.MoveRight))
-	{
-
-	}
-
-	else if (Keybinds.GetKey(Action.MoveBack))
-	{
-
-	}
-
-	else if (Keybinds.GetKey(Action.Attack))
-	{
-		OnAttack();
-	}
-
+        phantomController.Move(secondmove * speed * Time.deltaTime);
     }
-
 
     private void OnAttack()
     {
+	StartCoroutine(AttackCoolDown());
+        RaycastHit hit;
+        Ray ray = phantomCamera.ScreenPointToRay(Input.mousePosition);
+        attackSound.Play();
 
+        if (Physics.Raycast(ray, out hit, attackDistance))
+        {
+            GameObject hitGameObject = hit.collider.gameObject;
+
+            if (hitGameObject.CompareTag(Tags.SURVIVOR))
+            {
+                Survivor survivor = hitGameObject.GetComponent<Survivor>();
+                survivor.Die();
+            }
+        }
+    }
+
+    private IEnumerator AttackCoolDown()
+    {
+	    canAttack = false;
+	    yield return new WaitForSeconds(attackCoolDownInSeconds);
+	    canAttack = true;
+    }
+
+    private void HideImportantObjects()
+    {
+        GameObject[] doors = GameObject.FindGameObjectsWithTag(Tags.DOOR);
+
+        if (doors != null)
+        {
+            for (var i = 0; i < doors.Length; i++)
+            {
+                Door door = doors[i].GetComponent<Door>();
+                door.Hide();
+            }
+        }
+
+        GameObject[] keys = GameObject.FindGameObjectsWithTag(Tags.KEY);
+
+        if (keys != null)
+        {
+            for (var i = 0; i < keys.Length; i++)
+            {
+                KeyObject key = keys[i].GetComponent<KeyObject>();
+                key.Hide();
+            }
+        }
+
+        GameObject[] batteries = GameObject.FindGameObjectsWithTag(Tags.BATTERY);
+
+        if (batteries != null)
+        {
+            for (var i = 0; i < batteries.Length; i++)
+            {
+                Battery battery = batteries[i].GetComponent<Battery>();
+                battery.Hide();
+            }
+        }
+    }
+
+
+
+    // TODO: How do we want to handle the traps for the Phantom?
+    private IEnumerator HandleTraps()
+    {
+	    yield return null;
+    }
+
+    // TODO: How do we want to handle the survivor detection for the Phantom?
+    private IEnumerator HandleSurvivorDetection()
+    {
+	    yield return null;
+    }
+
+    private void OnGUI()
+    {
+        if (PausedGameInput.GAME_PAUSED)
+        {
+            return;
+        }
+
+        // TODO: Optimize this!
+        GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
+    }
+
+    private bool IsAnotherWindowOpen()
+    {
+        return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
     }
 }

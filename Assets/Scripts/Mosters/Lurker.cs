@@ -31,10 +31,6 @@ public class Lurker : MonoBehaviour
     private float trapArmDistance;
 
     [SerializeField]
-    private float attackSpeed;
-
-
-    [SerializeField]
     private float speed;
 
     private bool ghostForm = true;
@@ -73,6 +69,12 @@ public class Lurker : MonoBehaviour
     private Camera lurkerCamera;
 
     private bool isReadyToGoIntoPhysicalForm;
+
+
+    private bool canAttack = false;
+
+    [SerializeField]
+    private int attackCoolDownInSeconds;
 
     // Get the list of objects on the stage and cache them for the match.
     private GameObject[] traps;
@@ -202,7 +204,7 @@ public class Lurker : MonoBehaviour
         if (ghostForm)
         {
             StartCoroutine(GhostFormEnergyRoutine());
-	    isReadyToGoIntoPhysicalForm = false;
+            isReadyToGoIntoPhysicalForm = false;
             speed = ghostFormSpeed;
             Debug.Log("Now in ghost form...");
 
@@ -217,6 +219,7 @@ public class Lurker : MonoBehaviour
 
         else
         {
+            canAttack = true;
             speed = physicalFormSpeed;
             StartCoroutine(PhysicalFormEnergyRoutine());
             Debug.Log("Now in physical form...");
@@ -237,8 +240,11 @@ public class Lurker : MonoBehaviour
         Ray ray = lurkerCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        if (!ghostForm)
+        if (!ghostForm && canAttack)
         {
+            StartCoroutine(AttackCoolDown());
+	    attackSound.Play();
+
             if (Physics.Raycast(ray, out hit, attackDistance))
             {
                 GameObject hitGameObject = hit.collider.gameObject;
@@ -264,11 +270,11 @@ public class Lurker : MonoBehaviour
                     trap.Arm();
                 }
 
-		else if (hitGameObject.CompareTag(Tags.DOOR))
-		{
-			Door door = hitGameObject.GetComponent<Door>();
-			door.PlayLockedSound();
-		}
+                else if (hitGameObject.CompareTag(Tags.DOOR))
+                {
+                    Door door = hitGameObject.GetComponent<Door>();
+                    door.PlayLockedSound();
+                }
             }
         }
 
@@ -293,6 +299,7 @@ public class Lurker : MonoBehaviour
             }
         }
     }
+
 
     private void HandleGrab()
     {
@@ -396,6 +403,13 @@ public class Lurker : MonoBehaviour
         }
     }
 
+    private IEnumerator AttackCoolDown()
+    {
+        canAttack = false;
+        yield return new WaitForSeconds(attackCoolDownInSeconds);
+        canAttack = true;
+    }
+
     // TODO. Rewrite this probably.
     private IEnumerator GlowRoutine()
     {
@@ -454,13 +468,13 @@ public class Lurker : MonoBehaviour
                 yield break;
             }
 
-	    energy--;
+            energy--;
 
             yield return new WaitForSeconds(energyConsumptionRate);
         }
 
 
-	OnLurkerFormChanged();
+        OnLurkerFormChanged();
     }
 
     private IEnumerator GhostFormEnergyRoutine()

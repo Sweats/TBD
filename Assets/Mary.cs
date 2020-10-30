@@ -29,6 +29,10 @@ public class Mary : MonoBehaviour
     [SerializeField]
     private float attackDistance;
 
+
+    [SerializeField]
+    private int attackCoolDownInSeconds;
+
     [SerializeField]
     private float speed;
 
@@ -68,6 +72,9 @@ public class Mary : MonoBehaviour
     [SerializeField]
     private AudioSource maryTeleportSound;
 
+    [SerializeField]
+    private AudioSource attackSound;
+
     private GameObject[] teleportLocations;
 
     private CharacterController maryController;
@@ -82,15 +89,23 @@ public class Mary : MonoBehaviour
     [SerializeField]
     private float maximumX;
 
+
     [SerializeField]
     private Camera maryCamera;
+
+    [SerializeField]
+    private Texture crosshair;
 
     private Vector3 velocity;
 
     private Transform maryTransform;
 
-
+    [SerializeField]
     private bool frenzied = false;
+
+    [SerializeField]
+    private bool canAttack = false;
+
 
     [SerializeField]
     private bool canTeleport = false;
@@ -103,9 +118,6 @@ public class Mary : MonoBehaviour
     private Coroutine maryEnergyGainRoutine;
 
     private Coroutine maryEnergyFrenzyRoutine;
-
-    // TODO: Make it so we don't need this variable.
-    private bool coroutineAlreadyStarted;
 
     void LateUpdate()
     {
@@ -252,13 +264,22 @@ public class Mary : MonoBehaviour
         OnFrenzyEnd();
     }
 
+    private IEnumerator AttackCoolDown()
+    {
+        canAttack = false;
+        yield return new WaitForSeconds(attackCoolDownInSeconds);
+        canAttack = true;
+    }
+
 
     private void OnFrenzy()
     {
         readyToFrenzy = false;
         canTeleport = false;
-	frenzied = true;
+        frenzied = true;
+        canAttack = true;
         speed = frenzySpeed;
+        maryScreamSound.Play();
 
         if (maryCryingSound.isPlaying)
         {
@@ -283,7 +304,8 @@ public class Mary : MonoBehaviour
 
     private void OnFrenzyEnd()
     {
-	frenzied = false;
+        frenzied = false;
+        canAttack = false;
         speed = normalSpeed;
 
         if (maryFrenzyMusic.isPlaying)
@@ -305,19 +327,28 @@ public class Mary : MonoBehaviour
         Ray ray = maryCamera.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, attackDistance))
+        if (!frenzied)
         {
-            GameObject hitGameObject = hit.collider.gameObject;
-
-            if (hitGameObject.CompareTag(Tags.DOOR))
+            if (Physics.Raycast(ray, out hit, attackDistance))
             {
-                Door door = hitGameObject.GetComponent<Door>();
-                door.PlayLockedSound();
+                GameObject hitGameObject = hit.collider.gameObject;
+
+                if (hitGameObject.CompareTag(Tags.DOOR))
+                {
+                    Door door = hitGameObject.GetComponent<Door>();
+                    door.PlayLockedSound();
+                }
             }
+        }
 
-            if (frenzied)
+        else if (frenzied && canAttack)
+        {
+            attackSound.Play();
+            StartCoroutine(AttackCoolDown());
+
+            if (Physics.Raycast(ray, out hit, attackDistance))
             {
-		// play attack sound and animation somewhere in here.
+                GameObject hitGameObject = hit.collider.gameObject;
 
                 if (hitGameObject.CompareTag(Tags.SURVIVOR))
                 {
@@ -325,10 +356,14 @@ public class Mary : MonoBehaviour
                     survivor.Die();
                 }
 
+                else if (hitGameObject.CompareTag(Tags.DOOR))
+                {
+                    Door door = hitGameObject.GetComponent<Door>();
+                    door.PlayLockedSound();
+                }
             }
         }
     }
-
 
     private void Teleport(bool manuallyTeleported)
     {
@@ -354,11 +389,8 @@ public class Mary : MonoBehaviour
                         readyToFrenzy = false;
                     }
 
-                    if (!coroutineAlreadyStarted)
-                    {
-                        StopCoroutine(maryEnergyGainRoutine);
-                        maryEnergyGainRoutine = StartCoroutine(MaryRechargeTimer());
-                    }
+                    StopCoroutine(maryEnergyGainRoutine);
+                    maryEnergyGainRoutine = StartCoroutine(MaryRechargeTimer());
                 }
             }
 
@@ -367,6 +399,17 @@ public class Mary : MonoBehaviour
             maryTeleportSound.Play();
         }
 
+    }
+
+    private void OnGUI()
+    {
+        if (PausedGameInput.GAME_PAUSED)
+        {
+            return;
+        }
+
+        // TODO: Optimize this!
+        GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
     }
 
     private bool IsAnotherWindowOpen()
