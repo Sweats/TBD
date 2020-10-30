@@ -55,6 +55,10 @@ public static class EventManager
 
     public static MonsterSpawnedInStageEvent monsterSpawnedInStageEvent = new MonsterSpawnedInStageEvent();
 
+    public static MaryReadyToFrenzyEvent maryReadyToFrenzyEvent = new MaryReadyToFrenzyEvent();
+
+    public static MaryReadyToTeleportEvent maryReadyToTeleportEvent = new MaryReadyToTeleportEvent();
+
 }
 
 
@@ -154,6 +158,15 @@ public class LurkerChangedFormEvent : UnityEvent<bool> { }
 
 public class LurkerReadyToGoIntoPhysicalFormEvent : UnityEvent { }
 
+
+#endregion
+
+
+#region MARY_EVENTS
+
+public class MaryReadyToFrenzyEvent: UnityEvent {  }
+
+public class MaryReadyToTeleportEvent: UnityEvent {  }
 
 #endregion
 

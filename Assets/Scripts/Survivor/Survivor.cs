@@ -236,15 +236,13 @@ public class Survivor : MonoBehaviour
     {
         while (true)
         {
-
             RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, trapDistance, transform.forward, trapDistance);
 
             for (var i = 0; i < objectsHit.Length; i++)
             {
                 GameObject hitObject = objectsHit[i].collider.gameObject;
-                string tagName = hitObject.tag;
 
-                if (tagName == Tags.TRAP)
+                if (hitObject.CompareTag(Tags.TRAP))
                 {
                     Trap trap = hitObject.GetComponent<Trap>();
 
@@ -274,21 +272,20 @@ public class Survivor : MonoBehaviour
         if (Physics.Raycast(ray, out hit, grabDistance))
         {
             var gameObject = hit.collider.gameObject;
-            var tagName = gameObject.tag;
 
-            if (tagName == Tags.KEY)
+            if (gameObject.CompareTag(Tags.KEY))
             {
                 KeyObject keyObject = gameObject.GetComponent<KeyObject>();
                 OnClickedOnKey(keyObject);
             }
 
-            else if (tagName == Tags.DOOR)
+            else if (gameObject.CompareTag(Tags.DOOR))
             {
                 Door door = gameObject.GetComponent<Door>();
                 OnClickedOnDoor(door);
             }
 
-            else if (tagName == Tags.BATTERY)
+            else if (gameObject.CompareTag(Tags.BATTERY))
             {
                 Battery battery = gameObject.GetComponent<Battery>();
                 OnSurvivorClickedOnBattery(battery);
@@ -333,6 +330,7 @@ public class Survivor : MonoBehaviour
             {
                 found = true;
                 EventManager.SurvivorAlreadyHaveKeyEvent.Invoke();
+		break;
 
             }
         }

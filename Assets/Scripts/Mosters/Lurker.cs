@@ -242,16 +242,15 @@ public class Lurker : MonoBehaviour
             if (Physics.Raycast(ray, out hit, attackDistance))
             {
                 GameObject hitGameObject = hit.collider.gameObject;
-                string tag = hitGameObject.tag;
 
-                if (tag == Tags.SURVIVOR)
+                if (hitGameObject.CompareTag(Tags.SURVIVOR))
                 {
                     Survivor survivor = hitGameObject.GetComponent<Survivor>();
                     // TODO: Play an animation here.
                     survivor.Die();
                 }
 
-                else if (tag == Tags.TRAP)
+                else if (hitGameObject.CompareTag(Tags.TRAP))
                 {
                     Trap trap = hitGameObject.GetComponent<Trap>();
 
@@ -264,6 +263,12 @@ public class Lurker : MonoBehaviour
                     trapArmSound.Play();
                     trap.Arm();
                 }
+
+		else if (hitGameObject.CompareTag(Tags.DOOR))
+		{
+			Door door = hitGameObject.GetComponent<Door>();
+			door.PlayLockedSound();
+		}
             }
         }
 
@@ -272,9 +277,8 @@ public class Lurker : MonoBehaviour
             if (Physics.Raycast(ray, out hit, trapArmDistance))
             {
                 GameObject hitGameObject = hit.collider.gameObject;
-                string tag = hitGameObject.tag;
 
-                if (tag == Tags.TRAP)
+                if (hitGameObject.CompareTag(Tags.TRAP))
                 {
                     Trap trap = hitGameObject.GetComponent<Trap>();
 

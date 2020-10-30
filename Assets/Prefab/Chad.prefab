@@ -2843,6 +2843,7 @@ MonoBehaviour:
   matchOver: 0
   isInEscapeRoom: 0
   dead: 0
+  survivorRenderer: {fileID: 6408136150881541942}
 --- !u!143 &5170028035910589658
 CharacterController:
   m_ObjectHideFlags: 0

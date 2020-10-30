@@ -6,7 +6,7 @@ public class Escape : MonoBehaviour
     {
         GameObject gameObject = collider.gameObject;
 
-        if (gameObject.tag == Tags.SURVIVOR)
+        if (gameObject.CompareTag(Tags.SURVIVOR))
         {
             Survivor survivor = gameObject.GetComponent<Survivor>();
             survivor.isInEscapeRoom = true;
@@ -42,7 +42,7 @@ public class Escape : MonoBehaviour
     {
         GameObject gameObject = collision.gameObject;
 
-        if (gameObject.tag == Tags.SURVIVOR)
+        if (gameObject.CompareTag(Tags.SURVIVOR))
         {
             Survivor survivor = gameObject.GetComponent<Survivor>();
             survivor.isInEscapeRoom = false;

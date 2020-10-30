@@ -33,7 +33,8 @@ public class GameMessages : MonoBehaviour
         EventManager.playerConnectedEvent.AddListener(OnPlayerConnect);
         EventManager.playerDisconnectedEvent.AddListener(OnPlayerDisconnect);
 	EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
-
+	EventManager.maryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
+	EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
     }
 
     private void UpdateChatText()
@@ -47,11 +48,13 @@ public class GameMessages : MonoBehaviour
 
         messagesBox.text = stringBuilder.ToString();
     }
+
     private void OnSurvivorGrabbedKey(Survivor who, Key key)
     {
         string newMessage = $"{who.survivorName} picked up a {key.keyName}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
+
     private void OnSurvivorUnlockedDoor(Survivor who, Key key, Door door)
     {
         string newMessage = $"{who.survivorName} used a {key.keyName} to unlock a {door.doorName}!";
@@ -65,7 +68,6 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
-
 
     private void OnFailedToPickUpBatteryEvent()
     {
@@ -112,6 +114,17 @@ public class GameMessages : MonoBehaviour
 	    StartCoroutine(AddAndRemoveGameMessage(newMesasge));
     }
 
+    private void OnMaryReadyToFrenzy()
+    {
+	    string newMessage = $"Click {Keybinds.GetKey(Action.Transform)} to enter frenzied mode.";
+	    StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnMaryReadyToTeleport()
+    {
+	    string newMessage = $"Click {Keybinds.GetKey(Action.Teleport)} to teleport.";
+	    StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
 
     private IEnumerator AddAndRemoveGameMessage(string newMessage)
     {
@@ -121,6 +134,5 @@ public class GameMessages : MonoBehaviour
         messages.Remove(newMessage);
         UpdateChatText();
     }
-
 
 }

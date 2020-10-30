@@ -12,6 +12,8 @@ TagManager:
   - Trap
   - Battery
   - Lurker
+  - Mary
+  - Mary Teleport Location
   layers:
   - Default
   - TransparentFX
