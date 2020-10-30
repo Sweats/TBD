@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+// NOTE: This class may need a lot more testing. I think I covered all of the bugs though. It's a tricky problem to solve lol.
 public class Mary : MonoBehaviour
 {
     [SerializeField]
@@ -23,6 +24,10 @@ public class Mary : MonoBehaviour
 
     [SerializeField]
     private float frenzySpeed;
+
+
+    [SerializeField]
+    private float attackDistance;
 
     [SerializeField]
     private float speed;
@@ -93,6 +98,10 @@ public class Mary : MonoBehaviour
 
     private Coroutine maryRandomTeleportionRoutine;
 
+    private Coroutine maryEnergyGainRoutine;
+
+    private Coroutine maryEnergyFrenzyRoutine;
+
     // TODO: Make it so we don't need this variable.
     private bool coroutineAlreadyStarted;
 
@@ -130,8 +139,8 @@ public class Mary : MonoBehaviour
         speed = normalSpeed;
         Cursor.lockState = CursorLockMode.Locked;
         maryTransform = GetComponent<Transform>();
-        StartCoroutine(MaryRechargeTimer());
-	maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
+        maryEnergyGainRoutine = StartCoroutine(MaryRechargeTimer());
+        maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
     }
 
 
@@ -166,23 +175,18 @@ public class Mary : MonoBehaviour
 
         }
 
+        else if (Keybinds.GetKey(Action.Attack))
+        {
+            OnAttack();
+        }
+
         maryController.Move(secondmove * speed * Time.deltaTime);
     }
 
 
     private IEnumerator MaryRechargeTimer()
     {
-        // TODO: Remove this temp fix.
-
-        if (coroutineAlreadyStarted)
-        {
-            Debug.Log("EXTRA COROUTINE CREATED. FIXME?");
-            yield break;
-        }
-
         Debug.Log("MaryRechargeTimer coroutine started.");
-
-        coroutineAlreadyStarted = true;
 
         while (energy < maxEnergy)
         {
@@ -205,14 +209,13 @@ public class Mary : MonoBehaviour
         }
 
         Debug.Log("MaryRechargeTimer coroutine stopped.");
-        coroutineAlreadyStarted = false;
     }
 
 
     private IEnumerator MaryRandomTeleportationTimer()
     {
         maryTeleportTimer = Random.Range(minTeleportTimerSeconds, maxTeleportTimerSeconds);
-	Debug.Log("MaryRandomTeleportationTimer routine started.");
+        Debug.Log("MaryRandomTeleportationTimer routine started.");
 
         while (true)
         {
@@ -266,8 +269,13 @@ public class Mary : MonoBehaviour
 
         maryFrenzyMusic.Play();
 
-        StartCoroutine(MaryFrenzyTimer());
-	StopCoroutine(maryRandomTeleportionRoutine);
+        maryEnergyFrenzyRoutine = StartCoroutine(MaryFrenzyTimer());
+        StopCoroutine(maryRandomTeleportionRoutine);
+	// NOTE:
+	// If the player does a teleport and a frenzy at the same time, they can have 2 corutines running that allows them to have infinte frenzy energy. 
+	// We can either have this StopCoroutine function called below or change the value minEnergyNeededToFrenzy so this cannot happen.
+	// We will see. For now I will do this.
+	StopCoroutine(maryEnergyGainRoutine);
     }
 
     private void OnFrenzyEnd()
@@ -281,9 +289,36 @@ public class Mary : MonoBehaviour
 
         maryCalmMusic.Play();
         maryCryingSound.Play();
-        StartCoroutine(MaryRechargeTimer());
-	maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
+        maryEnergyGainRoutine = StartCoroutine(MaryRechargeTimer());
+        maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
         Teleport(false);
+    }
+
+
+    private void OnAttack()
+    {
+        // TODO: Make it so we do a cone raycast or something instead of simply having to click on the player.
+        Ray ray = maryCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, attackDistance))
+        {
+            GameObject hitGameObject = hit.collider.gameObject;
+
+            if (hitGameObject.CompareTag(Tags.DOOR))
+            {
+                Door door = hitGameObject.GetComponent<Door>();
+                door.PlayLockedSound();
+            }
+
+            // play attack somewhere in here.
+
+            else if (hitGameObject.CompareTag(Tags.SURVIVOR))
+            {
+                Survivor survivor = hitGameObject.GetComponent<Survivor>();
+                survivor.Die();
+            }
+        }
     }
 
 
@@ -296,8 +331,8 @@ public class Mary : MonoBehaviour
             if (manuallyTeleported)
             {
                 energy -= teleportEnergyCost;
-		StopCoroutine(maryRandomTeleportionRoutine);
-		maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
+                StopCoroutine(maryRandomTeleportionRoutine);
+                maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
 
                 if (energy < minEnergyNeededToTeleport)
                 {
@@ -313,7 +348,8 @@ public class Mary : MonoBehaviour
 
                     if (!coroutineAlreadyStarted)
                     {
-                        StartCoroutine(MaryRechargeTimer());
+			StopCoroutine(maryEnergyGainRoutine);
+                        maryEnergyGainRoutine = StartCoroutine(MaryRechargeTimer());
                     }
                 }
             }
