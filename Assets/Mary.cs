@@ -40,6 +40,15 @@ public class Mary : MonoBehaviour
     private float teleportEnergyCost;
 
     [SerializeField]
+    private int minTeleportTimerSeconds;
+
+    [SerializeField]
+    private int maxTeleportTimerSeconds;
+
+    [SerializeField]
+    private int maryTeleportTimer;
+
+    [SerializeField]
     private AudioSource maryScreamSound;
 
     [SerializeField]
@@ -82,6 +91,8 @@ public class Mary : MonoBehaviour
     [SerializeField]
     private bool readyToFrenzy = false;
 
+    private Coroutine maryRandomTeleportionRoutine;
+
     // TODO: Make it so we don't need this variable.
     private bool coroutineAlreadyStarted;
 
@@ -120,6 +131,7 @@ public class Mary : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         maryTransform = GetComponent<Transform>();
         StartCoroutine(MaryRechargeTimer());
+	maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
     }
 
 
@@ -160,7 +172,7 @@ public class Mary : MonoBehaviour
 
     private IEnumerator MaryRechargeTimer()
     {
-	// TODO: Remove this temp fix.
+        // TODO: Remove this temp fix.
 
         if (coroutineAlreadyStarted)
         {
@@ -194,6 +206,31 @@ public class Mary : MonoBehaviour
 
         Debug.Log("MaryRechargeTimer coroutine stopped.");
         coroutineAlreadyStarted = false;
+    }
+
+
+    private IEnumerator MaryRandomTeleportationTimer()
+    {
+        maryTeleportTimer = Random.Range(minTeleportTimerSeconds, maxTeleportTimerSeconds);
+	Debug.Log("MaryRandomTeleportationTimer routine started.");
+
+        while (true)
+        {
+            if (matchOver)
+            {
+                yield break;
+            }
+
+            maryTeleportTimer--;
+
+            if (maryTeleportTimer <= 0)
+            {
+                maryTeleportTimer = Random.Range(minTeleportTimerSeconds, maxTeleportTimerSeconds);
+                Teleport(false);
+            }
+
+            yield return new WaitForSeconds(1);
+        }
     }
 
     private IEnumerator MaryFrenzyTimer()
@@ -230,6 +267,7 @@ public class Mary : MonoBehaviour
         maryFrenzyMusic.Play();
 
         StartCoroutine(MaryFrenzyTimer());
+	StopCoroutine(maryRandomTeleportionRoutine);
     }
 
     private void OnFrenzyEnd()
@@ -244,6 +282,7 @@ public class Mary : MonoBehaviour
         maryCalmMusic.Play();
         maryCryingSound.Play();
         StartCoroutine(MaryRechargeTimer());
+	maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
         Teleport(false);
     }
 
@@ -257,6 +296,8 @@ public class Mary : MonoBehaviour
             if (manuallyTeleported)
             {
                 energy -= teleportEnergyCost;
+		StopCoroutine(maryRandomTeleportionRoutine);
+		maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
 
                 if (energy < minEnergyNeededToTeleport)
                 {

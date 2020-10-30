@@ -1385,8 +1385,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   energy: 0
-  energyRechargeRate: 0
-  energyConsumptionRate: 0
+  energyRechargeRate: 0.1
+  energyConsumptionRate: 0.1
   maxEnergy: 100
   minEnergy: 0
   normalSpeed: 1
@@ -1396,6 +1396,9 @@ MonoBehaviour:
   minEnergyNeededToTeleport: 20
   minEnergyNeededToFrenzy: 80
   teleportEnergyCost: 20
+  minTeleportTimerSeconds: 5
+  maxTeleportTimerSeconds: 10
+  maryTeleportTimer: 0
   maryScreamSound: {fileID: 1074094650}
   maryCryingSound: {fileID: 2059885875}
   maryCalmMusic: {fileID: 1019619060670189516}
