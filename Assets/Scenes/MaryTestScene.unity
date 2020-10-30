@@ -1391,6 +1391,7 @@ MonoBehaviour:
   minEnergy: 0
   normalSpeed: 1
   frenzySpeed: 10
+  attackDistance: 2
   speed: 0
   gravity: 10
   minEnergyNeededToTeleport: 20

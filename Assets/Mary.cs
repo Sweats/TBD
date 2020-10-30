@@ -90,6 +90,8 @@ public class Mary : MonoBehaviour
     private Transform maryTransform;
 
 
+    private bool frenzied = false;
+
     [SerializeField]
     private bool canTeleport = false;
 
@@ -255,6 +257,7 @@ public class Mary : MonoBehaviour
     {
         readyToFrenzy = false;
         canTeleport = false;
+	frenzied = true;
         speed = frenzySpeed;
 
         if (maryCryingSound.isPlaying)
@@ -271,15 +274,16 @@ public class Mary : MonoBehaviour
 
         maryEnergyFrenzyRoutine = StartCoroutine(MaryFrenzyTimer());
         StopCoroutine(maryRandomTeleportionRoutine);
-	// NOTE:
-	// If the player does a teleport and a frenzy at the same time, they can have 2 corutines running that allows them to have infinte frenzy energy. 
-	// We can either have this StopCoroutine function called below or change the value minEnergyNeededToFrenzy so this cannot happen.
-	// We will see. For now I will do this.
-	StopCoroutine(maryEnergyGainRoutine);
+        // NOTE:
+        // If the player does a teleport and a frenzy at the same time, they can have 2 corutines running that allows them to have infinte frenzy energy. 
+        // We can either have this StopCoroutine function called below or change the value minEnergyNeededToFrenzy so this cannot happen.
+        // We will see. For now I will do this.
+        StopCoroutine(maryEnergyGainRoutine);
     }
 
     private void OnFrenzyEnd()
     {
+	frenzied = false;
         speed = normalSpeed;
 
         if (maryFrenzyMusic.isPlaying)
@@ -311,12 +315,16 @@ public class Mary : MonoBehaviour
                 door.PlayLockedSound();
             }
 
-            // play attack somewhere in here.
-
-            else if (hitGameObject.CompareTag(Tags.SURVIVOR))
+            if (frenzied)
             {
-                Survivor survivor = hitGameObject.GetComponent<Survivor>();
-                survivor.Die();
+		// play attack sound and animation somewhere in here.
+
+                if (hitGameObject.CompareTag(Tags.SURVIVOR))
+                {
+                    Survivor survivor = hitGameObject.GetComponent<Survivor>();
+                    survivor.Die();
+                }
+
             }
         }
     }
@@ -348,7 +356,7 @@ public class Mary : MonoBehaviour
 
                     if (!coroutineAlreadyStarted)
                     {
-			StopCoroutine(maryEnergyGainRoutine);
+                        StopCoroutine(maryEnergyGainRoutine);
                         maryEnergyGainRoutine = StartCoroutine(MaryRechargeTimer());
                     }
                 }
