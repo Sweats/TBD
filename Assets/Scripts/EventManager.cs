@@ -39,6 +39,7 @@ public static class EventManager
     public static PlayerOpenedConsoleEvent playerOpenedConsoleEvent = new PlayerOpenedConsoleEvent();
 
     public static PlayerDisconnectedEvent playerDisconnectedEvent = new PlayerDisconnectedEvent();
+
     public static MonsterWonEvent monsterWonEvent = new MonsterWonEvent();
 
     public static FailedToLoadStageEvent failedToLoadStageEvent = new FailedToLoadStageEvent();
@@ -147,6 +148,14 @@ public class MonsterWonEvent : UnityEvent { }
 
 
 public class MonsterSpawnedInStageEvent : UnityEvent<int> { }
+
+public class LurkerSpawnedInStageEvent : UnityEvent { }
+
+public class PhantomSpawnedInStageEvent : UnityEvent { }
+
+public class MarySpawendInStageEvent : UnityEvent { }
+
+public class FallenSpawnedInStageEvent : UnityEvent { }
 
 
 #endregion

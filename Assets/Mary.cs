@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 // NOTE: This class may need a lot more testing. I think I covered all of the bugs though. It's a tricky problem to solve lol.
 public class Mary : MonoBehaviour
@@ -28,6 +29,10 @@ public class Mary : MonoBehaviour
 
     [SerializeField]
     private float attackDistance;
+
+
+    [SerializeField]
+    private float maryArmTrapDistance;
 
 
     [SerializeField]
@@ -118,6 +123,9 @@ public class Mary : MonoBehaviour
     private Coroutine maryEnergyGainRoutine;
 
     private Coroutine maryEnergyFrenzyRoutine;
+
+    // Used to disarm old traps when she teleports.
+    private List<Trap> oldTraps;
 
     void LateUpdate()
     {
@@ -397,6 +405,33 @@ public class Mary : MonoBehaviour
             int randomNumber = Random.Range(0, teleportLocations.Length);
             maryTransform.position = teleportLocations[randomNumber].transform.position;
             maryTeleportSound.Play();
+            OnTeleport();
+        }
+
+    }
+
+    //TODO: Test this. Should be good though.
+    private void OnTeleport()
+    {
+	for (var i = 0; i < oldTraps.Capacity; i++)
+	{
+		oldTraps[i].Disarm();
+	}
+
+	oldTraps.Clear();
+
+        RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, maryArmTrapDistance, transform.forward, maryArmTrapDistance);
+
+        for (var i = 0; i < objectsHit.Length; i++)
+        {
+            GameObject trapObject = objectsHit[i].collider.gameObject;
+
+            if (trapObject.CompareTag(Tags.TRAP))
+            {
+        	Trap trap = trapObject.GetComponent<Trap>();
+		trap.Arm();
+		oldTraps.Add(trap);
+            }
         }
 
     }

@@ -23,4 +23,6 @@ public static class Tags
 
 	public static string MARY_TELEPORT_LOCATION = "Mary Teleport Location";
 
+	public static string PATH = "Path";
+
 }

@@ -7,6 +7,9 @@ public class KeyObject : MonoBehaviour
     private Key key;
 
     [SerializeField]
+    private Transform[] potentialSpawnPoints;
+
+    [SerializeField]
     private Color groupColor;
 
     [SerializeField]

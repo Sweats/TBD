@@ -17,6 +17,9 @@ public class Survivor : MonoBehaviour
     private AudioSource deathSound;
 
     [SerializeField]
+    private AudioSource[] lurkerPassedThroughSurviorSounds;
+
+    [SerializeField]
     private Sprint sprint;
 
     [SerializeField]
@@ -71,7 +74,19 @@ public class Survivor : MonoBehaviour
     [SerializeField]
     private float trapDistance;
 
+
+    [SerializeField]
+    private float lurkerDetectionDistance;
+
+    [SerializeField]
+    private float lurkerDetectionRoutineDelay;
+
+
+    [SerializeField]
+    private float phantomDetectionRoutineDelay;
+
     private float xRotation;
+
     private bool isPlayerStatsOpened;
 
     public bool matchOver;
@@ -95,7 +110,7 @@ public class Survivor : MonoBehaviour
         EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenedPlayerStats);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
 
-        StartCoroutine(CheckForTraps());
+        StartCoroutine(TrapDetectionRoutine());
     }
 
     void LateUpdate()
@@ -130,7 +145,7 @@ public class Survivor : MonoBehaviour
     {
         velocity.y -= gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
-	//controller.attachedRigidbody.
+        //controller.attachedRigidbody.
 
         if (controller.isGrounded && velocity.y < 0)
         {
@@ -164,7 +179,7 @@ public class Survivor : MonoBehaviour
         {
             speed = defaultSpeed;
         }
-  
+
         if (Keybinds.GetKey(Action.SwitchFlashlight))
         {
             flashlight.Toggle();
@@ -184,11 +199,11 @@ public class Survivor : MonoBehaviour
             //To make it more 9heads-like, needs to check if player attemps to sprint while moving diagonally
             //while sprinting, diagonal movement is impossible
             //needs to check if player is backpaddling
-            if (isMoving && (sprint.GetEnergy()>=sprint.GetEnergyNeededToSprint()))
+            if (isMoving && (sprint.GetEnergy() >= sprint.GetEnergyNeededToSprint()))
             {
                 sprint.SetSprinting(true);
                 //immediately consume energy
-                sprint.SetEnergy(-3.0f/sprint.GetTickRate());
+                sprint.SetEnergy(-3.0f / sprint.GetTickRate());
             }
         }
         /* Not needed since Sprint triggers on tapping Shift key and works as long as you are moving
@@ -232,7 +247,7 @@ public class Survivor : MonoBehaviour
 
     }
 
-    private IEnumerator CheckForTraps()
+    private IEnumerator TrapDetectionRoutine()
     {
         while (true)
         {
@@ -248,19 +263,85 @@ public class Survivor : MonoBehaviour
 
                     if (trap.Armed())
                     {
-			    trap.Trigger();
+                        trap.Trigger();
                     }
                 }
             }
 
-	    if (matchOver || dead)
-	    {
-		    yield break;
-	    }
+            if (matchOver || dead)
+            {
+                yield break;
+            }
 
             yield return new WaitForSeconds(0.5f);
 
         }
+    }
+
+    // This routine is only started when a lurker has spawned in the stage. An event will be responsible for this.
+    private IEnumerator LurkerDetectionRoutine()
+    {
+        while (true)
+        {
+            RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, lurkerDetectionDistance, transform.forward, lurkerDetectionDistance);
+
+            for (var i = 0; i < objectsHit.Length; i++)
+            {
+                GameObject gameObject = objectsHit[i].collider.gameObject;
+
+                if (gameObject.CompareTag(Tags.LURKER))
+                {
+                    Lurker lurker = gameObject.GetComponent<Lurker>();
+
+                    if (lurker.IsInPhysicalForm())
+                    {
+                        break;
+                    }
+
+                    int randomNumber = Random.Range(0, lurkerPassedThroughSurviorSounds.Length);
+                    lurkerPassedThroughSurviorSounds[randomNumber].Play();
+                    break;
+                }
+            }
+
+            yield return new WaitForSeconds(lurkerDetectionRoutineDelay);
+        }
+    }
+
+    private IEnumerator PhantomDetectionRoutine()
+    {
+        while (true)
+        {
+            RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, lurkerDetectionDistance, transform.forward, lurkerDetectionDistance);
+
+            for (var i = 0; i < objectsHit.Length; i++)
+            {
+                GameObject hitGameObject = objectsHit[i].collider.gameObject;
+
+                if (hitGameObject.CompareTag(Tags.PHANTOM))
+                {
+                    // TODO: Figure out what kind of creepy sound that we want to play and play it here.
+                    // Also maybe do a screen effect here at some point.
+                    break;
+
+                }
+            }
+
+            yield return new WaitForSeconds(phantomDetectionRoutineDelay);
+        }
+    }
+
+
+    //TODO. Get around to doing this.
+    private IEnumerator FallenDetectionRoutine()
+    {
+	    yield return null;
+    }
+
+    //TODO. Get around to doing this.
+    private IEnumerator MaryDetectionRoutine()
+    {
+	    yield return null;
     }
 
     private void OnActionGrab()
@@ -330,7 +411,7 @@ public class Survivor : MonoBehaviour
             {
                 found = true;
                 EventManager.SurvivorAlreadyHaveKeyEvent.Invoke();
-		break;
+                break;
 
             }
         }
@@ -338,7 +419,7 @@ public class Survivor : MonoBehaviour
         if (!found)
         {
             Key key = foundKey.Key();
-	    inventory.Add(key);
+            inventory.Add(key);
             foundKey.Pickup();
         }
     }
@@ -363,7 +444,7 @@ public class Survivor : MonoBehaviour
 
         if (!found)
         {
-		door.PlayLockedSound();
+            door.PlayLockedSound();
         }
     }
 
@@ -371,11 +452,12 @@ public class Survivor : MonoBehaviour
     {
         if (flashlight.charge <= battery.chargeNeededToGrab)
         {
-		flashlight.Recharge();
+            flashlight.Recharge();
         }
 
         else
         {
+            EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
             EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
         }
     }
@@ -383,7 +465,7 @@ public class Survivor : MonoBehaviour
     public void Die()
     {
         dead = true;
-	sprint.SetDead(dead);
+        sprint.SetDead(dead);
         insanity.Reset();
         deathSound.Play();
         EventManager.survivorDeathEvent.Invoke(this);
@@ -392,21 +474,21 @@ public class Survivor : MonoBehaviour
     // Called if the player is the Lurker.
     public void Hide()
     {
-	    survivorRenderer.enabled = false;
-	    flashlight.Hide();
+        survivorRenderer.enabled = false;
+        flashlight.Hide();
     }
 
     // Called if the player is the Lurker.
     public void Show()
     {
-	    survivorRenderer.enabled = true;
-	    flashlight.Show();
+        survivorRenderer.enabled = true;
+        flashlight.Show();
     }
 
     private void OnSurvivorsEscapedStageEvent()
     {
         matchOver = true;
-	sprint.SetMatchOver(true);
+        sprint.SetMatchOver(true);
     }
 
     private void OnSurvivorOpenedPlayerStats()
@@ -425,4 +507,25 @@ public class Survivor : MonoBehaviour
     {
         return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
     }
+
+    private void OnMonsterSpawnedOnStage(int monster)
+    {
+        switch (monster)
+        {
+            case 0:
+                StartCoroutine(LurkerDetectionRoutine());
+                break;
+            case 1:
+                StartCoroutine(PhantomDetectionRoutine());
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            default:
+                break;
+        }
+    }
+
+
 }

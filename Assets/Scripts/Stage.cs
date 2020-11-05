@@ -7,8 +7,10 @@ public class Stage : MonoBehaviour
     private Survivor[] survivors;
 
     private bool matchOver;
+
     private void Start()
     {
+        //EventManager.monsterSpawnedInStageEvent.AddListener(OnMonsterSpawnedOnStage);
 
     }
 
@@ -34,38 +36,15 @@ public class Stage : MonoBehaviour
 
     }
 
-
-    public void OnSurvivorEnteredExitZone(Survivor who)
+    private void HandleKeyPaths()
     {
-        bool canEscape = true;
+        GameObject[] paths = GameObject.FindGameObjectsWithTag(Tags.PATH);
 
-        for (var i = 0; i < survivors.Length; i++)
+        for (var i = 0; i < paths.Length; i++)
         {
-            if (survivors[i].dead)
-            {
-                continue;
-            }
-
-            if (!survivors[i].isInEscapeRoom)
-            {
-                canEscape = false;
-                break;
-
-            }
+            Path path = paths[i].GetComponent<Path>();
+	    path.SpawnKeyObjectsInPath();
         }
-
-        if (canEscape)
-        {
-            for (var i = 0; i < survivors.Length; i++)
-            {
-                survivors[i].matchOver = true;
-            }
-        }
-    }
-
-    public void OnSurvivorLeftExitZone(Survivor who)
-    {
-        who.isInEscapeRoom = false;
     }
 
 }

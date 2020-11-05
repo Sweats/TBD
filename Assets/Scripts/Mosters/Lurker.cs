@@ -327,7 +327,6 @@ public class Lurker : MonoBehaviour
             for (var i = 0; i < survivors.Length; i++)
             {
                 Survivor survivor = survivors[i].GetComponent<Survivor>();
-                survivor.Hide();
             }
         }
 
@@ -514,6 +513,12 @@ public class Lurker : MonoBehaviour
     private bool IsAnotherWindowOpen()
     {
         return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
+    }
+
+
+    public bool IsInPhysicalForm()
+    {
+	    return ghostForm;
     }
 
 }

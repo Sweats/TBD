@@ -34,24 +34,6 @@ public class Trap : MonoBehaviour
 
         // get the kind of monster that is in the game and then call the corrisponding trap logic for the monster
         /*
-        switch (monster)
-        {
-            case 0:
-                StartCoroutine(DoLurkerTraps());
-                break;
-            case 1:
-                StartCoroutine(DoPhantomTraps());
-                break;
-            case 2:
-                StartCoroutine(DoMaryTraps());
-                break;
-            case 3:
-                StartCoroutine(DoFallenTraps());
-                break;
-            default:
-                break;
-
-        }
         */
 
     }
@@ -73,7 +55,7 @@ public class Trap : MonoBehaviour
         return armed;
     }
 
-    public void UnArm()
+    public void Disarm()
     {
         armed = false;
     }
