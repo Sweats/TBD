@@ -128,7 +128,7 @@ public class ConsoleUI : MonoBehaviour
         x = survivor.transform.position.x;
         y = survivor.transform.position.y;
         z = survivor.transform.position.z;
-        string text = $"Survivor \"{survivor.survivorName}\" has unlocked a door named \"{door.doorName}\" using an item named \"{key.keyName}\" at {x} {y} {z}!";
+        string text = $"Survivor \"{survivor.survivorName}\" has unlocked a door named \"{door.doorName}\" using an item named \"{key.Name()}\" at {x} {y} {z}!";
         UpdateConsoleText(text);
     }
 
@@ -157,14 +157,14 @@ public class ConsoleUI : MonoBehaviour
 
     private void OnSurvivorPickedUpKey(Survivor survivor, Key key)
     {
-        string keyName = key.keyName;
+        string keyName = key.Name();
         float x, y, z;
         x = survivor.transform.position.x;
         y = survivor.transform.position.y;
         z = survivor.transform.position.z;
         string survivorName = survivor.survivorName;
         string timestamp = GetTimeStamp();
-        string keyTypeName = Enum.GetName(typeof(KeyType), key.type);
+        string keyTypeName = Enum.GetName(typeof(KeyType), key.Type());
         string text = $"Survivor \"{survivorName}\" picked up an item named \"{key}\" of type \"{keyTypeName}\" at {x} {y} {z}";
         UpdateConsoleText(text);
 

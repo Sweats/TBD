@@ -6,6 +6,8 @@ public class Inventory : MonoBehaviour
     private List<Key> keys;
     private Rect currentPosition;
 
+    private Canvas inventoryCanvas;
+
     void Start()
     {
         // TO DO: Get the size of the Keylist and 
@@ -16,13 +18,11 @@ public class Inventory : MonoBehaviour
             height = 30,
             width = 30
         };
-
-
-        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
     }
 
-    public void Add(Key key)
+    public void Add(Key key, Texture keyIcon)
     {
+        key.SetTexture(keyIcon);
         keys.Add(key);
     }
 
@@ -40,13 +40,13 @@ public class Inventory : MonoBehaviour
     {
         for (int i = 0; i < keys.Count; i++)
         {
-            if (keys[i].mask == key.mask)
+            if (keys[i].Mask() == key.Mask())
             {
                 keys.RemoveAt(i);
                 break;
             }
         }
-        
+
     }
 
     public void Draw()
@@ -56,7 +56,7 @@ public class Inventory : MonoBehaviour
 
         for (var i = 0; i < keys.Count; i++)
         {
-            Texture itemIcon = keys[i].textureIcon;
+            Texture itemIcon = keys[i].Texture();
 
             if (i % 8 == 0)
             {
@@ -73,8 +73,4 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    private void OnSurvivorPickedUpKey(Survivor survivor, Key key)
-    {
-        survivor.inventory.Add(key);
-    }
 }

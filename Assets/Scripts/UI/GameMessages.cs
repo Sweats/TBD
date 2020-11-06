@@ -51,13 +51,13 @@ public class GameMessages : MonoBehaviour
 
     private void OnSurvivorGrabbedKey(Survivor who, Key key)
     {
-        string newMessage = $"{who.survivorName} picked up a {key.keyName}!";
+        string newMessage = $"{who.survivorName} picked up a {key.Name()}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
     private void OnSurvivorUnlockedDoor(Survivor who, Key key, Door door)
     {
-        string newMessage = $"{who.survivorName} used a {key.keyName} to unlock a {door.doorName}!";
+        string newMessage = $"{who.survivorName} used a {key.Name()} to unlock a {door.doorName}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }

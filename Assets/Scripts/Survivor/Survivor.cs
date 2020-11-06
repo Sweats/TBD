@@ -283,6 +283,11 @@ public class Survivor : MonoBehaviour
     {
         while (true)
         {
+		if (matchOver || dead)
+		{
+			yield break;
+		}
+
             RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, lurkerDetectionDistance, transform.forward, lurkerDetectionDistance);
 
             for (var i = 0; i < objectsHit.Length; i++)
@@ -312,6 +317,11 @@ public class Survivor : MonoBehaviour
     {
         while (true)
         {
+		if (matchOver || dead)
+		{
+			yield break;
+		}
+
             RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, lurkerDetectionDistance, transform.forward, lurkerDetectionDistance);
 
             for (var i = 0; i < objectsHit.Length; i++)
@@ -419,7 +429,8 @@ public class Survivor : MonoBehaviour
         if (!found)
         {
             Key key = foundKey.Key();
-            inventory.Add(key);
+	    Texture texture = foundKey.Texture();
+            inventory.Add(key, texture);
             foundKey.Pickup();
         }
     }
@@ -431,7 +442,7 @@ public class Survivor : MonoBehaviour
 
         for (var i = 0; i < keys.Length; i++)
         {
-            int unlockMask = keys[i].mask;
+            int unlockMask = keys[i].Mask();
 
             if (door.unlockMask == unlockMask)
             {

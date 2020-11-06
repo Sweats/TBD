@@ -327,6 +327,7 @@ public class Lurker : MonoBehaviour
             for (var i = 0; i < survivors.Length; i++)
             {
                 Survivor survivor = survivors[i].GetComponent<Survivor>();
+		survivor.Hide();
             }
         }
 

@@ -66,7 +66,7 @@ public class PlayerStatsUI : MonoBehaviour
     public void OnSurvivorPickedUpKey(Survivor survivor, Key key)
     {
         int id = survivor.survivorID;
-        int keyType = (int)key.type;
+        int keyType = (int)key.Type();
         Key[] keys = survivor.inventory.Keys();
         int rustyKeyCount = 0, metalKeyCount = 0, oldKeyCount = 0, silverKeyCount = 0;
         int crowbarCount = 0, hammerCount = 0, codeCount = 0;
@@ -74,7 +74,7 @@ public class PlayerStatsUI : MonoBehaviour
         for (var i = 0; i < keys.Length; i++)
         {
             Key currentKey = keys[i];
-            int type = (int)currentKey.type;
+            int type = (int)currentKey.Type();
 
             switch (keyType)
             {

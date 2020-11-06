@@ -25,4 +25,7 @@ public static class Tags
 
 	public static string PATH = "Path";
 
+
+	public static string OBJECT_SPAWN_POINT = "Object Spawn Point";
+
 }

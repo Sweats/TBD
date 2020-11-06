@@ -4,10 +4,7 @@
 public class KeyObject : MonoBehaviour
 {
     [SerializeField]
-    private Key key;
-
-    [SerializeField]
-    private Transform[] potentialSpawnPoints;
+    private Key _key;
 
     [SerializeField]
     private Color groupColor;
@@ -19,8 +16,10 @@ public class KeyObject : MonoBehaviour
 
     [SerializeField]
     private float maxTimerForGlow = 100;
+
     [SerializeField]
     private float minTimer = 0;
+
     [SerializeField]
     private float noGlowTimer;
 
@@ -29,6 +28,11 @@ public class KeyObject : MonoBehaviour
 
     private bool pickedUp = false;
 
+    [SerializeField]
+    private AudioSource pickupSound;
+
+    [SerializeField]
+    private Texture keyIcon;
 
     [SerializeField]
     // this is the color that will appear around the key mesh to let the player know they can pick it up
@@ -72,7 +76,7 @@ public class KeyObject : MonoBehaviour
 
     public Key Key()
     {
-        return key;
+        return _key;
 
     }
 
@@ -91,7 +95,7 @@ public class KeyObject : MonoBehaviour
     public void Pickup()
     {
         pickedUp = true;
-        key.PlayPickupSound();
+	pickupSound.Play();
         Hide();
     }
 
@@ -108,6 +112,19 @@ public class KeyObject : MonoBehaviour
             keyRenderer.enabled = true;
             keyCollider.enabled = true;
         }
+    }
+
+
+    public void SetKey(Key key)
+    {
+	    _key =  key;
+    }
+
+
+    public Texture Texture()
+    {
+	    return keyIcon;
+
     }
 }
 
