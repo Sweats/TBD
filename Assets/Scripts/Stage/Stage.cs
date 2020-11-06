@@ -89,7 +89,7 @@ public class Stage : MonoBehaviour
     {
         bool found = false;
 
-        for (var i = 0; i < ignoreMaskList.Capacity; i++)
+        for (var i = 0; i < ignoreMaskList.Count; i++)
         {
             int foundIgnoreMaskID = ignoreMaskList[i];
 
