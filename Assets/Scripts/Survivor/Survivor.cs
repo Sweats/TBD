@@ -29,6 +29,7 @@ public class Survivor : MonoBehaviour
     private Camera survivorCamera;
 
 
+
     //[SerializeField]
     //private PausedGameInput pausedGameInput;
 

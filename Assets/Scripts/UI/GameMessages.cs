@@ -19,7 +19,7 @@ public class GameMessages : MonoBehaviour
     [SerializeField]
     private Canvas gameMessagesCanvas;
     private StringBuilder stringBuilder;
-    
+
     void Start()
     {
         stringBuilder = new StringBuilder();
@@ -32,9 +32,10 @@ public class GameMessages : MonoBehaviour
         EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
         EventManager.playerConnectedEvent.AddListener(OnPlayerConnect);
         EventManager.playerDisconnectedEvent.AddListener(OnPlayerDisconnect);
-	EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
-	EventManager.maryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
-	EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
+        EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
+        EventManager.maryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
+        EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
+        EventManager.invalidLobbyNameEvent.AddListener(OnFailedToCreateLobby);
     }
 
     private void UpdateChatText()
@@ -110,20 +111,20 @@ public class GameMessages : MonoBehaviour
 
     private void OnLurkerReadyToGoIntoPhysicalForm()
     {
-	    string newMesasge = "You may now transform into physical form.";
-	    StartCoroutine(AddAndRemoveGameMessage(newMesasge));
+        string newMesasge = "You may now transform into physical form.";
+        StartCoroutine(AddAndRemoveGameMessage(newMesasge));
     }
 
     private void OnMaryReadyToFrenzy()
     {
-	    string newMessage = $"Click {Keybinds.GetKey(Action.Transform)} to enter frenzied mode.";
-	    StartCoroutine(AddAndRemoveGameMessage(newMessage));
+        string newMessage = $"Click {Keybinds.GetKey(Action.Transform)} to enter frenzied mode.";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
     private void OnMaryReadyToTeleport()
     {
-	    string newMessage = $"Click {Keybinds.GetKey(Action.Teleport)} to teleport.";
-	    StartCoroutine(AddAndRemoveGameMessage(newMessage));
+        string newMessage = $"Click {Keybinds.GetKey(Action.Teleport)} to teleport.";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
     private IEnumerator AddAndRemoveGameMessage(string newMessage)
@@ -133,6 +134,12 @@ public class GameMessages : MonoBehaviour
         yield return new WaitForSeconds(chatMessageAppearanceLength);
         messages.Remove(newMessage);
         UpdateChatText();
+    }
+
+    private void OnFailedToCreateLobby()
+    {
+        string newMessage = "You must enter a lobby name!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
 }

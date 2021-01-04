@@ -41,6 +41,7 @@ public class Stage : MonoBehaviour
     }
 
 
+
     private void ChoosePath()
     {
         if (forcedPathID <= -1)
@@ -112,6 +113,7 @@ public class Stage : MonoBehaviour
         ObjectSpawnPoint pickedSpawnPoint = potentialSpawnPoints[randomNumber];
         keyObject.SetKey(key);
         Instantiate(keyObject, pickedSpawnPoint.transform.position, Quaternion.identity);
+	//NetworkServer.Spawn(keyObject.gameObject);
     }
 
     private ObjectSpawnPoint[] GetSpawnPointsForKey(Key key)

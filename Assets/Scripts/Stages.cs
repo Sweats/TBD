@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
+// NOTE: Make sure that this list matches the dictionary down a few lines below.
 public enum StageName
 {
-    Hotel = 0,
-    Menu,
-    Template
-
+    Template = 0,
+    Template_Lurker,
+    Template_Mary,
+    Template_Phantom,
+    Template_Fallen,
+    Menu
 }
 
 public class Stages
@@ -14,12 +17,15 @@ public class Stages
 
     private Stages() { }
 
+    // NOTE: Make sure that the order of this matches the enum at the top of this file.
     private static Dictionary<StageName, string> stagesDict = new Dictionary<StageName, string>()
     {
-        {StageName.Hotel, "hotel"},
-        {StageName.Menu, "menu"},
-        {StageName.Template, "stage-template"}
-
+        {StageName.Template, "stage-template"},
+        {StageName.Template_Fallen, "stage-template-fallen"},
+        {StageName.Template_Phantom, "stage-template-phantom"},
+        {StageName.Template_Mary, "stage-template-mary"},
+        {StageName.Template_Lurker, "stage-template-lurker"},
+        {StageName.Menu, "menu"}
     };
 
 

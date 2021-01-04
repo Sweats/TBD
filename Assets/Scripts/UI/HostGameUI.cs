@@ -1,28 +1,60 @@
 ﻿using UnityEngine;
+using UnityEngine;
+using UnityEngine.UI;
+
 public class HostGameUI : MonoBehaviour
 {
-    // Start is called before the first frame update
 
     [SerializeField]
-    private Canvas hostgameCanvas;
+    private InputField lobbyNameField;
 
-    void Start()
+    [SerializeField]
+    private InputField passwordField;
+
+    [SerializeField]
+    private Canvas hostLobbyCanvas;
+
+    [SerializeField]
+    private Button backButton;
+
+    [SerializeField]
+    private Text lobbyNameNotification;
+
+    public string LobbyName()
     {
-        
+        return lobbyNameField.text;
+
     }
 
-
-    public void Show()
+    public string LobbyPassword()
     {
-        hostgameCanvas.enabled = true;
+        return passwordField.text;
 
     }
-
 
     public void Hide()
     {
-        hostgameCanvas.enabled = false;
+        hostLobbyCanvas.enabled = false;
+
     }
 
-    
+    public void Show()
+    {
+        hostLobbyCanvas.enabled = true;
+    }
+
+    public void ShowLobbyNotification()
+    {
+        lobbyNameNotification.enabled = true;
+    }
+
+    public void HideLobbyNotification()
+    {
+        lobbyNameNotification.enabled = false;
+    }
+
+    public void OnLobbyNameChanged()
+    {
+        HideLobbyNotification();
+    }
 }

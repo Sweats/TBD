@@ -60,6 +60,8 @@ public static class EventManager
 
     public static MaryReadyToTeleportEvent maryReadyToTeleportEvent = new MaryReadyToTeleportEvent();
 
+    public static InvalidLobbyNameEvent invalidLobbyNameEvent = new InvalidLobbyNameEvent();
+
 }
 
 
@@ -173,9 +175,9 @@ public class LurkerReadyToGoIntoPhysicalFormEvent : UnityEvent { }
 
 #region MARY_EVENTS
 
-public class MaryReadyToFrenzyEvent: UnityEvent {  }
+public class MaryReadyToFrenzyEvent : UnityEvent { }
 
-public class MaryReadyToTeleportEvent: UnityEvent {  }
+public class MaryReadyToTeleportEvent : UnityEvent { }
 
 #endregion
 
@@ -184,6 +186,13 @@ public class MaryReadyToTeleportEvent: UnityEvent {  }
 
 //[System.Serializable]
 //public class ReturnToLobbyEvent: UnityEvent {}
+
+#endregion
+
+
+#region UI_EVENTS
+
+public class InvalidLobbyNameEvent : UnityEvent { }
 
 #endregion
 

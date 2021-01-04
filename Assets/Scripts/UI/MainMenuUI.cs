@@ -10,7 +10,7 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField]
     private Canvas mainMenuCanvas;
 
-    private const int ARRAY_SIZE = 11;
+    private const int ARRAY_SIZE = 12;
 
     [SerializeField]
     private SoundUI soundUI;
@@ -40,11 +40,15 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField]
     private JoinGameUI joinGameUI;
 
+    [SerializeField]
+    private LobbyUI lobbyUI;
 
     [SerializeField]
     private CreditsUI creditsUI;
 
     public bool[] openedMenus;
+
+    private bool hosting;
 
     public enum Menu
     {
@@ -58,7 +62,8 @@ public class MainMenuUI : MonoBehaviour
         Sound,
         Controls,
         Misc,
-        JoinGame
+        JoinGame,
+        Lobby
     }
 
 
@@ -161,6 +166,28 @@ public class MainMenuUI : MonoBehaviour
                         openedMenus[(int)Menu.JoinGame] = false;
                         openedMenuFound = true;
                         break;
+                    case Menu.Lobby:
+
+                        if (hosting)
+                        {
+                            hostGameUI.Show();
+                            lobbyUI.Hide();
+                            openedMenus[(int)Menu.Lobby] = false;
+                            openedMenus[(int)Menu.HostGame] = true;
+                            openedMenuFound = true;
+                            hosting = false;
+                        }
+
+                        else
+                        {
+                            joinGameUI.Show();
+                            lobbyUI.Hide();
+                            openedMenus[(int)Menu.Lobby] = false;
+                            openedMenus[(int)Menu.JoinGame] = true;
+                            openedMenuFound = true;
+                        }
+
+                        break;
                 }
 
                 if (openedMenuFound)
@@ -173,12 +200,21 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnMouseOverButton(Button button)
     {
-        button.GetComponentInChildren<Text>().color = buttonTextColor;
+        if (!button.enabled)
+        {
+            return;
+        }
 
+        button.GetComponentInChildren<Text>().color = buttonTextColor;
     }
 
     public void OnMouseLeftButton(Button button)
     {
+        if (!button.enabled)
+        {
+            return;
+        }
+
         button.GetComponentInChildren<Text>().color = Color.white;
     }
 
@@ -212,11 +248,27 @@ public class MainMenuUI : MonoBehaviour
         Hide();
         openedMenus[(int)Menu.HostGame] = true;
         openedMenus[(int)Menu.Main] = false;
-
     }
+
+
+    public void OnCreateLobbyButtonClicked()
+    {
+        if (hostGameUI.LobbyName() == string.Empty)
+        {
+            hostGameUI.ShowLobbyNotification();
+            return;
+        }
+
+        lobbyUI.Show();
+        hostGameUI.Hide();
+        openedMenus[(int)Menu.HostGame] = false;
+        openedMenus[(int)Menu.Lobby] = true;
+        hosting = true;
+    }
+
     public void OnPlayButtonClicked()
     {
-        Stages.Load(StageName.Hotel);
+        Stages.Load(StageName.Template);
     }
 
     public void OnOptionsButtonClicked()
@@ -321,9 +373,9 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnHostGameBackButtonClicked()
     {
-        optionsUI.Show();
+        Show();
         hostGameUI.Hide();
-        openedMenus[(int)Menu.Options] = true;
+        openedMenus[(int)Menu.Main] = true;
         openedMenus[(int)Menu.HostGame] = false;
 
     }
@@ -363,6 +415,26 @@ public class MainMenuUI : MonoBehaviour
         openedMenus[(int)Menu.JoinGame] = false;
     }
 
+    public void OnLeaveLobbyButtonClicked()
+    {
+        if (hosting)
+        {
+            hostGameUI.Show();
+            lobbyUI.Hide();
+            openedMenus[(int)Menu.HostGame] = true;
+            openedMenus[(int)Menu.Lobby] = false;
+            hosting = false;
+        }
+
+        else
+        {
+            joinGameUI.Show();
+            lobbyUI.Hide();
+            openedMenus[(int)Menu.JoinGame] = true;
+            openedMenus[(int)Menu.Lobby] = false;
+        }
+
+    }
 
     #endregion
 
@@ -371,12 +443,12 @@ public class MainMenuUI : MonoBehaviour
         mainMenuCanvas.enabled = true;
 
     }
+
     public void Hide()
     {
 
         mainMenuCanvas.enabled = false;
     }
-
 
 }
 
