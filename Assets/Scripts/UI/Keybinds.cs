@@ -21,7 +21,7 @@ public enum Action
     SpectateNext,
     VoiceChat,
     GuiAccept,
-    GUiReturn
+    GuiReturn
 }
 
 public class Keybinds : MonoBehaviour
@@ -66,7 +66,7 @@ public class Keybinds : MonoBehaviour
         Keybinds.actions[Action.SpectateNext] = KeyCode.Mouse0;
         Keybinds.actions[Action.VoiceChat] = KeyCode.C;
         Keybinds.actions[Action.GuiAccept] = KeyCode.Mouse0;
-        Keybinds.actions[Action.GUiReturn] = KeyCode.Escape;
+        Keybinds.actions[Action.GuiReturn] = KeyCode.Escape;
     }
 
 

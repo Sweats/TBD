@@ -315,6 +315,43 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &366660644 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4486954875496816756, guid: 7f8935340521d426780fc2df4c6f40fe,
+    type: 3}
+  m_PrefabInstance: {fileID: 1231363446}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &366660646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 366660644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb5f752499ba09ee8a38e2bfd14863dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lurkerCloserMusic: {fileID: 0}
+  lurkerCloseMusic: {fileID: 0}
+  lurkerPassedThroughSurviorSounds:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  lurkerCloseMusicDistance: 0
+  lurkerCloserMusicDistance: 0
+  lurkerGhostTouchingDistance: 0
+  phantomCloseMusic: {fileID: 0}
+  phantomCloserMusic: {fileID: 0}
+  phantomCloseMusicDistance: 0
+  phantomCloserMusicDistance: 0
+  maryCloseMusic: {fileID: 0}
+  maryCloseMusicDistance: 0
+  fallenCloseMusic: {fileID: 0}
+  fallenCloseSound: {fileID: 0}
+  fallenAmbientMusicDistance: 0
+  fallenCloseMusicDistance: 0
 --- !u!1 &557898553
 GameObject:
   m_ObjectHideFlags: 0
@@ -556,6 +593,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4486954876449288366, guid: 7f8935340521d426780fc2df4c6f40fe,
+        type: 3}
+      propertyPath: maxCharge
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486954876449288366, guid: 7f8935340521d426780fc2df4c6f40fe,
+        type: 3}
+      propertyPath: charge
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486954876449288366, guid: 7f8935340521d426780fc2df4c6f40fe,
+        type: 3}
+      propertyPath: dischargeRate
+      value: 0.0023809525
+      objectReference: {fileID: 0}
+    - target: {fileID: 4486954876449288367, guid: 7f8935340521d426780fc2df4c6f40fe,
+        type: 3}
+      propertyPath: m_Intensity
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5170028035910589657, guid: 7f8935340521d426780fc2df4c6f40fe,
         type: 3}
       propertyPath: m_Name
@@ -616,7 +673,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 4486954875496816759, guid: 7f8935340521d426780fc2df4c6f40fe, type: 3}
+    - {fileID: 4486954875496816758, guid: 7f8935340521d426780fc2df4c6f40fe, type: 3}
+    - {fileID: 4486954875496816752, guid: 7f8935340521d426780fc2df4c6f40fe, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7f8935340521d426780fc2df4c6f40fe, type: 3}
 --- !u!82 &1240195633 stripped
 AudioSource:
@@ -2701,7 +2761,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: bbe2c7293af197640a2b40018e79b9a6, type: 2}
+  - {fileID: 2100000, guid: ffd2d7b7d8d49e7dcac8d54c434fde05, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3391,7 +3451,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseHover
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266657181495}
@@ -3406,7 +3466,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseLeft
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266657181495}
@@ -3698,7 +3758,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseHover
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266697117830}
@@ -3713,7 +3773,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseLeft
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266697117830}
@@ -3976,7 +4036,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseHover
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266737964579}
@@ -3991,7 +4051,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseLeft
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266737964579}
@@ -4225,7 +4285,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 8392479267703075264}
-        m_MethodName: OnKeybindsBackButtonClicked
+        m_MethodName: OnControlsBackButtonClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4301,8 +4361,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266749218680}
@@ -4316,8 +4376,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266749218680}
@@ -4341,7 +4401,7 @@ GameObject:
   - component: {fileID: 8392479266749218680}
   - component: {fileID: 8392479266749218683}
   m_Layer: 5
-  m_Name: Back Button
+  m_Name: Controls Back Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4586,8 +4646,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266766142686}
@@ -4601,8 +4661,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266766142686}
@@ -4654,18 +4714,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479266766142687}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnPlayerstatsButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479266766142687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5241,7 +5290,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseHover
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266856118169}
@@ -5256,7 +5305,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseLeft
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266856118169}
@@ -5386,7 +5435,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseHover
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266859180746}
@@ -5401,7 +5450,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseLeft
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479266859180746}
@@ -6986,8 +7035,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267015930781}
@@ -7001,8 +7050,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267015930781}
@@ -7054,18 +7103,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267015930778}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnTeleportButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &8392479267015930782
 GameObject:
   m_ObjectHideFlags: 0
@@ -7429,8 +7467,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267064222092}
@@ -7444,8 +7482,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267064222092}
@@ -7505,18 +7543,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267064222093}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnMoveForwardButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479267064222093
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7640,8 +7667,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267065553239}
@@ -7655,8 +7682,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267065553239}
@@ -7708,18 +7735,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267065553236}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnLoadDefaultsButton
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &8392479267065553576
 GameObject:
   m_ObjectHideFlags: 0
@@ -7734,7 +7750,7 @@ GameObject:
   - component: {fileID: 8392479267065553239}
   - component: {fileID: 8392479267065553238}
   m_Layer: 5
-  m_Name: Load Defaults Button
+  m_Name: Control Load Defaults Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8092,8 +8108,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267100413943}
@@ -8107,8 +8123,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267100413943}
@@ -8217,18 +8233,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267100413940}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnMoveRightButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479267101135976
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8407,8 +8412,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267143799732}
@@ -8422,8 +8427,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267143799732}
@@ -8475,18 +8480,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267143799733}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnGrabButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479267143799733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9902,8 +9896,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267290212137}
@@ -9917,8 +9911,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267290212137}
@@ -9970,18 +9964,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267290212310}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: guiReturnButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &8392479267290212138
 GameObject:
   m_ObjectHideFlags: 0
@@ -10580,34 +10563,6 @@ RectTransform:
   m_AnchoredPosition: {x: 132, y: 64}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &8392479267344139281
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8392479267344139283}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 1
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseLeft
-          m_Mode: 2
-          m_Arguments:
-            m_ObjectArgument: {fileID: 8392479267344139295}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!1 &8392479267344139283
 GameObject:
   m_ObjectHideFlags: 0
@@ -10621,7 +10576,6 @@ GameObject:
   - component: {fileID: 8392479267344139292}
   - component: {fileID: 8392479267344139295}
   - component: {fileID: 8392479267344139294}
-  - component: {fileID: 8392479267344139281}
   m_Layer: 5
   m_Name: Sound Button
   m_TagString: Untagged
@@ -10684,7 +10638,22 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseHover
+          m_MethodName: OnPointerEnterButton
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 8392479267344139295}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267344139295}
@@ -11968,8 +11937,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267524836141}
@@ -11983,8 +11952,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267524836141}
@@ -12093,18 +12062,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267524836138}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnSwitchFlashlightButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &8392479267524836143
 GameObject:
   m_ObjectHideFlags: 0
@@ -12257,8 +12215,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267531014771}
@@ -12272,8 +12230,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267531014771}
@@ -12325,18 +12283,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267531014768}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnVoiceChatButtonCilck
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &8392479267531014772
 GameObject:
   m_ObjectHideFlags: 0
@@ -12427,18 +12374,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267531485763}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: guiAcceptButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479267531485763
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12505,8 +12441,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267531485762}
@@ -12520,8 +12456,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267531485762}
@@ -13193,7 +13129,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseHover
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267657056995}
@@ -13208,7 +13144,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseLeft
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267657056995}
@@ -13624,8 +13560,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267700167567}
@@ -13639,8 +13575,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267700167567}
@@ -13749,18 +13685,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267700167564}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnCrouchButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479267700772888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14310,7 +14235,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseHover
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267760320969}
@@ -14325,7 +14250,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseLeft
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267760320969}
@@ -14758,9 +14683,9 @@ RectTransform:
   m_Father: {fileID: 8392479268524230883}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 50, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8392479267882981167
@@ -15588,8 +15513,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267996850924}
@@ -15603,8 +15528,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479267996850924}
@@ -15656,18 +15581,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479267996850925}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnWalkButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479267996850925
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15779,18 +15693,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479268003663185}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnAttackButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479268003663185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15857,8 +15760,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268003663184}
@@ -15872,8 +15775,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268003663184}
@@ -16278,8 +16181,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268067627622}
@@ -16293,8 +16196,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268067627622}
@@ -16346,18 +16249,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479268067627623}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnPauseButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479268067627623
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16649,8 +16541,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268103488118}
@@ -16664,8 +16556,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268103488118}
@@ -16745,18 +16637,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479268103488119}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnSpectateNextButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479268103488119
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17230,8 +17111,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268159899598}
@@ -17245,8 +17126,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268159899598}
@@ -17326,18 +17207,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479268159899599}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnMoveBackButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479268159899599
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18308,7 +18178,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8392479268315104577}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}
@@ -18512,8 +18382,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268360640507}
@@ -18527,8 +18397,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268360640507}
@@ -18637,18 +18507,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479268360640504}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnStartButtonCilck
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &8392479268360640509
 GameObject:
   m_ObjectHideFlags: 0
@@ -19352,8 +19211,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268476152215}
@@ -19367,8 +19226,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268476152215}
@@ -19477,18 +19336,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479268476152212}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnMoveLeftButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &8392479268476152297
 GameObject:
   m_ObjectHideFlags: 0
@@ -19683,8 +19531,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268510156530}
@@ -19698,8 +19546,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 0}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268510156530}
@@ -19751,18 +19599,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479268510156531}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnSprintButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &8392479268510156531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19942,6 +19779,8 @@ MonoBehaviour:
   voicechatKeyButton: {fileID: 8392479267531014771}
   guiAcceptKeyButton: {fileID: 8392479267531485762}
   guiReturnKeyButton: {fileID: 8392479267290212137}
+  defaultsButton: {fileID: 8392479267065553239}
+  backButton: {fileID: 8392479266749218680}
   keybindingsCanvas: {fileID: 8392479267801849776}
   mouseSensitivySlider: {fileID: 8392479266901353711}
   invertXToggle: {fileID: 8392479267668571745}
@@ -20143,12 +19982,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ReferenceResolution: {x: 1024, y: 768}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.502
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -20683,7 +20522,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseHover
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268594290125}
@@ -20698,7 +20537,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseLeft
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268594290125}
@@ -21159,10 +20998,10 @@ RectTransform:
   m_Father: {fileID: 8392479267882981166}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -250.7, y: 167.3}
-  m_SizeDelta: {x: 235.48651, y: 200.10938}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 114.72, y: -97.327}
+  m_SizeDelta: {x: 229.44324, y: 194.65466}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &8392479268633119425
 MonoBehaviour:
@@ -21787,8 +21626,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseEnterButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268683492603}
@@ -21802,8 +21641,8 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 8392479268512795258}
-          m_MethodName: OnMouseLeftButton
+        - m_Target: {fileID: 8392479267703075264}
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268683492603}
@@ -21912,18 +21751,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8392479268683492600}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 8392479268512795258}
-        m_MethodName: OnTransformButtonClick
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &8392479268683492605
 GameObject:
   m_ObjectHideFlags: 0
@@ -22324,7 +22152,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseHover
+          m_MethodName: OnPointerEnterButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268719552239}
@@ -22339,7 +22167,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 8392479267703075264}
-          m_MethodName: OnMouseLeft
+          m_MethodName: OnPointerExitButton
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 8392479268719552239}

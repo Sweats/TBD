@@ -1,7 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
+
+public struct ButtonStruct
+{
+    public Button button;
+    public Action action;
+    public string defaultKey;
+
+}
 
 public class ControlsUI : MonoBehaviour
 {
@@ -67,6 +76,12 @@ public class ControlsUI : MonoBehaviour
     private Button guiReturnKeyButton;
 
     [SerializeField]
+    private Button defaultsButton;
+
+    [SerializeField]
+    private Button backButton;
+
+    [SerializeField]
     private Canvas keybindingsCanvas;
 
     [SerializeField]
@@ -78,9 +93,12 @@ public class ControlsUI : MonoBehaviour
     [SerializeField]
     private Toggle invertYToggle;
 
+
+    private IEnumerator buttonRoutine;
+
     private Action lastSettingPressed;
-    // used to save the key binds to the config
-    private Dictionary<Action, Button> buttonDict;
+
+    private ButtonStruct[] buttonStructs;
 
     private const string MOUSE_SENSITIVITY_KEY = "mouse_sensitivity";
     private const string INVERT_X_KEY = "invert_x";
@@ -94,57 +112,11 @@ public class ControlsUI : MonoBehaviour
     // when the scene is launched.
     private bool initialized;
 
-    void Update()
+    private void Start()
     {
-        if (Input.anyKeyDown && (int)lastSettingPressed != ACTION_NONE && Cursor.lockState == CursorLockMode.Locked)
-        {
-            KeyCode[] keyCodes = (KeyCode[])Enum.GetValues(typeof(KeyCode));
+        SetUpButtons();
 
-            for (var i = 0; i < keyCodes.Length; i++)
-            {
-                KeyCode currentKeyCode = keyCodes[i];
-
-                if (Input.GetKeyDown(keyCodes[i]))
-                {
-                    Keybinds.actions[lastSettingPressed] = currentKeyCode;
-                    Text text = buttonDict[lastSettingPressed].GetComponentInChildren<Text>();
-                    text.color = Color.white;
-                    text.text = Enum.GetName(typeof(KeyCode), currentKeyCode);
-                    Cursor.lockState = CursorLockMode.Confined;
-                    lastSettingPressed = (Action)ACTION_NONE;
-                    break;
-                }
-            }
-        }
-    }
-
-
-    void Start()
-    {
-        initialized = false;
-        buttonDict = new Dictionary<Action, Button>();
-        buttonDict[Action.MoveForward] = moveForwardKeyButton;
-        buttonDict[Action.MoveLeft] = moveLeftKeyButton;
-        buttonDict[Action.MoveBack] = moveBackwardKeyButton;
-        buttonDict[Action.MoveRight] = moveRightKeyButton;
-        buttonDict[Action.Sprint] = sprintKeyButton;
-        buttonDict[Action.Walk] = walkKeyButton;
-        buttonDict[Action.Crouch] = crouchKeyButton;
-        buttonDict[Action.Start] = startKeyButton;
-        buttonDict[Action.Pause] = pauseKeyButton;
-        buttonDict[Action.PlayerStats] = playerStatsKeyButton;
-        buttonDict[Action.Transform] = transformKeyButton;
-        buttonDict[Action.Grab] = grabKeyButton;
-        buttonDict[Action.SwitchFlashlight] = switchFlashlightKeyButton;
-        buttonDict[Action.Attack] = attackKeyButton;
-        buttonDict[Action.Teleport] = teleportKeyButton;
-        buttonDict[Action.SpectateNext] = spectateNextButton;
-        buttonDict[Action.VoiceChat] = voicechatKeyButton;
-        buttonDict[Action.GuiAccept] = guiAcceptKeyButton;
-        buttonDict[Action.GUiReturn] = guiReturnKeyButton;
-        lastSettingPressed = (Action)ACTION_NONE;
-
-        if (!PlayerPrefs.HasKey(Enum.GetName(typeof(Action), Action.GUiReturn)))
+        if (!PlayerPrefs.HasKey(Enum.GetName(typeof(Action), Action.GuiReturn)))
         {
             // We don't have to worry about setting text for the buttons because I will set that in the inspector.
             GenerateSettings();
@@ -155,7 +127,276 @@ public class ControlsUI : MonoBehaviour
 
         LoadSettings();
         initialized = true;
+    }
 
+    private void SetUpButtons()
+    {
+
+        buttonStructs = new ButtonStruct[]
+        {
+            new ButtonStruct() { button = moveRightKeyButton, action = Action.MoveRight, defaultKey =  "D" },
+            new ButtonStruct(){button = moveLeftKeyButton, action = Action.MoveLeft, defaultKey = "A" },
+            new ButtonStruct(){button = moveBackwardKeyButton, action = Action.MoveBack, defaultKey = "S"},
+            new ButtonStruct(){button = moveForwardKeyButton, action = Action.MoveForward, defaultKey = "W"},
+            new ButtonStruct(){button = sprintKeyButton, action = Action.Sprint, defaultKey = "Shift"},
+            new ButtonStruct(){button = transformKeyButton, action = Action.Transform, defaultKey = "E"},
+            new ButtonStruct(){button = walkKeyButton, action = Action.Walk, defaultKey = "LeftAlt"},
+            new ButtonStruct(){button = crouchKeyButton, action = Action.Crouch, defaultKey = "LeftControl"},
+            new ButtonStruct(){button = startKeyButton, action = Action.Start, defaultKey = "KeypadEnter"},
+            new ButtonStruct(){button = pauseKeyButton, action = Action.Pause, defaultKey = "Escape"},
+            new ButtonStruct(){button = playerStatsKeyButton, action = Action.PlayerStats, defaultKey = "Tab"},
+            new ButtonStruct(){button = grabKeyButton, action = Action.Grab, defaultKey = "Mouse0"},
+            new ButtonStruct(){button = switchFlashlightKeyButton, action = Action.SwitchFlashlight, defaultKey = "Mouse1"},
+
+            new ButtonStruct(){button = attackKeyButton, action = Action.Attack, defaultKey = "Mouse0"},
+            new ButtonStruct(){button = teleportKeyButton, action = Action.Teleport, defaultKey = "E"},
+            new ButtonStruct(){button = spectateNextButton, action = Action.SpectateNext, defaultKey = "Mouse1"},
+            new ButtonStruct(){button = voicechatKeyButton, action = Action.VoiceChat, defaultKey = "C"},
+            new ButtonStruct(){button = guiAcceptKeyButton, action = Action.GuiAccept, defaultKey = "Mouse0"},
+            new ButtonStruct(){button = guiReturnKeyButton, action = Action.GuiReturn, defaultKey = "Escape"}
+
+
+        };
+
+        // A lot easier to do this here rather than the insepector in my opinion.
+        // The power of copy and pasting and vim :) 
+        moveBackwardKeyButton.onClick.AddListener(OnMoveBackButtonClick);
+        moveForwardKeyButton.onClick.AddListener(OnMoveForwardButtonClick);
+        moveLeftKeyButton.onClick.AddListener(OnMoveLeftButtonClick);
+        moveRightKeyButton.onClick.AddListener(OnMoveRightButtonClicked);
+        sprintKeyButton.onClick.AddListener(OnSprintKeyButton);
+        transformKeyButton.onClick.AddListener(OnTransformKeyButton);
+        walkKeyButton.onClick.AddListener(OnWalkKeyButton);
+        crouchKeyButton.onClick.AddListener(OnCrouchKeyButton);
+        startKeyButton.onClick.AddListener(OnStartKeyButton);
+        pauseKeyButton.onClick.AddListener(OnPauseKeyButton);
+        playerStatsKeyButton.onClick.AddListener(OnPlayerStatsButtonClicked);
+        grabKeyButton.onClick.AddListener(OnGrabKeyButton);
+        switchFlashlightKeyButton.onClick.AddListener(OnSwitchFlashlightKeyButton);
+        attackKeyButton.onClick.AddListener(OnAttackKeyButton);
+        teleportKeyButton.onClick.AddListener(OnTeleportKeyButton);
+        spectateNextButton.onClick.AddListener(OnSpectateNextKeyButton);
+        voicechatKeyButton.onClick.AddListener(OnVoiceChatKeyButton);
+        guiAcceptKeyButton.onClick.AddListener(OnGUIAcceptKeyButton);
+        guiReturnKeyButton.onClick.AddListener(OnGUIReturnKeyButton);
+        defaultsButton.onClick.AddListener(OnDefaultsButtonClicked);
+    }
+
+
+
+    #region ButtonCallbacks
+    private void OnMoveForwardButtonClick()
+    {
+        lastSettingPressed = Action.MoveForward;
+        UpdateButtons();
+
+    }
+
+    private void OnMoveLeftButtonClick()
+    {
+        lastSettingPressed = Action.MoveLeft;
+        UpdateButtons();
+
+    }
+
+    private void OnMoveRightButtonClicked()
+    {
+        lastSettingPressed = Action.MoveRight;
+        UpdateButtons();
+
+    }
+
+
+    private void OnMoveBackButtonClick()
+    {
+        lastSettingPressed = Action.MoveBack;
+        UpdateButtons();
+
+    }
+    private void OnSprintKeyButton()
+    {
+
+        lastSettingPressed = Action.Sprint;
+        UpdateButtons();
+    }
+
+    private void OnTransformKeyButton()
+    {
+
+        lastSettingPressed = Action.Transform;
+        UpdateButtons();
+    }
+
+    private void OnWalkKeyButton()
+    {
+
+        lastSettingPressed = Action.Walk;
+        UpdateButtons();
+    }
+
+    private void OnCrouchKeyButton()
+    {
+        lastSettingPressed = Action.Crouch;
+        UpdateButtons();
+
+    }
+
+    private void OnPlayerStatsButtonClicked()
+    {
+        lastSettingPressed = Action.PlayerStats;
+        UpdateButtons();
+
+    }
+
+    private void OnStartKeyButton()
+    {
+        lastSettingPressed = Action.Start;
+        UpdateButtons();
+
+    }
+
+    private void OnPauseKeyButton()
+    {
+        lastSettingPressed = Action.Pause;
+        UpdateButtons();
+
+    }
+
+    private void OnGrabKeyButton()
+    {
+        lastSettingPressed = Action.Grab;
+        UpdateButtons();
+
+    }
+
+    private void OnSwitchFlashlightKeyButton()
+    {
+        lastSettingPressed = Action.SwitchFlashlight;
+        UpdateButtons();
+
+    }
+    private void OnAttackKeyButton()
+    {
+        lastSettingPressed = Action.Attack;
+        UpdateButtons();
+
+    }
+
+    private void OnTeleportKeyButton()
+    {
+
+        lastSettingPressed = Action.Teleport;
+        UpdateButtons();
+    }
+
+    private void OnSpectateNextKeyButton()
+    {
+
+        lastSettingPressed = Action.SpectateNext;
+        UpdateButtons();
+    }
+
+    private void OnVoiceChatKeyButton()
+    {
+
+        lastSettingPressed = Action.VoiceChat;
+        UpdateButtons();
+    }
+
+    private void OnGUIAcceptKeyButton()
+    {
+
+        lastSettingPressed = Action.GuiAccept;
+        UpdateButtons();
+    }
+
+    private void OnGUIReturnKeyButton()
+    {
+
+        lastSettingPressed = Action.GuiReturn;
+        UpdateButtons();
+    }
+
+    #endregion
+
+    private void UpdateButtons()
+    {
+        for (var i = 0; i < buttonStructs.Length; i++)
+        {
+            Action action = buttonStructs[i].action;
+            Button button = buttonStructs[i].button;
+            button.enabled = false;
+
+            if (action == lastSettingPressed)
+            {
+                button.GetComponentInChildren<Text>().color = Color.red;
+                buttonRoutine = ButtonRoutine(button);
+                StartCoroutine(buttonRoutine);
+
+            }
+
+            else
+            {
+                button.GetComponentInChildren<Text>().color = Color.grey;
+
+            }
+        }
+    }
+
+
+    private void ResetButtonControls()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        lastSettingPressed = (Action)ACTION_NONE;
+
+        for (var i = 0; i < buttonStructs.Length; i++)
+        {
+            Button button = buttonStructs[i].button;
+            button.enabled = true;
+            button.GetComponentInChildren<Text>().color = Color.white;
+        }
+    }
+
+    private IEnumerator ButtonRoutine(Button clickedButton)
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        KeyCode[] keyCodes = (KeyCode[])Enum.GetValues(typeof(KeyCode));
+
+        bool keyCodeFound = false;
+
+        while (true)
+        {
+            if (Input.anyKeyDown)
+            {
+                for (var i = 0; i < keyCodes.Length; i++)
+                {
+                    KeyCode keyCode = keyCodes[i];
+
+                    if (Input.GetKey(keyCode))
+                    {
+                        Text clickedButtonText = clickedButton.GetComponentInChildren<Text>();
+                        clickedButtonText.color = Color.white;
+                        string keyCodeString = Enum.GetName(typeof(KeyCode), keyCode);
+                        clickedButtonText.text = keyCodeString;
+                        Keybinds.actions[lastSettingPressed] = keyCode;
+                        keyCodeFound = true;
+                        //NOTE: I wanted to just do a yield break here but it hangs the Unity Editor.
+                        break;
+                    }
+                }
+
+                if (keyCodeFound)
+                {
+                    break;
+                }
+
+            }
+
+            yield return null;
+        }
+
+        ResetButtonControls();
+        Debug.Log("ButtonRoutine stopped.");
     }
 
     public void Show()
@@ -169,10 +410,41 @@ public class ControlsUI : MonoBehaviour
         keybindingsCanvas.enabled = false;
     }
 
+    private void OnDefaultsButtonClicked()
+    {
+        Keybinds.SetDefaults();
+        PlayerPrefs.SetInt(INVERT_X_KEY, 0);
+        PlayerPrefs.SetInt(INVERT_Y_KEY, 0);
+        PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_KEY, 5);
+
+        Settings.MOUSE_SENSITIVITY = 5;
+        Settings.INVERT_X = 0;
+        Settings.INVERT_Y = 0;
+
+        UpdateMiscControls();
+        PlayerPrefs.Save();
+
+        for (var i = 0; i < buttonStructs.Length; i++)
+        {
+            buttonStructs[i].button.GetComponentInChildren<Text>().text = buttonStructs[i].defaultKey;
+        }
+
+    }
 
     private void GenerateSettings()
     {
-        SetDefaultBindings();
+        Keybinds.SetDefaults();
+
+        PlayerPrefs.SetInt(INVERT_X_KEY, 0);
+        PlayerPrefs.SetInt(INVERT_Y_KEY, 0);
+        PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_KEY, 5);
+
+        Settings.MOUSE_SENSITIVITY = 5;
+        Settings.INVERT_X = 0;
+        Settings.INVERT_Y = 0;
+
+        UpdateMiscControls();
+        PlayerPrefs.Save();
     }
 
 
@@ -187,7 +459,7 @@ public class ControlsUI : MonoBehaviour
             Action action = (Action)actions.GetValue(i);
             KeyCode loadedKeycode = (KeyCode)PlayerPrefs.GetInt(keyName);
             Keybinds.actions[action] = loadedKeycode;
-            buttonDict[action].GetComponentInChildren<Text>().text = Enum.GetName(typeof(KeyCode), loadedKeycode);
+            UpdateButtonControl(action, loadedKeycode);
         }
 
         Settings.MOUSE_SENSITIVITY = PlayerPrefs.GetFloat(MOUSE_SENSITIVITY_KEY);
@@ -195,6 +467,23 @@ public class ControlsUI : MonoBehaviour
         Settings.INVERT_Y = PlayerPrefs.GetInt(INVERT_Y_KEY);
 
         UpdateMiscControls();
+
+    }
+
+    private void UpdateButtonControl(Action action, KeyCode newKeyCode)
+    {
+        for (var i = 0; i < buttonStructs.Length; i++)
+        {
+            Button button = buttonStructs[i].button;
+            Action foundAction = buttonStructs[i].action;
+
+            if (action == foundAction)
+            {
+                string newText = Enum.GetName(typeof(KeyCode), newKeyCode);
+                button.GetComponentInChildren<Text>().text = newText;
+                break;
+            }
+        }
     }
 
     private void UpdateMiscControls()
@@ -223,286 +512,6 @@ public class ControlsUI : MonoBehaviour
         }
 
     }
-
-    private void SetDefaultBindings()
-    {
-        Keybinds.SetDefaults();
-
-        PlayerPrefs.SetInt(INVERT_X_KEY, 0);
-        PlayerPrefs.SetInt(INVERT_Y_KEY, 0);
-        PlayerPrefs.SetFloat(MOUSE_SENSITIVITY_KEY, 5);
-
-        Settings.MOUSE_SENSITIVITY = 5;
-        Settings.INVERT_X = 0;
-        Settings.INVERT_Y = 0;
-
-        UpdateMiscControls();
-
-        PlayerPrefs.Save();
-    }
-
-    public void OnMoveForwardButtonClick()
-    {
-        lastSettingPressed = Action.MoveForward;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-    }
-
-
-    public void OnMoveLeftButtonClick()
-    {
-        lastSettingPressed = Action.MoveLeft;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnMoveBackButtonClick()
-    {
-        lastSettingPressed = Action.MoveBack;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnMoveRightButtonClick()
-    {
-
-        lastSettingPressed = Action.MoveRight;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnSprintButtonClick()
-    {
-        lastSettingPressed = Action.Sprint;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnWalkButtonClick()
-    {
-        lastSettingPressed = Action.Walk;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnCrouchButtonClick()
-    {
-        lastSettingPressed = Action.Crouch;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnStartButtonCilck()
-    {
-        lastSettingPressed = Action.Start;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnPauseButtonClick()
-    {
-        lastSettingPressed = Action.Pause;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnPlayerstatsButtonClick()
-    {
-        lastSettingPressed = Action.PlayerStats;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-
-    public void OnGrabButtonClick()
-    {
-        lastSettingPressed = Action.Grab;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnSwitchFlashlightButtonClick()
-    {
-        lastSettingPressed = Action.SwitchFlashlight;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-    }
-
-
-    public void OnTransformButtonClick()
-    {
-        lastSettingPressed = Action.Transform;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnAttackButtonClick()
-    {
-        lastSettingPressed = Action.Attack;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnTeleportButtonClick()
-    {
-
-        lastSettingPressed = Action.Teleport;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-
-    public void OnSpectateNextButtonClick()
-    {
-
-        lastSettingPressed = Action.SpectateNext;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-    }
-
-
-    public void OnVoiceChatButtonCilck()
-    {
-
-        lastSettingPressed = Action.VoiceChat;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-    }
-
-
-    public void guiAcceptButtonClick()
-    {
-        lastSettingPressed = Action.GuiAccept;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-    }
-
-
-    public void guiReturnButtonClick()
-    {
-        lastSettingPressed = Action.GUiReturn;
-        Cursor.lockState = CursorLockMode.Locked;
-        buttonDict[lastSettingPressed].GetComponentInChildren<Text>().color = Color.red;
-
-    }
-
-    public void OnMouseEnterButton(Button button)
-    {
-        Text text = button.GetComponentInChildren<Text>();
-        text.color = buttonTextColor;
-    }
-
-
-    public void OnMouseLeftButton(Button button)
-    {
-        // Hack to get around the fact that this gets called after we click on a button.
-        // We want the button text to be highlighed in red after the user clicks on it.
-        if (lastSettingPressed == (Action)ACTION_NONE)
-        {
-            Text text = button.GetComponentInChildren<Text>();
-            text.color = Color.white;
-        }
-
-    }
-    public void OnLoadDefaultsButton()
-    {
-        initialized = false;
-        lastSettingPressed = (Action)ACTION_NONE;
-        SetDefaultBindings();
-        ResetActionButtons();
-        initialized = true;
-    }
-
-
-    private void ResetActionButtons()
-    {
-        foreach (KeyValuePair<Action, KeyCode> pair in Keybinds.actions)
-        {
-            Action action = pair.Key;
-            KeyCode keycode = pair.Value;
-            string enumName = Enum.GetName(typeof(Action), action);
-            PlayerPrefs.SetInt(enumName, (int)keycode);
-
-            foreach (KeyValuePair<Action, Button> secondPair in buttonDict)
-            {
-                Action secondAction = secondPair.Key;
-
-                if (action == secondAction)
-                {
-                    string keyCodeString = Enum.GetName(typeof(KeyCode), keycode);
-                    buttonDict[action].GetComponentInChildren<Text>().text = keyCodeString;
-                    break;
-                }
-            }
-        }
-    }
-
-    public void OnMouseSensitivySliderChanged(float value)
-    {
-        Settings.MOUSE_SENSITIVITY = value;
-    }
-
-    public void OnInvertXToggle(bool value)
-    {
-        if (!initialized)
-        {
-            return;
-        }
-
-        if (value)
-        {
-            Settings.INVERT_X = 1;
-        }
-
-        else
-        {
-            Settings.INVERT_X = 0;
-        }
-    }
-
-    public void OnInvertYToggle(bool value)
-    {
-        if (!initialized)
-        {
-            return;
-        }
-
-        if (value)
-        {
-            Settings.INVERT_Y = 1;
-        }
-
-        else
-        {
-            Settings.INVERT_Y = 0;
-        }
-    }
-
 
     private void SaveKeybindsConfig()
     {

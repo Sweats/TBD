@@ -96,6 +96,9 @@ public class SurvivorStopSprintingEvent : UnityEvent<Survivor> { }
 [System.Serializable]
 public class SurvivorToggleFlashlightEvent : UnityEvent<Survivor> { }
 
+//TODO. Figure out if we need this or not.
+public class FlashlightEvent : UnityEvent<Flashlight> { }
+
 [System.Serializable]
 public class SurvivorAlreadyHaveKeyEvent : UnityEvent { }
 

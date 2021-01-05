@@ -163,6 +163,7 @@ public class Mary : MonoBehaviour
         maryTransform = GetComponent<Transform>();
         maryEnergyGainRoutine = StartCoroutine(MaryRechargeTimer());
         maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
+        oldTraps = new List<Trap>();
     }
 
 
@@ -413,12 +414,12 @@ public class Mary : MonoBehaviour
     //TODO: Test this. Should be good though.
     private void OnTeleport()
     {
-	for (var i = 0; i < oldTraps.Count; i++)
-	{
-		oldTraps[i].Disarm();
-	}
+        for (var i = 0; i < oldTraps.Count; i++)
+        {
+            oldTraps[i].Disarm();
+        }
 
-	oldTraps.Clear();
+        oldTraps.Clear();
 
         RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, maryArmTrapDistance, transform.forward, maryArmTrapDistance);
 
@@ -428,9 +429,9 @@ public class Mary : MonoBehaviour
 
             if (trapObject.CompareTag(Tags.TRAP))
             {
-        	Trap trap = trapObject.GetComponent<Trap>();
-		trap.Arm();
-		oldTraps.Add(trap);
+                Trap trap = trapObject.GetComponent<Trap>();
+                trap.Arm();
+                oldTraps.Add(trap);
             }
         }
 

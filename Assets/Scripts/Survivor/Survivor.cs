@@ -11,9 +11,6 @@ public class Survivor : MonoBehaviour
     public int survivorID;
 
     [SerializeField]
-    private Music music;
-
-    [SerializeField]
     private AudioSource deathSound;
 
     [SerializeField]
@@ -27,14 +24,6 @@ public class Survivor : MonoBehaviour
 
     [SerializeField]
     private Camera survivorCamera;
-
-
-
-    //[SerializeField]
-    //private PausedGameInput pausedGameInput;
-
-    //[SerializeField]
-    //private ConsoleUI consoleUI;
 
     private CharacterController controller;
 
@@ -61,6 +50,7 @@ public class Survivor : MonoBehaviour
 
     [SerializeField]
     private float minimumX;
+
     [SerializeField]
     private float maximumX;
 
@@ -75,16 +65,6 @@ public class Survivor : MonoBehaviour
     [SerializeField]
     private float trapDistance;
 
-
-    [SerializeField]
-    private float lurkerDetectionDistance;
-
-    [SerializeField]
-    private float lurkerDetectionRoutineDelay;
-
-
-    [SerializeField]
-    private float phantomDetectionRoutineDelay;
 
     private float xRotation;
 
@@ -280,80 +260,6 @@ public class Survivor : MonoBehaviour
     }
 
     // This routine is only started when a lurker has spawned in the stage. An event will be responsible for this.
-    private IEnumerator LurkerDetectionRoutine()
-    {
-        while (true)
-        {
-		if (matchOver || dead)
-		{
-			yield break;
-		}
-
-            RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, lurkerDetectionDistance, transform.forward, lurkerDetectionDistance);
-
-            for (var i = 0; i < objectsHit.Length; i++)
-            {
-                GameObject gameObject = objectsHit[i].collider.gameObject;
-
-                if (gameObject.CompareTag(Tags.LURKER))
-                {
-                    Lurker lurker = gameObject.GetComponent<Lurker>();
-
-                    if (lurker.IsInPhysicalForm())
-                    {
-                        break;
-                    }
-
-                    int randomNumber = Random.Range(0, lurkerPassedThroughSurviorSounds.Length);
-                    lurkerPassedThroughSurviorSounds[randomNumber].Play();
-                    break;
-                }
-            }
-
-            yield return new WaitForSeconds(lurkerDetectionRoutineDelay);
-        }
-    }
-
-    private IEnumerator PhantomDetectionRoutine()
-    {
-        while (true)
-        {
-		if (matchOver || dead)
-		{
-			yield break;
-		}
-
-            RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, lurkerDetectionDistance, transform.forward, lurkerDetectionDistance);
-
-            for (var i = 0; i < objectsHit.Length; i++)
-            {
-                GameObject hitGameObject = objectsHit[i].collider.gameObject;
-
-                if (hitGameObject.CompareTag(Tags.PHANTOM))
-                {
-                    // TODO: Figure out what kind of creepy sound that we want to play and play it here.
-                    // Also maybe do a screen effect here at some point.
-                    break;
-
-                }
-            }
-
-            yield return new WaitForSeconds(phantomDetectionRoutineDelay);
-        }
-    }
-
-
-    //TODO. Get around to doing this.
-    private IEnumerator FallenDetectionRoutine()
-    {
-	    yield return null;
-    }
-
-    //TODO. Get around to doing this.
-    private IEnumerator MaryDetectionRoutine()
-    {
-	    yield return null;
-    }
 
     private void OnActionGrab()
     {
@@ -430,9 +336,10 @@ public class Survivor : MonoBehaviour
         if (!found)
         {
             Key key = foundKey.Key();
-	    Texture texture = foundKey.Texture();
+            Texture texture = foundKey.Texture();
             inventory.Add(key, texture);
             foundKey.Pickup();
+            EventManager.survivorPickedUpKeyEvent.Invoke(this, key);
         }
     }
 
@@ -450,6 +357,7 @@ public class Survivor : MonoBehaviour
                 Key key = keys[i];
                 found = true;
                 door.Unlock();
+                EventManager.survivorUnlockDoorEvent.Invoke(this, key, door);
                 break;
             }
         }
@@ -519,25 +427,4 @@ public class Survivor : MonoBehaviour
     {
         return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
     }
-
-    private void OnMonsterSpawnedOnStage(int monster)
-    {
-        switch (monster)
-        {
-            case 0:
-                StartCoroutine(LurkerDetectionRoutine());
-                break;
-            case 1:
-                StartCoroutine(PhantomDetectionRoutine());
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            default:
-                break;
-        }
-    }
-
-
 }

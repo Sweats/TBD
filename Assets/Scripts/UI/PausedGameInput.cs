@@ -74,7 +74,7 @@ public class PausedGameInput : MonoBehaviour
             return;
         }
 
-        if (Keybinds.GetKey(Action.GUiReturn) && !GAME_PAUSED)
+        if (Keybinds.GetKey(Action.GuiReturn) && !GAME_PAUSED)
         {
             openedMenus[(int)Menu.Pause] = true;
             GAME_PAUSED = true;
@@ -83,7 +83,7 @@ public class PausedGameInput : MonoBehaviour
         }
 
         // I tried to make this clean but oh well.
-        else if (Keybinds.GetKey(Action.GUiReturn) && GAME_PAUSED)
+        else if (Keybinds.GetKey(Action.GuiReturn) && GAME_PAUSED)
         {
             bool openedMenuFound = false;
 
@@ -256,7 +256,7 @@ public class PausedGameInput : MonoBehaviour
     }
 
 
-    public void OnKeybindsBackButtonClicked()
+    public void OnControlsBackButtonClicked()
     {
         openedMenus[(int)Menu.Controls] = false;
         openedMenus[(int)Menu.Options] = true;
@@ -281,15 +281,25 @@ public class PausedGameInput : MonoBehaviour
         optionsUI.Show();
     }
 
-
-    public void OnMouseHover(Button button)
+    public void OnPointerEnterButton(Button button)
     {
+        if (!button.enabled)
+        {
+            return;
+        }
+
         button.GetComponentInChildren<Text>().color = buttonTextColor;
-        
     }
 
-    public void OnMouseLeft(Button button)
+
+    public void OnPointerExitButton(Button button)
     {
-        button.GetComponentInChildren<Text>().color = Color.white;
+        if (!button.enabled)
+        {
+            return;
+        }
+
+        button.GetComponentInChildren<Text>().color = Color.white;;
+
     }
 }

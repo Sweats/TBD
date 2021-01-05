@@ -40,7 +40,7 @@ public class Chat : MonoBehaviour
             ShowChatMessageInputBox();
         }
 
-        else if (Keybinds.GetKey(Action.GUiReturn) && OPENED)
+        else if (Keybinds.GetKey(Action.GuiReturn) && OPENED)
         {
             HideChatMessageInputBox();
         }

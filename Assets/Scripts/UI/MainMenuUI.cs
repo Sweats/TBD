@@ -75,9 +75,10 @@ public class MainMenuUI : MonoBehaviour
         Cursor.lockState = CursorLockMode.Confined;
     }
 
+    //NOTE: This whole function seems dumb. 
     void Update()
     {
-        if (Keybinds.GetKey(Action.GUiReturn))
+        if (Keybinds.GetKey(Action.GuiReturn))
         {
             bool openedMenuFound = false;
 

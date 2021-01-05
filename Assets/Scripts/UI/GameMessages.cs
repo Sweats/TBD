@@ -35,7 +35,6 @@ public class GameMessages : MonoBehaviour
         EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
         EventManager.maryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
         EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
-        EventManager.invalidLobbyNameEvent.AddListener(OnFailedToCreateLobby);
     }
 
     private void UpdateChatText()
@@ -134,12 +133,6 @@ public class GameMessages : MonoBehaviour
         yield return new WaitForSeconds(chatMessageAppearanceLength);
         messages.Remove(newMessage);
         UpdateChatText();
-    }
-
-    private void OnFailedToCreateLobby()
-    {
-        string newMessage = "You must enter a lobby name!";
-        StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
 }
