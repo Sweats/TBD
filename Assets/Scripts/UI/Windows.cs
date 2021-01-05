@@ -2,7 +2,6 @@
 
 public class Windows : MonoBehaviour
 {
-
     [SerializeField]
     private PauseUI pauseUI;
 
@@ -25,11 +24,6 @@ public class Windows : MonoBehaviour
     private bool chatWindowOpened;
 
     private bool playerStatsWindowOpened;
-
-    private void Start()
-    {
-
-    }
 
     private void Update()
     {
@@ -57,11 +51,16 @@ public class Windows : MonoBehaviour
 
         }
 
-        else if (Keybinds.GetKey(Action.PlayerStats))
+        else if (Keybinds.GetKey(Action.PlayerStats) && !IsWindowOpen())
         {
-            playerStatsUI.Show();
-            this.enabled = false;
             playerStatsWindowOpened = true;
+            playerStatsUI.Show();
+        }
+
+        else if (Keybinds.GetKey(Action.PlayerStats, true) && playerStatsWindowOpened)
+        {
+            playerStatsUI.Hide();
+            playerStatsWindowOpened = false;
 
         }
     }
@@ -88,12 +87,6 @@ public class Windows : MonoBehaviour
         consoleWindowOpened = false;
     }
 
-    public void MarkPlayerStatsWindowClosed()
-    {
-        playerStatsWindowOpened = false;
-    }
-
-
     public void MarkChatWindowClosed()
     {
         chatWindowOpened = false;
@@ -102,6 +95,6 @@ public class Windows : MonoBehaviour
 
     public bool IsWindowOpen()
     {
-        return pauseWindowOpened || consoleWindowOpened || playerStatsWindowOpened || chatWindowOpened;
+        return pauseWindowOpened || consoleWindowOpened ||  chatWindowOpened;
     }
 }

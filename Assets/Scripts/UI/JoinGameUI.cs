@@ -26,22 +26,36 @@ public class JoinGameUI : MonoBehaviour
     [SerializeField]
     private Button backButton;
 
+    [SerializeField]
+    private MainMenuUI mainMenuUI;
 
     private List<Lobby> lobbies;
 
+    private void Update()
+    {
+        if (Keybinds.GetKey(Action.GuiReturn))
+        {
+            Hide();
+            mainMenuUI.Show();
+        }
+    }
+
     void Start()
     {
+        this.enabled = false;
         lobbies = new List<Lobby>();
     }
 
     public void Show()
     {
+        this.enabled = true;
         joinGameCanvas.enabled = true;
 
     }
 
     public void Hide()
     {
+        this.enabled = false;
         joinGameCanvas.enabled = false;
     }
 

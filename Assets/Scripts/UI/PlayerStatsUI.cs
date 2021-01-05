@@ -32,21 +32,10 @@ public class PlayerStatsUI : MonoBehaviour
     [SerializeField]
     private KeyGUI[] keyGUI;
 
-    [SerializeField]
-    private Windows window;
-
     private void Start()
     {
         this.enabled = false;
         EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
-    }
-
-    private void Update()
-    {
-        if (Keybinds.GetKey(Action.PlayerStats, true))
-        {
-            Hide();
-        }
     }
 
     // TO DO: Make this a lot better?
@@ -149,10 +138,9 @@ public class PlayerStatsUI : MonoBehaviour
     }
 
 
-    private void Hide()
+    public void Hide()
     {
         this.enabled = false;
         playerStatsCanvas.enabled = false;
-        window.MarkPlayerStatsWindowClosed();
     }
 }

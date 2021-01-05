@@ -42,6 +42,9 @@ public class LobbyUI : MonoBehaviour
 
     [SerializeField]
     private JoinGameUI joinGameUI;
+    [SerializeField]
+
+    private HostGameUI hostGameUI;
 
     [SerializeField]
     private Color buttonTextColor;
@@ -114,13 +117,37 @@ public class LobbyUI : MonoBehaviour
     private const int STAGE_TEMPLATE_LURKER = 3;
     private const int STAGE_TEMPLATE_PHANTOM = 4;
 
-    void Start()
+    private bool hosting;
+
+    private void Start()
     {
+        this.enabled = false;
+    }
+
+    private void Update()
+    {
+        if (Keybinds.GetKey(Action.GuiReturn))
+        {
+            Hide();
+
+            if (hosting)
+            {
+                hostGameUI.Show();
+            }
+
+            else
+            {
+                joinGameUI.Hide();
+            }
+
+
+        }
     }
 
 
     public void Show()
     {
+        this.enabled = true;
         lobbyCanvas.enabled = true;
 
     }
@@ -128,6 +155,7 @@ public class LobbyUI : MonoBehaviour
 
     public void Hide()
     {
+        this.enabled = true;
         lobbyCanvas.enabled = false;
 
     }

@@ -16,18 +16,33 @@ public class MiscUI : MonoBehaviour
 
     }
 
+    private void Update()
+    {
+        if (Keybinds.GetKey(Action.GuiReturn))
+        {
+            pauseUI.Show();
+            Hide();
+        }
+    }
+
     public void Show()
     {
         miscCanvas.enabled = true;
         this.enabled = true;
     }
 
+    private void OnMiscBackButtonClicked()
+    {
 
-    public void Hide()
+    }
+
+
+    private void Hide()
     {
         SaveMiscConfig();
         miscCanvas.enabled = false;
         this.enabled = false;
+        pauseUI.Show();
 
     }
 

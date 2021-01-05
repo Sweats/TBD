@@ -31,6 +31,9 @@ public class SoundUI : MonoBehaviour
     private Canvas soundMenu;
 
     [SerializeField]
+    private OptionsUI optionsUI;
+
+    [SerializeField]
     private Color buttonColor;
 
 
@@ -75,25 +78,43 @@ public class SoundUI : MonoBehaviour
 
     public AudioMixer audioMixer;
 
-    void Start()
+    private void Start()
     {
+        this.enabled = false;
         LoadSoundsFromConfig();
     }
 
 
+    private void Update()
+    {
+        if (Keybinds.GetKey(Action.GuiReturn))
+        {
+            Hide();
+            optionsUI.Show();
+        }
+    }
 
     public void Show()
     {
+        this.enabled = true;
         soundMenu.enabled = true;
 
     }
+
 
 
     public void Hide()
     {
         SaveSoundConfig();
         soundMenu.enabled = false;
+        this.enabled = false;
 
+    }
+
+    public void OnSoundBackButtonClicked()
+    {
+        Hide();
+        optionsUI.Show();
     }
 
 
@@ -177,25 +198,12 @@ public class SoundUI : MonoBehaviour
     {
 
     }
+
     public void OnVoiceActivationLevelChanged(float value)
     {
         voiceActivationLevel = value;
         audioMixer.SetFloat(VOICE_ACTIVATION_MIXER_STRING, Mathf.Log(voiceActivationLevel) * 20);
         //gameSounds.SetVolume(voiceActivationLevel, SoundType.VoiceActivation);
-    }
-
-    public void OnMoveEnterButton(Button button)
-    {
-        Text text = button.GetComponentInChildren<Text>();
-        text.color = buttonColor;
-
-    }
-
-    public void OnMouseLeftButton(Button button)
-    {
-        Text text = button.GetComponentInChildren<Text>();
-        text.color = Color.white;
-
     }
 
     public void OnDefaultsButtonClicked()

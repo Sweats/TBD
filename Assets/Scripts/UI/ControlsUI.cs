@@ -94,7 +94,7 @@ public class ControlsUI : MonoBehaviour
     private Toggle invertYToggle;
 
     [SerializeField]
-    private PauseUI pauseUI;
+    private OptionsUI optionsUI;
 
     private IEnumerator buttonRoutine;
 
@@ -118,7 +118,7 @@ public class ControlsUI : MonoBehaviour
     {
         if (Keybinds.GetKey(Action.GuiReturn))
         {
-            pauseUI.Show();
+            optionsUI.Show();
             Hide();
         }
     }
@@ -192,9 +192,8 @@ public class ControlsUI : MonoBehaviour
         guiAcceptKeyButton.onClick.AddListener(OnGUIAcceptKeyButton);
         guiReturnKeyButton.onClick.AddListener(OnGUIReturnKeyButton);
         defaultsButton.onClick.AddListener(OnDefaultsButtonClicked);
+        backButton.onClick.AddListener(OnControlsBackButtonClicked);
     }
-
-
 
     #region ButtonCallbacks
     private void OnMoveForwardButtonClick()
@@ -296,37 +295,38 @@ public class ControlsUI : MonoBehaviour
 
     private void OnTeleportKeyButton()
     {
-
         lastSettingPressed = Action.Teleport;
         UpdateButtons();
     }
 
     private void OnSpectateNextKeyButton()
     {
-
         lastSettingPressed = Action.SpectateNext;
         UpdateButtons();
     }
 
     private void OnVoiceChatKeyButton()
     {
-
         lastSettingPressed = Action.VoiceChat;
         UpdateButtons();
     }
 
     private void OnGUIAcceptKeyButton()
     {
-
         lastSettingPressed = Action.GuiAccept;
         UpdateButtons();
     }
 
     private void OnGUIReturnKeyButton()
     {
-
         lastSettingPressed = Action.GuiReturn;
         UpdateButtons();
+    }
+
+    private void OnControlsBackButtonClicked()
+    {
+        optionsUI.Show();
+        Hide();
     }
 
     #endregion
@@ -417,7 +417,7 @@ public class ControlsUI : MonoBehaviour
         keybindingsCanvas.enabled = true;
     }
 
-    public void Hide()
+    private void Hide()
     {
         SaveKeybindsConfig();
         keybindingsCanvas.enabled = false;

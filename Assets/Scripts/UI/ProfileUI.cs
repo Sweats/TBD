@@ -6,15 +6,13 @@ public class ProfileUI : MonoBehaviour
     private Canvas profileCanvas;
 
     [SerializeField]
-    private PauseUI pauseUI;
-
-    public static string profileName;
+    private OptionsUI optionsUI;
 
     private void Update()
     {
         if (Keybinds.GetKey(Action.GuiReturn))
         {
-            pauseUI.Show();
+            optionsUI.Show();
             Hide();
         }
     }
@@ -31,7 +29,7 @@ public class ProfileUI : MonoBehaviour
     }
 
 
-    public void Hide()
+    private void Hide()
     {
         this.enabled = false;
         profileCanvas.enabled = false;
@@ -41,8 +39,7 @@ public class ProfileUI : MonoBehaviour
 
     public void OnEditProfileName(string name)
     {
-        profileName = name;
-
+        Settings.PROFILE_NAME = name;
     }
 
     private void SaveProfileConfig()

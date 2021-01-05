@@ -9,25 +9,7 @@ public class PauseUI : MonoBehaviour
     private Canvas pauseCanvas;
 
     [SerializeField]
-    private ProfileUI profileUI;
-
-    [SerializeField]
-    private SoundUI soundUI;
-
-    [SerializeField]
     private OptionsUI optionsUI;
-
-    [SerializeField]
-    private ControlsUI controlsUI;
-
-    [SerializeField]
-    private GraphicsUI graphicsUI;
-
-    [SerializeField]
-    private ConnectionUI connectionUI;
-
-    [SerializeField]
-    private MiscUI miscUI;
 
     [SerializeField]
     private Color buttonTextColor;
@@ -44,6 +26,9 @@ public class PauseUI : MonoBehaviour
     {
         if (Keybinds.GetKey(Action.GuiReturn))
         {
+            windows.enabled = true;
+            windows.MarkPauseWindowClosed();
+            Cursor.lockState = CursorLockMode.Locked;
             Hide();
         }
     }
@@ -55,13 +40,10 @@ public class PauseUI : MonoBehaviour
         Cursor.lockState = CursorLockMode.Confined;
     }
 
-    public void Hide()
+    private void Hide()
     {
         this.enabled = false;
         pauseCanvas.enabled = false;
-        windows.enabled = true;
-        windows.MarkPauseWindowClosed();
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public void OnExitGameButtonClicked()
@@ -80,98 +62,21 @@ public class PauseUI : MonoBehaviour
         Stages.Load(StageName.Menu);
     }
 
-    public void OnGraphicsButtonClicked()
-    {
-        graphicsUI.Show();
-        optionsUI.Hide();
-    }
-
-    private void OnClosePauseWindow()
-    {
-        Hide();
-    }
-
-    public void OnConnectionButtonClicked()
-    {
-        connectionUI.Show();
-        optionsUI.Hide();
-    }
-
-    public void OnControlsButtonClicked()
-    {
-        controlsUI.Show();
-        optionsUI.Hide();
-    }
-
-    public void OnProfileButtonClicked()
-    {
-        profileUI.Show();
-        optionsUI.Hide();
-    }
-
     public void OnOptionsButtonClicked()
     {
         optionsUI.Show();
         Hide();
     }
 
-    public void OnSoundsButtonClicked()
-    {
-        soundUI.Show();
-        optionsUI.Hide();
-    }
 
     public void OnReturnToGameButtonClicked()
     {
-        OnClosePauseWindow();
+        windows.enabled = true;
+        windows.MarkPauseWindowClosed();
+        Hide();
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
-    public void OnMiscButtonClicked()
-    {
-        miscUI.Show();
-        optionsUI.Hide();
-    }
-
-    public void OnSoundsBackButtonClicked()
-    {
-        soundUI.Hide();
-        optionsUI.Show();
-    }
-
-
-    public void OnGraphicsBackButtonClicked()
-    {
-        graphicsUI.Hide();
-        optionsUI.Show();
-
-    }
-
-    public void OnProfileBackButtonClicked()
-    {
-        profileUI.Hide();
-        optionsUI.Show();
-
-    }
-
-
-    public void OnControlsBackButtonClicked()
-    {
-        controlsUI.Hide();
-        optionsUI.Show();
-    }
-
-
-    public void OnOptionsBackButtonClicked()
-    {
-        optionsUI.Hide();
-        Show();
-    }
-
-    public void OnMiscBackButtonClicked()
-    {
-        miscUI.Hide();
-        optionsUI.Show();
-    }
 
     public void OnPointerEnterButton(Button button)
     {
