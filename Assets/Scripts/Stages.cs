@@ -33,9 +33,6 @@ public class Stages
     {
         if (stagesDict.ContainsKey(stageName))
         {
-            PausedGameInput.GAME_PAUSED = false;
-            ConsoleUI.OPENED = false;
-            Chat.OPENED = false;
             SceneManager.LoadScene(stagesDict[stageName]);
         }
 

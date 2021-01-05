@@ -14,13 +14,8 @@ public class Survivor : MonoBehaviour
     private AudioSource deathSound;
 
     [SerializeField]
-    private AudioSource[] lurkerPassedThroughSurviorSounds;
-
-    [SerializeField]
     private Sprint sprint;
 
-    [SerializeField]
-    private Texture crosshair;
 
     [SerializeField]
     private Camera survivorCamera;
@@ -47,6 +42,8 @@ public class Survivor : MonoBehaviour
 
     private Rect crouchingAndWalkingIconPosition;
 
+    [SerializeField]
+    private Windows playerWindows;
 
     [SerializeField]
     private float minimumX;
@@ -65,10 +62,7 @@ public class Survivor : MonoBehaviour
     [SerializeField]
     private float trapDistance;
 
-
     private float xRotation;
-
-    private bool isPlayerStatsOpened;
 
     public bool matchOver;
 
@@ -81,22 +75,25 @@ public class Survivor : MonoBehaviour
     [SerializeField]
     private Renderer survivorRenderer;
 
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
         animator = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         moving = new Vector3();
-        EventManager.survivorClosedPlayerStats.AddListener(OnSurvivorClosedPlayerStats);
-        EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenedPlayerStats);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
-
         StartCoroutine(TrapDetectionRoutine());
     }
 
     void LateUpdate()
     {
-        if (IsAnotherWindowOpen() || matchOver)
+        if (matchOver)
+        {
+            return;
+        }
+
+        if (playerWindows.IsWindowOpen())
         {
             return;
         }
@@ -126,14 +123,18 @@ public class Survivor : MonoBehaviour
     {
         velocity.y -= gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
-        //controller.attachedRigidbody.
 
         if (controller.isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
 
-        if (IsAnotherWindowOpen() || matchOver)
+        if (matchOver)
+        {
+            return;
+        }
+
+        if (playerWindows.IsWindowOpen())
         {
             return;
         }
@@ -165,7 +166,6 @@ public class Survivor : MonoBehaviour
         {
             flashlight.Toggle();
         }
-
 
         else if (Keybinds.GetKey(Action.Crouch))
         {
@@ -219,10 +219,6 @@ public class Survivor : MonoBehaviour
             OnActionGrab();
         }
 
-        else if (Keybinds.Get(Action.PlayerStats))
-        {
-            EventManager.survivorOpenedPlayerStats.Invoke();
-        }
 
         controller.Move(secondmove * speed * Time.deltaTime);
 
@@ -296,23 +292,6 @@ public class Survivor : MonoBehaviour
         }
     }
 
-    private void OnGUI()
-    {
-        if (PausedGameInput.GAME_PAUSED)
-        {
-            return;
-        }
-
-        if (!isPlayerStatsOpened && !ConsoleUI.OPENED)
-        {
-            inventory.Draw();
-        }
-
-        // TO DO: Optimize this!
-        GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
-    }
-
-
     private void OnClickedOnKey(KeyObject foundKey)
     {
         Key[] keysInInventory = inventory.Keys();
@@ -378,7 +357,6 @@ public class Survivor : MonoBehaviour
         else
         {
             EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
-            EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
         }
     }
 
@@ -411,20 +389,4 @@ public class Survivor : MonoBehaviour
         sprint.SetMatchOver(true);
     }
 
-    private void OnSurvivorOpenedPlayerStats()
-    {
-        isPlayerStatsOpened = true;
-    }
-
-
-    private void OnSurvivorClosedPlayerStats()
-    {
-        isPlayerStatsOpened = false;
-    }
-
-
-    private bool IsAnotherWindowOpen()
-    {
-        return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
-    }
 }

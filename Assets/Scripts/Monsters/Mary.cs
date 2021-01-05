@@ -129,7 +129,7 @@ public class Mary : MonoBehaviour
 
     void LateUpdate()
     {
-        if (IsAnotherWindowOpen() || matchOver)
+        if (matchOver)
         {
             return;
         }
@@ -439,18 +439,7 @@ public class Mary : MonoBehaviour
 
     private void OnGUI()
     {
-        if (PausedGameInput.GAME_PAUSED)
-        {
-            return;
-        }
-
         // TODO: Optimize this!
         GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
     }
-
-    private bool IsAnotherWindowOpen()
-    {
-        return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
-    }
-
 }

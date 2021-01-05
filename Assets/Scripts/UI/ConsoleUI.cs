@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Text;
 using UnityEngine.UI;
 using System;
@@ -16,17 +16,14 @@ public class ConsoleUI : MonoBehaviour
     [SerializeField]
     private InputField consoleInputTextField;
 
-    public static bool OPENED;
-
-    private bool pauseWindowOpen;
 
     [SerializeField]
-    private PausedGameInput pausedGameInput;
-
+    private Windows window;
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
+        this.enabled = false;
         stringBuilder = new StringBuilder();
         EventManager.monsterWonEvent.AddListener(OnMonsterWon);
         EventManager.playerConnectedEvent.AddListener(OnPlayerConnected);
@@ -40,43 +37,34 @@ public class ConsoleUI : MonoBehaviour
     }
 
 
-    void Update()
+    private void Update()
     {
-        if (PausedGameInput.GAME_PAUSED)
+        if (Keybinds.GetKey(Action.GuiReturn))
         {
-            return;
-        }
-
-        if (Input.GetKeyDown(KeyCode.BackQuote) && !OPENED)
-        {
-            OPENED = true;
-            Show();
-        }
-
-        else if (Input.GetKeyDown(KeyCode.BackQuote) && OPENED)
-        {
-            OPENED = false;
             Hide();
         }
+
     }
 
-    private void Show()
+    public void Show()
     {
-        OPENED = true;
         consoleCanvas.enabled = true;
         consoleInputTextField.Select();
         consoleInputTextField.text = string.Empty;
+        this.enabled = true;
+        window.enabled = false;
         Cursor.lockState = CursorLockMode.Confined;
-        EventManager.playerOpenedConsoleEvent.Invoke();
     }
 
-
-    private void Hide()
+    public void Hide()
     {
-        OPENED = false;
+        this.enabled = false;
         consoleCanvas.enabled = false;
         EventManager.playerClosedConsoleEvent.Invoke();
+        window.MarkConsoleWindowClosed();
+        window.enabled = true;
         Cursor.lockState = CursorLockMode.Locked;
+
     }
 
 
@@ -198,15 +186,5 @@ public class ConsoleUI : MonoBehaviour
         consoleInputTextField.text = string.Empty;
         //consoleInputTextField.Select();
     }
-
-    private void OnPlayerClosedPauseMenu()
-    {
-        pauseWindowOpen = false;
-    }
-
-    private void OnPlayerOpenedPauseMenu()
-    {
-        pauseWindowOpen = true;
-
-    }
 }
+

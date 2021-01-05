@@ -121,7 +121,7 @@ public class Lurker : MonoBehaviour
 
     void LateUpdate()
     {
-        if (IsAnotherWindowOpen() || matchOver)
+        if (matchOver)
         {
             return;
         }
@@ -243,7 +243,7 @@ public class Lurker : MonoBehaviour
         if (!ghostForm && canAttack)
         {
             StartCoroutine(AttackCoolDown());
-	    attackSound.Play();
+            attackSound.Play();
 
             if (Physics.Raycast(ray, out hit, attackDistance))
             {
@@ -327,7 +327,7 @@ public class Lurker : MonoBehaviour
             for (var i = 0; i < survivors.Length; i++)
             {
                 Survivor survivor = survivors[i].GetComponent<Survivor>();
-		survivor.Hide();
+                survivor.Hide();
             }
         }
 
@@ -502,24 +502,13 @@ public class Lurker : MonoBehaviour
 
     private void OnGUI()
     {
-        if (PausedGameInput.GAME_PAUSED)
-        {
-            return;
-        }
-
         // TO DO: Optimize this!
         GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
     }
 
-    private bool IsAnotherWindowOpen()
-    {
-        return (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
-    }
-
-
     public bool IsInPhysicalForm()
     {
-	    return ghostForm;
+        return ghostForm;
     }
 
 }

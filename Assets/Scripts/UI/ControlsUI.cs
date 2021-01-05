@@ -93,6 +93,8 @@ public class ControlsUI : MonoBehaviour
     [SerializeField]
     private Toggle invertYToggle;
 
+    [SerializeField]
+    private PauseUI pauseUI;
 
     private IEnumerator buttonRoutine;
 
@@ -112,8 +114,18 @@ public class ControlsUI : MonoBehaviour
     // when the scene is launched.
     private bool initialized;
 
+    private void Update()
+    {
+        if (Keybinds.GetKey(Action.GuiReturn))
+        {
+            pauseUI.Show();
+            Hide();
+        }
+    }
+
     private void Start()
     {
+        this.enabled = false;
         SetUpButtons();
 
         if (!PlayerPrefs.HasKey(Enum.GetName(typeof(Action), Action.GuiReturn)))
@@ -401,6 +413,7 @@ public class ControlsUI : MonoBehaviour
 
     public void Show()
     {
+        this.enabled = true;
         keybindingsCanvas.enabled = true;
     }
 
@@ -408,6 +421,7 @@ public class ControlsUI : MonoBehaviour
     {
         SaveKeybindsConfig();
         keybindingsCanvas.enabled = false;
+        this.enabled = false;
     }
 
     private void OnDefaultsButtonClicked()

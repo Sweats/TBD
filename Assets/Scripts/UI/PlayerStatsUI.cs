@@ -1,8 +1,7 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
 
 [System.Serializable]
 public struct KeyGUI
@@ -24,6 +23,7 @@ public struct KeyGUI
 
     public Text codeCountText;
 }
+
 public class PlayerStatsUI : MonoBehaviour
 {
     [SerializeField]
@@ -32,35 +32,22 @@ public class PlayerStatsUI : MonoBehaviour
     [SerializeField]
     private KeyGUI[] keyGUI;
 
+    [SerializeField]
+    private Windows window;
+
     private void Start()
     {
+        this.enabled = false;
         EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
-        EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenPlayerStats);
-        EventManager.survivorClosedPlayerStats.AddListener(OnSurvivorClosePlayerStats);
     }
-
 
     private void Update()
     {
-        if (playerStatsCanvas.enabled)
+        if (Keybinds.GetKey(Action.PlayerStats, true))
         {
-            if (Keybinds.GetKey(Action.PlayerStats, true))
-            {
-                EventManager.survivorClosedPlayerStats.Invoke();
-            }
+            Hide();
         }
     }
-                
-    private void OnSurvivorOpenPlayerStats()
-    {
-        Show();
-    }
-
-    private void OnSurvivorClosePlayerStats()
-    {
-        Hide();
-    }
-
 
     // TO DO: Make this a lot better?
     public void OnSurvivorPickedUpKey(Survivor survivor, Key key)
@@ -155,16 +142,17 @@ public class PlayerStatsUI : MonoBehaviour
     }
 
 
-    private void Show()
+    public void Show()
     {
+        this.enabled = true;
         playerStatsCanvas.enabled = true;
-
     }
 
 
     private void Hide()
     {
+        this.enabled = false;
         playerStatsCanvas.enabled = false;
-
+        window.MarkPlayerStatsWindowClosed();
     }
 }
