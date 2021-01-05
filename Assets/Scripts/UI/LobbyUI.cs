@@ -119,6 +119,8 @@ public class LobbyUI : MonoBehaviour
 
     private bool hosting;
 
+    private bool selectingCharacter;
+
     private void Start()
     {
         this.enabled = false;
@@ -128,6 +130,13 @@ public class LobbyUI : MonoBehaviour
     {
         if (Keybinds.GetKey(Action.GuiReturn))
         {
+            if (selectingCharacter)
+            {
+                DisableSelectCharacterControls();
+                EnableControls();
+                return;
+            }
+
             Hide();
 
             if (hosting)
@@ -137,7 +146,7 @@ public class LobbyUI : MonoBehaviour
 
             else
             {
-                joinGameUI.Hide();
+                joinGameUI.Show();
             }
 
 
@@ -145,19 +154,19 @@ public class LobbyUI : MonoBehaviour
     }
 
 
-    public void Show()
+    public void Show(bool isHosting)
     {
+        hosting = isHosting;
         this.enabled = true;
         lobbyCanvas.enabled = true;
 
     }
 
-
-    public void Hide()
+    private void Hide()
     {
-        this.enabled = true;
+        this.enabled = false;
         lobbyCanvas.enabled = false;
-
+        Reset();
     }
 
 #region HOST_OPTIONS
@@ -229,8 +238,6 @@ public class LobbyUI : MonoBehaviour
         chooseCharacterButton.GetComponentInChildren<Text>().color = Color.white;
     }
 
-
-
     public void OnJamalButtonClicked()
     {
         playerOneLobbyIcon.texture = jamalIcon;
@@ -298,6 +305,30 @@ public class LobbyUI : MonoBehaviour
     }
 
 
+    public void OnLeaveLobbyButtonClicked()
+    {
+        if (hosting)
+        {
+            hostGameUI.Show();
+        }
+
+        else
+        {
+            joinGameUI.Show();
+
+        }
+
+        Hide();
+    }
+
+    private void Reset()
+    {
+        playerOneLobbyIcon.texture = emptyLobbySlotIcon;
+        playerTwoLobbyIcon.texture = emptyLobbySlotIcon;
+        playerThreeLobbyIcon.texture = emptyLobbySlotIcon;
+        playerFourLobbyIcon.texture = emptyLobbySlotIcon;
+    }
+
     /*
     private void OnMouseOverSelectCharacterButton(Button button)
     {
@@ -332,6 +363,7 @@ public class LobbyUI : MonoBehaviour
 
     private void EnableSelectCharacterControls()
     {
+        selectingCharacter = true;
         jamalButton.enabled = true;
         jamalButton.image.enabled = true;
         aliceButton.enabled = true;
@@ -357,6 +389,7 @@ public class LobbyUI : MonoBehaviour
 
     private void DisableSelectCharacterControls()
     {
+        selectingCharacter = false;
         jamalButton.enabled = false;
         jamalButton.image.enabled = false;
         aliceButton.enabled = false;

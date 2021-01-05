@@ -29,6 +29,9 @@ public class JoinGameUI : MonoBehaviour
     [SerializeField]
     private MainMenuUI mainMenuUI;
 
+    [SerializeField]
+    private LobbyUI lobbyUI;
+
     private List<Lobby> lobbies;
 
     private void Update()
@@ -53,7 +56,7 @@ public class JoinGameUI : MonoBehaviour
 
     }
 
-    public void Hide()
+    private void Hide()
     {
         this.enabled = false;
         joinGameCanvas.enabled = false;
@@ -62,13 +65,23 @@ public class JoinGameUI : MonoBehaviour
     public void OnRefreshButtonClicked()
     {
         Debug.Log("Refresh all button clicked!");
+        lobbies.Clear();
         //lobbies = GetLobbies();
 
+    }
+
+
+    public void OnJoinGameBackButtonClicked()
+    {
+        Hide();
+        mainMenuUI.Show();
     }
 
     public void OnConnectButtonClicked()
     {
         Debug.Log("Connect button clicked!");
+        lobbyUI.Show(false);
+        Hide();
 
     }
 

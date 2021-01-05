@@ -38,7 +38,24 @@ public class OptionsUI : MonoBehaviour
     {
         if (Keybinds.GetKey(Action.GuiReturn))
         {
-            pauseUI.Show();
+            //NOTE:We must be calling this from the main menu
+            //because I did not set it in the In-game UI prefab which is always in a 
+            //game scene.
+
+            if (pauseUI == null)
+            {
+                mainMenuUI.Show();
+            }
+
+            //NOTE:We must be calling this from the in-game menu
+            //because I did not set it in the main menu scene.
+
+            else if (mainMenuUI == null)
+            {
+                pauseUI.Show();
+
+            }
+
             Hide();
         }
     }
@@ -107,6 +124,6 @@ public class OptionsUI : MonoBehaviour
         Hide();
     }
 
-    
+
 }
 

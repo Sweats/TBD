@@ -35,7 +35,6 @@ public class MainMenuUI : MonoBehaviour
 
     private void Hide()
     {
-
         mainMenuCanvas.enabled = false;
     }
 
@@ -59,6 +58,24 @@ public class MainMenuUI : MonoBehaviour
         optionsUI.Show();
         Hide();
 
+    }
+
+    public void OnHostGameButtonClicked()
+    {
+        hostGameUI.Show();
+        Hide();
+    }
+
+    public void OnJoinGameButtonClicked()
+    {
+        joinGameUI.Show();
+        Hide();
+    }
+
+    public void OnCreditsButtonClicked()
+    {
+        creditsUI.Show();
+        Hide();
     }
 
     public void OnPointerEnterButton(Button button)

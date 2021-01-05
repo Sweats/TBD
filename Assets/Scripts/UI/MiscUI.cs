@@ -8,7 +8,7 @@ public class MiscUI : MonoBehaviour
     private Canvas miscCanvas;
 
     [SerializeField]
-    private PauseUI pauseUI;
+    private OptionsUI optionsUI;
 
     private void Start()
     {
@@ -20,7 +20,7 @@ public class MiscUI : MonoBehaviour
     {
         if (Keybinds.GetKey(Action.GuiReturn))
         {
-            pauseUI.Show();
+            optionsUI.Show();
             Hide();
         }
     }
@@ -42,7 +42,7 @@ public class MiscUI : MonoBehaviour
         SaveMiscConfig();
         miscCanvas.enabled = false;
         this.enabled = false;
-        pauseUI.Show();
+        optionsUI.Show();
 
     }
 

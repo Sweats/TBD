@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class HostGameUI : MonoBehaviour
 {
@@ -14,13 +15,13 @@ public class HostGameUI : MonoBehaviour
     private Canvas hostLobbyCanvas;
 
     [SerializeField]
-    private Button backButton;
-
-    [SerializeField]
     private Text lobbyNameNotification;
 
     [SerializeField]
     private MainMenuUI mainMenuUI;
+
+    [SerializeField]
+    private LobbyUI lobbyUI;
 
     private void Start()
     {
@@ -36,18 +37,6 @@ public class HostGameUI : MonoBehaviour
             Hide();
 
         }
-    }
-
-    public string LobbyName()
-    {
-        return lobbyNameField.text;
-
-    }
-
-    public string LobbyPassword()
-    {
-        return passwordField.text;
-
     }
 
     private void Hide()
@@ -68,20 +57,29 @@ public class HostGameUI : MonoBehaviour
         lobbyNameNotification.enabled = true;
     }
 
-    public void HideLobbyNotification()
-    {
-        lobbyNameNotification.enabled = false;
-    }
-
-
-    private void OnHostLobbyBackButtonClicked()
+    public void OnHostLobbyBackButtonClicked()
     {
         Hide();
         mainMenuUI.Show();
     }
 
+
+    public void OnCreateLobbyButtonClicked()
+    {
+        string lobbyText = lobbyNameField.text;
+
+        if (lobbyText == String.Empty)
+        {
+            lobbyNameNotification.enabled = true;
+            return;
+        }
+
+        Hide();
+        lobbyUI.Show(true);
+    }
+
     public void OnLobbyNameChanged()
     {
-        HideLobbyNotification();
+        lobbyNameNotification.enabled = false;
     }
 }
