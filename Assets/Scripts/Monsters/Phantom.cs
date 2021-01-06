@@ -22,6 +22,10 @@ public class Phantom : MonoBehaviour
     [SerializeField]
     private Camera phantomCamera;
 
+
+    [SerializeField]
+    private Windows playerWindows;
+
     private Vector3 velocity;
 
     private CharacterController phantomController;
@@ -44,16 +48,21 @@ public class Phantom : MonoBehaviour
 
     private bool canAttack = true;
 
-    void Start()
+    private void Start()
     {
         phantomController = GetComponent<CharacterController>();
-	HideImportantObjects();
+        HideImportantObjects();
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
         if (matchOver)
+        {
+            return;
+        }
+
+        if (playerWindows.IsWindowOpen())
         {
             return;
         }
@@ -75,10 +84,10 @@ public class Phantom : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, minimumX, maximumX);
         transform.Rotate(Vector3.up * mouseX);
-	phantomCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
+        phantomCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
 
-    void Update()
+    private void Update()
     {
         velocity.y -= gravity * Time.deltaTime;
         phantomController.Move(velocity * Time.deltaTime);
@@ -86,6 +95,12 @@ public class Phantom : MonoBehaviour
         if (phantomController.isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
+        }
+
+
+        if (playerWindows.IsWindowOpen())
+        {
+            return;
         }
 
         float x = Input.GetAxis("Horizontal");
@@ -102,7 +117,7 @@ public class Phantom : MonoBehaviour
 
     private void OnAttack()
     {
-	StartCoroutine(AttackCoolDown());
+        StartCoroutine(AttackCoolDown());
         RaycastHit hit;
         Ray ray = phantomCamera.ScreenPointToRay(Input.mousePosition);
         attackSound.Play();
@@ -121,9 +136,9 @@ public class Phantom : MonoBehaviour
 
     private IEnumerator AttackCoolDown()
     {
-	    canAttack = false;
-	    yield return new WaitForSeconds(attackCoolDownInSeconds);
-	    canAttack = true;
+        canAttack = false;
+        yield return new WaitForSeconds(attackCoolDownInSeconds);
+        canAttack = true;
     }
 
     private void HideImportantObjects()
@@ -167,17 +182,21 @@ public class Phantom : MonoBehaviour
     // TODO: How do we want to handle the traps for the Phantom?
     private IEnumerator HandleTraps()
     {
-	    yield return null;
+        yield return null;
     }
 
     // TODO: How do we want to handle the survivor detection for the Phantom?
     private IEnumerator HandleSurvivorDetection()
     {
-	    yield return null;
+        yield return null;
     }
 
     private void OnGUI()
     {
+        if (playerWindows.IsWindowOpen())
+        {
+            return;
+        }
 
         // TODO: Optimize this!
         GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);

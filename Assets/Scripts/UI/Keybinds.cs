@@ -24,11 +24,12 @@ public enum Action
     GuiReturn
 }
 
-public class Keybinds : MonoBehaviour
+public static class Keybinds
 {
     public static Dictionary<Action, KeyCode> actions;
 
-    void Start()
+    //NOTE: Called when the ControlUI class is initialized.
+    public static void Init()
     {
         actions = new Dictionary<Action, KeyCode>();
     }

@@ -68,6 +68,10 @@ public class Lurker : MonoBehaviour
     [SerializeField]
     private Camera lurkerCamera;
 
+
+    [SerializeField]
+    private Windows playerWindows;
+
     private bool isReadyToGoIntoPhysicalForm;
 
 
@@ -104,7 +108,7 @@ public class Lurker : MonoBehaviour
     private Texture crosshair;
 
 
-    void Start()
+    private void Start()
     {
         lurkerController = GetComponent<CharacterController>();
         speed = ghostFormSpeed;
@@ -119,9 +123,14 @@ public class Lurker : MonoBehaviour
     }
 
 
-    void LateUpdate()
+    private void LateUpdate()
     {
         if (matchOver)
+        {
+            return;
+        }
+
+        if (playerWindows.IsWindowOpen())
         {
             return;
         }
@@ -146,7 +155,7 @@ public class Lurker : MonoBehaviour
         lurkerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
 
-    void Update()
+    private void Update()
     {
         velocity.y -= gravity * Time.deltaTime;
         lurkerController.Move(velocity * Time.deltaTime);
@@ -156,6 +165,10 @@ public class Lurker : MonoBehaviour
             velocity.y = -2f;
         }
 
+        if (playerWindows.IsWindowOpen())
+        {
+            return;
+        }
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
@@ -502,12 +515,19 @@ public class Lurker : MonoBehaviour
 
     private void OnGUI()
     {
+        if (playerWindows.IsWindowOpen())
+        {
+            return;
+        }
+
         // TO DO: Optimize this!
         GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
     }
 
     public bool IsInPhysicalForm()
     {
+
+
         return ghostForm;
     }
 

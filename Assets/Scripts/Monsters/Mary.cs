@@ -80,6 +80,9 @@ public class Mary : MonoBehaviour
     [SerializeField]
     private AudioSource attackSound;
 
+    [SerializeField]
+    private Windows playerWindows;
+
     private GameObject[] teleportLocations;
 
     private CharacterController maryController;
@@ -134,6 +137,11 @@ public class Mary : MonoBehaviour
             return;
         }
 
+        if (playerWindows.IsWindowOpen())
+        {
+            return;
+        }
+
         float mouseX = Input.GetAxis("Mouse X") * Settings.MOUSE_SENSITIVITY;
         float mouseY = Input.GetAxis("Mouse Y") * Settings.MOUSE_SENSITIVITY;
 
@@ -154,7 +162,7 @@ public class Mary : MonoBehaviour
         maryCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
 
-    void Start()
+    private void Start()
     {
         maryController = GetComponent<CharacterController>();
         teleportLocations = GameObject.FindGameObjectsWithTag(Tags.MARY_TELEPORT_LOCATION);
@@ -167,7 +175,7 @@ public class Mary : MonoBehaviour
     }
 
 
-    void Update()
+    private void Update()
     {
         velocity.y -= gravity * Time.deltaTime;
         maryController.Move(velocity * Time.deltaTime);
@@ -175,6 +183,11 @@ public class Mary : MonoBehaviour
         if (maryController.isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
+        }
+
+        if (playerWindows.IsWindowOpen())
+        {
+            return;
         }
 
         float x = Input.GetAxis("Horizontal");
@@ -439,6 +452,11 @@ public class Mary : MonoBehaviour
 
     private void OnGUI()
     {
+        if (playerWindows.IsWindowOpen())
+        {
+            return;
+        }
+
         // TODO: Optimize this!
         GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
     }

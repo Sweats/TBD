@@ -8,9 +8,9 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: Assets/Scenes/hotel.unity
-    guid: 70ead09a6cc36834b87bc1982bf9bb45
+  - enabled: 1
+    path: Assets/Scenes/stage-template.unity
+    guid: 41af87f03e91c9acc97d15b8061cf3af
   - enabled: 1
     path: Assets/Scenes/stage-template-lurker.unity
     guid: 6fb59dbddc8634e4cac2d210f4fe1fa0

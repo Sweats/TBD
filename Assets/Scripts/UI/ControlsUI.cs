@@ -125,6 +125,7 @@ public class ControlsUI : MonoBehaviour
 
     private void Start()
     {
+        Keybinds.Init();
         this.enabled = false;
         SetUpButtons();
 
@@ -458,6 +459,13 @@ public class ControlsUI : MonoBehaviour
         Settings.INVERT_Y = 0;
 
         UpdateMiscControls();
+
+        foreach (KeyValuePair<Action, KeyCode> pair in Keybinds.actions)
+        {
+            string keyName = Enum.GetName(typeof(Action), pair.Key);
+            PlayerPrefs.SetInt(keyName, (int)pair.Value);
+        }
+
         PlayerPrefs.Save();
     }
 
