@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
+using System.Collections;
 
 // we will use this at some point to tell other clients that we have toggeled the flashlight.
-public class FlashlightEvent: UnityEvent<Flashlight> { }
 
 public class Flashlight : MonoBehaviour
 {
@@ -22,48 +21,84 @@ public class Flashlight : MonoBehaviour
 
     private Light flashlightSource;
 
-
     private bool flashlightDead = false;
+
+    // May seem like an unneeded variable but this is used for the Lurker. We don't want to accidentally show the flashlight to the Lurker if the survivor has their actual flashlight off.
+    private bool flashlightEnabled = true;
+
+    private IEnumerator flashlightRoutine;
 
     void Start()
     {
         flashlightSource = GetComponent<Light>();
-        EventManager.survivorPickedUpBatteryEvent.AddListener(OnSurvivorPickedUpBattery);
+        flashlightRoutine = FlashlightRoutine();
+        StartCoroutine(flashlightRoutine);
     }
 
-    void Update()
+
+    private IEnumerator FlashlightRoutine()
     {
-        if (flashlightSource.enabled && charge > 0 && !flashlightDead)
+        while (true)
         {
-            charge -= Time.deltaTime * dischargeRate;
+            charge -= dischargeRate;
             flashlightSource.intensity = charge;
 
-            if (charge < minCharge)
+            if (charge <= minCharge)
             {
                 charge = minCharge;
                 flashlightSource.intensity = minCharge;
                 flashlightDead = true;
+                yield break;
             }
+
+            yield return new WaitForSeconds(1);
         }
     }
-
 
     public void Toggle()
     {
         flashlightSource.enabled = !flashlightSource.enabled;
+        flashlightEnabled = !flashlightEnabled;
         flashlightToggleSound.Play();
+
+        if (flashlightDead)
+        {
+            return;
+        }
+
+        if (flashlightEnabled && charge > minCharge)
+        {
+            StartCoroutine(flashlightRoutine);
+        }
+
+        else if (!flashlightEnabled && charge > minCharge)
+        {
+            StopCoroutine(flashlightRoutine);
+        }
+
     }
 
     public void Recharge()
     {
         charge = maxCharge;
-        flashlightSource.intensity = 4;
+        flashlightSource.intensity = maxCharge;
         flashlightDead = false;
     }
 
-
-    private void OnSurvivorPickedUpBattery(Survivor survivor, Battery battery)
+    // For the Monsters
+    public void Hide()
     {
-        survivor.flashlight.Recharge();
+        flashlightSource.enabled = false;
     }
+
+    // For the Monsters
+    public void Show()
+    {
+        if (flashlightEnabled)
+        {
+            flashlightSource.enabled = true;
+
+        }
+    }
+
 }

@@ -3,7 +3,8 @@
 // this class stores the stuff we need to update the mesh itself. The actual key information will be stored in the class key.
 public class KeyObject : MonoBehaviour
 {
-    public Key key;
+    [SerializeField]
+    private Key _key;
 
     [SerializeField]
     private Color groupColor;
@@ -15,14 +16,23 @@ public class KeyObject : MonoBehaviour
 
     [SerializeField]
     private float maxTimerForGlow = 100;
+
     [SerializeField]
     private float minTimer = 0;
+
     [SerializeField]
     private float noGlowTimer;
 
     [SerializeField]
     private float glowTimer;
 
+    private bool pickedUp = false;
+
+    [SerializeField]
+    private AudioSource pickupSound;
+
+    [SerializeField]
+    private Texture keyIcon;
 
     [SerializeField]
     // this is the color that will appear around the key mesh to let the player know they can pick it up
@@ -31,14 +41,16 @@ public class KeyObject : MonoBehaviour
     [SerializeField]
     private Color glowColor = Color.white;
 
+    [SerializeField]
     private Renderer keyRenderer;
+
+    [SerializeField]
+    private MeshCollider keyCollider;
 
     void Start()
     {
         noGlowTimer = maxTimerForGlow;
-        keyRenderer = GetComponent<Renderer>();
         keyRenderer.material.SetColor("_Color", glowOutlineColor);
-        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
     }
 
     void Update()
@@ -62,6 +74,12 @@ public class KeyObject : MonoBehaviour
 
     }
 
+    public Key Key()
+    {
+        return _key;
+
+    }
+
     private void Glow()
     {
         keyRenderer.material.SetColor("_Color", glowColor);
@@ -76,13 +94,37 @@ public class KeyObject : MonoBehaviour
 
     public void Pickup()
     {
-        Destroy(this.gameObject);
+        pickedUp = true;
+	pickupSound.Play();
+        Hide();
     }
 
-    private void OnSurvivorPickedUpKey(Survivor survivor, Key key)
+    public void Hide()
     {
-        key.PlayPickupSound();
+	    keyRenderer.enabled = false;
+	    keyCollider.enabled = false;
     }
 
+    public void Show()
+    {
+        if (!pickedUp)
+        {
+            keyRenderer.enabled = true;
+            keyCollider.enabled = true;
+        }
+    }
+
+
+    public void SetKey(Key key)
+    {
+	    _key =  key;
+    }
+
+
+    public Texture Texture()
+    {
+	    return keyIcon;
+
+    }
 }
 

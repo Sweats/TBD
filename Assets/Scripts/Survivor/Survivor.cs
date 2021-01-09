@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System.Collections;
+
 public class Survivor : MonoBehaviour
 {
 
@@ -14,17 +16,9 @@ public class Survivor : MonoBehaviour
     [SerializeField]
     private Sprint sprint;
 
-    [SerializeField]
-    private Texture crosshair;
 
     [SerializeField]
     private Camera survivorCamera;
-
-    //[SerializeField]
-    //private PausedGameInput pausedGameInput;
-
-    //[SerializeField]
-    //private ConsoleUI consoleUI;
 
     private CharacterController controller;
 
@@ -43,19 +37,19 @@ public class Survivor : MonoBehaviour
     private float crouchSpeed;
 
     private bool crouched;
+
     private bool walking;
+
     private Rect crouchingAndWalkingIconPosition;
 
+    [SerializeField]
+    private Windows playerWindows;
 
     [SerializeField]
     private float minimumX;
+
     [SerializeField]
     private float maximumX;
-
-    public static int invertX;
-    public static int invertY;
-    public static float mouseSensitivity;
-
 
     [SerializeField]
     private float gravity;
@@ -69,7 +63,6 @@ public class Survivor : MonoBehaviour
     private float trapDistance;
 
     private float xRotation;
-    private bool isPlayerStatsOpened;
 
     public bool matchOver;
 
@@ -79,37 +72,41 @@ public class Survivor : MonoBehaviour
 
     private Vector3 moving;
 
+    [SerializeField]
+    private Renderer survivorRenderer;
+
 
     void Start()
     {
-        //survivorBody = GetComponent<Transform>();
         controller = GetComponent<CharacterController>();
-	animator = GetComponent<Animator>();
+        animator = GetComponent<Animator>();
         Cursor.lockState = CursorLockMode.Locked;
         moving = new Vector3();
-        //EventManager.survivorClosedChatEvent.AddListener(OnSurvivorClosedChatEvent);
-        //EventManager.survivorOpenedChatEvent.AddListener(OnSurvivorOpenedChatEvent);
-        EventManager.survivorClosedPlayerStats.AddListener(OnSurvivorClosedPlayerStats);
-        EventManager.survivorOpenedPlayerStats.AddListener(OnSurvivorOpenedPlayerStats);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
+        StartCoroutine(TrapDetectionRoutine());
     }
 
     void LateUpdate()
     {
-        if (IsAnotherWindowOpen() || matchOver)
+        if (matchOver)
         {
             return;
         }
 
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        if (playerWindows.IsWindowOpen())
+        {
+            return;
+        }
 
-        if (invertX == 1)
+        float mouseX = Input.GetAxis("Mouse X") * Settings.MOUSE_SENSITIVITY;
+        float mouseY = Input.GetAxis("Mouse Y") * Settings.MOUSE_SENSITIVITY;
+
+        if (Settings.INVERT_X == 1)
         {
             mouseX *= -1;
         }
 
-        if (invertY == 1)
+        if (Settings.INVERT_Y == 1)
         {
             mouseY *= -1;
         }
@@ -132,9 +129,12 @@ public class Survivor : MonoBehaviour
             velocity.y = -2f;
         }
 
-        CheckForTraps();
+        if (matchOver)
+        {
+            return;
+        }
 
-        if (IsAnotherWindowOpen() || matchOver)
+        if (playerWindows.IsWindowOpen())
         {
             return;
         }
@@ -145,11 +145,11 @@ public class Survivor : MonoBehaviour
         bool isMoving = moving != secondmove;
         float speed;
 
-        if (sprint.sprinting)
+        if (sprint.GetSprinting())
         {
             if (!isMoving)
             {
-                sprint.sprinting = false;
+                sprint.SetSprinting(false);
                 speed = defaultSpeed;
             }
 
@@ -161,12 +161,11 @@ public class Survivor : MonoBehaviour
         {
             speed = defaultSpeed;
         }
-  
+
         if (Keybinds.GetKey(Action.SwitchFlashlight))
         {
             flashlight.Toggle();
         }
-
 
         else if (Keybinds.GetKey(Action.Crouch))
         {
@@ -178,18 +177,22 @@ public class Survivor : MonoBehaviour
 
         else if (Keybinds.GetKey(Action.Sprint))
         {
-            if (isMoving)
+            //To make it more 9heads-like, needs to check if player attemps to sprint while moving diagonally
+            //while sprinting, diagonal movement is impossible
+            //needs to check if player is backpaddling
+            if (isMoving && (sprint.GetEnergy() >= sprint.GetEnergyNeededToSprint()))
             {
-                sprint.sprinting = true;
+                sprint.SetSprinting(true);
+                //immediately consume energy
+                sprint.SetEnergy(-3.0f / sprint.GetTickRate());
             }
-
         }
-
+        /* Not needed since Sprint triggers on tapping Shift key and works as long as you are moving
         else if (Keybinds.GetKey(Action.Sprint, true))
         {
             sprint.sprinting = false;
         }
-
+        */
 
 
         else if (Keybinds.GetKey(Action.Crouch, true))
@@ -216,36 +219,43 @@ public class Survivor : MonoBehaviour
             OnActionGrab();
         }
 
-        else if (Keybinds.Get(Action.PlayerStats))
-        {
-            EventManager.survivorOpenedPlayerStats.Invoke();
-        }
 
         controller.Move(secondmove * speed * Time.deltaTime);
 
     }
-    // TO DO. Give a tiny bit of delay to this function because we don't need to spam this function on every frame.
-    private void CheckForTraps()
+
+    private IEnumerator TrapDetectionRoutine()
     {
-        RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, trapDistance, transform.forward, trapDistance);
-
-        for (var i = 0; i < objectsHit.Length; i++)
+        while (true)
         {
-            GameObject hitObject = objectsHit[i].collider.gameObject;
-            string tagName = hitObject.tag;
+            RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, trapDistance, transform.forward, trapDistance);
 
-            if (tagName == "Trap")
+            for (var i = 0; i < objectsHit.Length; i++)
             {
-                Trap trap = hitObject.GetComponent<Trap>();
+                GameObject hitObject = objectsHit[i].collider.gameObject;
 
-                if (trap.armed)
+                if (hitObject.CompareTag(Tags.TRAP))
                 {
-                    EventManager.survivorTriggeredTrapEvent.Invoke(this, trap);
+                    Trap trap = hitObject.GetComponent<Trap>();
+
+                    if (trap.Armed())
+                    {
+                        trap.Trigger();
+                    }
                 }
             }
+
+            if (matchOver || dead)
+            {
+                yield break;
+            }
+
+            yield return new WaitForSeconds(0.5f);
+
         }
     }
 
+    // This routine is only started when a lurker has spawned in the stage. An event will be responsible for this.
 
     private void OnActionGrab()
     {
@@ -256,21 +266,20 @@ public class Survivor : MonoBehaviour
         if (Physics.Raycast(ray, out hit, grabDistance))
         {
             var gameObject = hit.collider.gameObject;
-            var tagName = gameObject.tag;
 
-            if (tagName == "Key")
+            if (gameObject.CompareTag(Tags.KEY))
             {
                 KeyObject keyObject = gameObject.GetComponent<KeyObject>();
                 OnClickedOnKey(keyObject);
             }
 
-            else if (tagName == "Door")
+            else if (gameObject.CompareTag(Tags.DOOR))
             {
                 Door door = gameObject.GetComponent<Door>();
                 OnClickedOnDoor(door);
             }
 
-            else if (tagName == "Battery")
+            else if (gameObject.CompareTag(Tags.BATTERY))
             {
                 Battery battery = gameObject.GetComponent<Battery>();
                 OnSurvivorClickedOnBattery(battery);
@@ -283,23 +292,6 @@ public class Survivor : MonoBehaviour
         }
     }
 
-    void OnGUI()
-    {
-        if (PausedGameInput.GAME_PAUSED)
-        {
-            return;
-        }
-
-        if (!isPlayerStatsOpened && !ConsoleUI.OPENED)
-        {
-            inventory.Draw();
-        }
-
-        // TO DO: Optimize this!
-        GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
-    }
-        
- 
     private void OnClickedOnKey(KeyObject foundKey)
     {
         Key[] keysInInventory = inventory.Keys();
@@ -308,20 +300,23 @@ public class Survivor : MonoBehaviour
         for (var i = 0; i < keysInInventory.Length; i++)
         {
             Key key = keysInInventory[i];
-            int foundKeyMask = foundKey.key.mask;
-            int currentInventoryKeyMask = key.mask;
+            int foundKeyMask = foundKey.Key().Mask();
+            int currentInventoryKeyMask = key.Mask();
 
             if (foundKeyMask == currentInventoryKeyMask)
             {
                 found = true;
                 EventManager.SurvivorAlreadyHaveKeyEvent.Invoke();
+                break;
 
             }
         }
 
         if (!found)
         {
-            Key key = foundKey.key;
+            Key key = foundKey.Key();
+            Texture texture = foundKey.Texture();
+            inventory.Add(key, texture);
             foundKey.Pickup();
             EventManager.survivorPickedUpKeyEvent.Invoke(this, key);
         }
@@ -334,12 +329,13 @@ public class Survivor : MonoBehaviour
 
         for (var i = 0; i < keys.Length; i++)
         {
-            int unlockMask = keys[i].mask;
+            int unlockMask = keys[i].Mask();
 
             if (door.unlockMask == unlockMask)
             {
                 Key key = keys[i];
                 found = true;
+                door.Unlock();
                 EventManager.survivorUnlockDoorEvent.Invoke(this, key, door);
                 break;
             }
@@ -347,21 +343,15 @@ public class Survivor : MonoBehaviour
 
         if (!found)
         {
-            EventManager.survivorFailedToUnlockDoorEvent.Invoke(door);
+            door.PlayLockedSound();
         }
     }
 
-
-//    private void OnClickOnObject(DarnedObject object)
-//    {
-//
-//    }
-//
     private void OnSurvivorClickedOnBattery(Battery battery)
     {
         if (flashlight.charge <= battery.chargeNeededToGrab)
         {
-            EventManager.survivorPickedUpBatteryEvent.Invoke(this, battery);
+            flashlight.Recharge();
         }
 
         else
@@ -373,30 +363,30 @@ public class Survivor : MonoBehaviour
     public void Die()
     {
         dead = true;
+        sprint.SetDead(dead);
         insanity.Reset();
         deathSound.Play();
         EventManager.survivorDeathEvent.Invoke(this);
     }
 
+    // Called if the player is the Lurker.
+    public void Hide()
+    {
+        survivorRenderer.enabled = false;
+        flashlight.Hide();
+    }
+
+    // Called if the player is the Lurker.
+    public void Show()
+    {
+        survivorRenderer.enabled = true;
+        flashlight.Show();
+    }
+
     private void OnSurvivorsEscapedStageEvent()
     {
         matchOver = true;
+        sprint.SetMatchOver(true);
     }
 
-    private void OnSurvivorOpenedPlayerStats()
-    {
-        isPlayerStatsOpened = true;
-    }
-
-
-    private void OnSurvivorClosedPlayerStats()
-    {
-        isPlayerStatsOpened = false;
-    }
-
-
-    private bool IsAnotherWindowOpen()
-    {
-        return  (PausedGameInput.GAME_PAUSED) || (ConsoleUI.OPENED) || (Chat.OPENED);
-    }
 }

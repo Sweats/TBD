@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 424282626034555675}
   m_Layer: 0
   m_Name: Battery
-  m_TagString: Untagged
+  m_TagString: Battery
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -119,3 +119,5 @@ MonoBehaviour:
   maxTimerForGlow: 1
   minTimer: 0
   maxTimer: 1
+  batteryRenderer: {fileID: 424282626034555678}
+  batteryCollider: {fileID: 424282626034555679}

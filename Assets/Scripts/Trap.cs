@@ -12,39 +12,67 @@ public class Trap : MonoBehaviour
     private float minTimer;
 
     public float trapTimer;
+
     public float trapTimerRate;
 
-    public bool armed;
+    private bool armed;
+
+    [SerializeField]
+    private MeshRenderer trapRenderer;
+
+    [SerializeField]
+    private CapsuleCollider capsuleCollider;
+
+    private Color originalColor;
 
     private void Start()
     {
-        EventManager.survivorTriggeredTrapEvent.AddListener(OnSurvivorTriggeredTrap);
-    }
+        originalColor = trapRenderer.material.color;
 
-    void Update()
-    {
-        if (!armed)
-        {
-            trapTimer -= Time.deltaTime * trapTimerRate;
+        //EventManager.lurkerChangedFormEvent.AddListener(OnLurkerGoBackToGhostForm);
+        //int monster = 0;
 
-            if (trapTimer <= minTimer)
-            {
-                armed = true;
-                trapTimer = minTimer;
-            }
-        }
-        
+        // get the kind of monster that is in the game and then call the corrisponding trap logic for the monster
+        /*
+        */
+
     }
 
     public void Trigger()
     {
         trapSound.Play();
         armed = false;
-        trapTimer = maxTimer;
     }
 
-    private void OnSurvivorTriggeredTrap(Survivor survivor, Trap trap)
+    public void Arm()
     {
-        trap.Trigger();
+        armed = true;
+	Unglow();
     }
+
+    public bool Armed()
+    {
+        return armed;
+    }
+
+    public void Disarm()
+    {
+        armed = false;
+    }
+
+    // For the Lurker monster.
+    public void Glow()
+    {
+	    Debug.Log("Glowing...");
+        trapRenderer.material.SetColor("_Color", Color.white);
+
+    }
+
+    public void Unglow()
+    {
+	    Debug.Log("Unglowing...");
+        trapRenderer.material.SetColor("_Color", originalColor);
+
+    }
+
 }

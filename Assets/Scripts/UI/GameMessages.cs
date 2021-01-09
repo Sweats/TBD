@@ -19,7 +19,7 @@ public class GameMessages : MonoBehaviour
     [SerializeField]
     private Canvas gameMessagesCanvas;
     private StringBuilder stringBuilder;
-    
+
     void Start()
     {
         stringBuilder = new StringBuilder();
@@ -32,7 +32,9 @@ public class GameMessages : MonoBehaviour
         EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
         EventManager.playerConnectedEvent.AddListener(OnPlayerConnect);
         EventManager.playerDisconnectedEvent.AddListener(OnPlayerDisconnect);
-
+        EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
+        EventManager.maryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
+        EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
     }
 
     private void UpdateChatText()
@@ -46,14 +48,16 @@ public class GameMessages : MonoBehaviour
 
         messagesBox.text = stringBuilder.ToString();
     }
+
     private void OnSurvivorGrabbedKey(Survivor who, Key key)
     {
-        string newMessage = $"{who.survivorName} picked up a {key.keyName}!";
+        string newMessage = $"{who.survivorName} picked up a {key.Name()}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
+
     private void OnSurvivorUnlockedDoor(Survivor who, Key key, Door door)
     {
-        string newMessage = $"{who.survivorName} used a {key.keyName} to unlock a {door.doorName}!";
+        string newMessage = $"{who.survivorName} used a {key.Name()} to unlock a {door.doorName}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
@@ -64,7 +68,6 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
-
 
     private void OnFailedToPickUpBatteryEvent()
     {
@@ -104,6 +107,25 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
+
+    private void OnLurkerReadyToGoIntoPhysicalForm()
+    {
+        string newMesasge = "You may now transform into physical form.";
+        StartCoroutine(AddAndRemoveGameMessage(newMesasge));
+    }
+
+    private void OnMaryReadyToFrenzy()
+    {
+        string newMessage = $"Click {Keybinds.GetKey(Action.Transform)} to enter frenzied mode.";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnMaryReadyToTeleport()
+    {
+        string newMessage = $"Click {Keybinds.GetKey(Action.Teleport)} to teleport.";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
     private IEnumerator AddAndRemoveGameMessage(string newMessage)
     {
         messages.Add(newMessage);
@@ -112,4 +134,5 @@ public class GameMessages : MonoBehaviour
         messages.Remove(newMessage);
         UpdateChatText();
     }
+
 }

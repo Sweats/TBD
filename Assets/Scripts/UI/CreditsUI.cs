@@ -2,32 +2,41 @@
 
 public class CreditsUI : MonoBehaviour
 {
-    // Start is called before the first frame update
 
     [SerializeField]
     private Canvas creditsCanvas;
-    void Start()
+
+
+    [SerializeField]
+    private  MainMenuUI mainMenuUI;
+
+    private void Start()
     {
+        this.enabled = false;
         
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
+        if (Keybinds.GetKey(Action.GuiReturn))
+        {
+            mainMenuUI.Show();
+            Hide();
+        }
         
     }
 
 
     public void Show()
     {
+        this.enabled = true;
         creditsCanvas.enabled = true;
 
     }
 
-
-    public void Hide()
+    private void Hide()
     {
+        this.enabled = false;
         creditsCanvas.enabled = false;
-
     }
 }

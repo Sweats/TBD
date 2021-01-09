@@ -9,6 +9,12 @@ TagManager:
   - Door
   - Key
   - Item
+  - Trap
+  - Battery
+  - Lurker
+  - Mary
+  - Mary Teleport Location
+  - Phantom
   layers:
   - Default
   - TransparentFX

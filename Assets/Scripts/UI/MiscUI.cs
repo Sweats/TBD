@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class MiscUI : MonoBehaviour
 {
@@ -9,22 +7,42 @@ public class MiscUI : MonoBehaviour
     [SerializeField]
     private Canvas miscCanvas;
 
-    void Start()
-    {
+    [SerializeField]
+    private OptionsUI optionsUI;
 
+    private void Start()
+    {
+        this.enabled = false;
+
+    }
+
+    private void Update()
+    {
+        if (Keybinds.GetKey(Action.GuiReturn))
+        {
+            optionsUI.Show();
+            Hide();
+        }
     }
 
     public void Show()
     {
-
         miscCanvas.enabled = true;
+        this.enabled = true;
+    }
+
+    private void OnMiscBackButtonClicked()
+    {
+
     }
 
 
-    public void Hide()
+    private void Hide()
     {
         SaveMiscConfig();
         miscCanvas.enabled = false;
+        this.enabled = false;
+        optionsUI.Show();
 
     }
 

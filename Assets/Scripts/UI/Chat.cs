@@ -9,6 +9,7 @@ public class Chat : MonoBehaviour
 
     [SerializeField]
     private float chatAppearanceLength;
+
     private float currentChatApperanceLength;
 
     [SerializeField]
@@ -19,30 +20,31 @@ public class Chat : MonoBehaviour
 
     [SerializeField]
     private InputField chatMessageBox;
+
+
+    [SerializeField]
+    private Windows window;
+
     private string messageText;
+
     private StringBuilder stringBuilder;
 
-    public static bool OPENED;
 
 
-    void Start()
+    private void Start()
     {
+        this.enabled = false;
         stringBuilder = new StringBuilder();
         currentChatApperanceLength = 0f;
         chatMessageBoxInput.text = string.Empty;
         EventManager.survivorSendChatMessageEvent.AddListener(OnSurviorRecievedChat);
     }
 
-    void Update()
+    private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return) && !OPENED && !ConsoleUI.OPENED)
+        if (Keybinds.GetKey(Action.GuiReturn))
         {
-            ShowChatMessageInputBox();
-        }
-
-        else if (Keybinds.GetKey(Action.GUiReturn) && OPENED)
-        {
-            HideChatMessageInputBox();
+            Hide();
         }
 
         if (currentChatApperanceLength >= 0f)
@@ -55,9 +57,26 @@ public class Chat : MonoBehaviour
             }
         }
     }
+
+
+    public void Show()
+    {
+        this.enabled = true;
+        chatCanvas.enabled = true;
+        Cursor.lockState = CursorLockMode.Confined;
+    }
+
+    public void Hide()
+    {
+        this.enabled = false;
+        chatCanvas.enabled = false;
+        window.MarkChatWindowClosed();
+        Cursor.lockState = CursorLockMode.Locked;
+    }
+
     public void OnSurvivorSendChat(string chatMessageText)
     {
-        if (chatMessageBoxInput.text != string.Empty && OPENED)
+        if (chatMessageBoxInput.text != string.Empty)
         {
             ChatMessage chatMessage = new ChatMessage()
             {
@@ -83,26 +102,20 @@ public class Chat : MonoBehaviour
     private void OnSurviorRecievedChat(ChatMessage chatMessage)
     {
         currentChatApperanceLength = chatAppearanceLength;
-
-        if (!PausedGameInput.GAME_PAUSED && !ConsoleUI.OPENED)
-        {
-            UpdateChatMessagesBox(chatMessage.text);
-            ShowChatMessageBox();
-        }
+        UpdateChatMessagesBox(chatMessage.text);
+        ShowChatMessageBox();
     }
 
 
     private void ShowChatMessageInputBox()
     {
         chatMessageBoxInput.interactable = true;
-        OPENED = true;
         Cursor.lockState = CursorLockMode.Confined;
     }
 
     private void HideChatMessageInputBox()
     {
         chatMessageBoxInput.interactable = false;
-        OPENED = false;
         chatMessageBoxInput.text = string.Empty;
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -164,5 +177,5 @@ public class Chat : MonoBehaviour
         DateTime currentDateTime = DateTime.Now;
         return currentDateTime.ToString("HH:mm:ss");
     }
-    
+
 }

@@ -2,19 +2,33 @@
 
 public class GraphicsUI : MonoBehaviour
 {
-    // Start is called before the first frame update
-
 
     [SerializeField]
     private Canvas graphicsMenu;
 
-    void Start()
+    [SerializeField]
+    private OptionsUI optionsUI;
+
+    private void Start()
     {
+        this.enabled = false;
+
+    }
+
+
+    private void Update()
+    {
+        if (Keybinds.GetKey(Action.GuiReturn))
+        {
+            optionsUI.Show();
+            Hide();
+        }
 
     }
 
     public void Show()
     {
+        this.enabled = true;
         graphicsMenu.enabled = true;
 
     }
@@ -22,9 +36,10 @@ public class GraphicsUI : MonoBehaviour
 
     public void Hide()
     {
+        this.enabled = false;
         graphicsMenu.enabled = false;
+        optionsUI.Show();
         SaveGraphicsConfig();
-
     }
 
     private void SaveGraphicsConfig()
