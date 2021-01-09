@@ -15,7 +15,7 @@ public class Stage : NetworkManager
     private int choosenKeyPath;
 
     [SerializeField]
-    private GameObject keyPrefab;
+    private KeyObject keyPrefab;
 
     [SerializeField]
     private GameObject batteryPrefab;
@@ -41,14 +41,19 @@ public class Stage : NetworkManager
 
     private const int MAX_PLAYER_COUNT = 5;
 
+    private void Start()
+    {
+
+    }
+
     public override void OnStartServer()
     {
         base.OnStartServer();
-        survivors = new List<Survivor>();
         SetObjectSpawnPoints();
         SetSurvivorSpawnPoints();
         ChoosePath();
         SpawnKeys();
+        survivors = new List<Survivor>();
     }
 
     // NOTE: Called when a new client connects to the server.
@@ -82,6 +87,7 @@ public class Stage : NetworkManager
 
     }
 
+    [Server]
     private void SpawnSurvivor(NetworkConnection connection)
     {
         for (var i = 0; i < survivorSpawnPoints.Length; i++)
@@ -99,6 +105,8 @@ public class Stage : NetworkManager
             Survivor newSurvivor = chadSurvivor.GetComponent<Survivor>();
             survivors.Add(newSurvivor);
             NetworkServer.AddPlayerForConnection(connection, chadSurvivor);
+            survivorSpawnPoint.SetUsed();
+            break;
         }
 
     }
@@ -315,10 +323,9 @@ public class Stage : NetworkManager
         ObjectSpawnPoint[] potentialSpawnPoints = GetSpawnPointsForKey(key);
         int randomNumber = Random.Range(0, potentialSpawnPoints.Length);
         ObjectSpawnPoint pickedSpawnPoint = potentialSpawnPoints[randomNumber];
-        GameObject spawnedKeyObject = Instantiate(keyPrefab, pickedSpawnPoint.transform.position, Quaternion.identity);
-        //NOTE: Maybe there is a cleaner way to do this.
-        spawnedKeyObject.GetComponent<KeyObject>().SetKey(key);
-        NetworkServer.Spawn(spawnedKeyObject);
+        KeyObject spawnedKeyObject = Instantiate(keyPrefab, pickedSpawnPoint.transform.position, Quaternion.identity);
+        spawnedKeyObject.SetKey(key);
+        NetworkServer.Spawn(spawnedKeyObject.gameObject);
     }
 
     [Server]

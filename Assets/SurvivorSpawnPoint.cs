@@ -17,4 +17,9 @@ public class SurvivorSpawnPoint : NetworkBehaviour
         return spawnPointUsed;
     }
 
+    public void SetUsed()
+    {
+        spawnPointUsed = true;
+    }
+
 }

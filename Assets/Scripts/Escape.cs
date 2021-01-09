@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Mirror;
 
-public class Escape : MonoBehaviour
+public class Escape : NetworkBehaviour
 {
     void OnTriggerEnter(Collider collider)
     {
@@ -9,35 +10,59 @@ public class Escape : MonoBehaviour
         if (gameObject.CompareTag(Tags.SURVIVOR))
         {
             Survivor survivor = gameObject.GetComponent<Survivor>();
-            survivor.isInEscapeRoom = true;
-
-            GameObject[] survivors = GameObject.FindGameObjectsWithTag(Tags.SURVIVOR);
-
-            bool canEscape = true;
-
-            for (var i = 0; i < survivors.Length; i++)
-            {
-                Survivor otherSurvivor = survivors[i].GetComponent<Survivor>();
-
-                if (survivor.dead)
-                {
-                    continue;
-                }
-
-                if (!survivor.isInEscapeRoom)
-                {
-                    canEscape = false;
-                    break;
-                }
-            }
-
-            if (canEscape)
-            {
-                EventManager.survivorsEscapedStageEvent.Invoke();
-            }
+            CmdSurvivorEnteredEscapeRoom(survivor.netIdentity);
         }
     }
 
+    [Command]
+    private void CmdSurvivorEnteredEscapeRoom(NetworkIdentity survivorIdentity)
+    {
+        Survivor survivor = survivorIdentity.gameObject.GetComponent<Survivor>();
+        survivor.SetEscaped(true);
+
+        GameObject[] survivors = GameObject.FindGameObjectsWithTag(Tags.SURVIVOR);
+
+        bool canEscape = true;
+
+        for (var i = 0; i < survivors.Length; i++)
+        {
+            Survivor otherSurvivor = survivors[i].GetComponent<Survivor>();
+
+            if (survivor.dead)
+            {
+                continue;
+            }
+
+            if (!survivor.Escaped())
+            {
+                canEscape = false;
+                break;
+            }
+        }
+
+        if (canEscape)
+        {
+            RpcSurvivorsEscapedStageEvent();
+        }
+
+    }
+
+
+    [Command]
+    private void CmdSurviorLeftEscapeRoom(NetworkIdentity survivorIdentity)
+    {
+        Survivor survivor = survivorIdentity.gameObject.GetComponent<Survivor>();
+        survivor.SetEscaped(false);
+    }
+
+
+    [ClientRpc]
+    private void RpcSurvivorsEscapedStageEvent()
+    {
+        EventManager.survivorsEscapedStageEvent.Invoke();
+    }
+
+    [Client]
     void OnTriggerExit(Collider collision)
     {
         GameObject gameObject = collision.gameObject;
@@ -45,7 +70,7 @@ public class Escape : MonoBehaviour
         if (gameObject.CompareTag(Tags.SURVIVOR))
         {
             Survivor survivor = gameObject.GetComponent<Survivor>();
-            survivor.isInEscapeRoom = false;
+            CmdSurviorLeftEscapeRoom(survivor.netIdentity);
         }
     }
 }

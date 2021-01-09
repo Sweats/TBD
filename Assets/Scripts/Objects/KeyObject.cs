@@ -5,6 +5,7 @@ using Mirror;
 public class KeyObject : NetworkBehaviour
 {
     [SerializeField]
+    [SyncVar]
     private Key _key;
 
     [SerializeField]

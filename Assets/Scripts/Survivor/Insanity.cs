@@ -90,11 +90,20 @@ public class Insanity : MonoBehaviour
 
     public void Increment(float amount)
     {
-        this.insanityValue += amount;
+        if (insanityEnabled)
+        {
+            this.insanityValue += amount;
+
+        }
     }
-    
+
     private void OnSurvivorDeath(string playerName)
     {
-        this.insanityValue += insanitySurvivorDeathAmount;
+        if (insanityEnabled)
+        {
+            this.insanityValue += insanitySurvivorDeathAmount;
+
+        }
+
     }
 }

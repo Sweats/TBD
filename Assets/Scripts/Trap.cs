@@ -19,6 +19,8 @@ public class Trap : NetworkBehaviour
 
     public float trapTimerRate;
 
+    [SerializeField]
+    [SyncVar]
     private bool armed;
 
     [SerializeField]
@@ -32,20 +34,24 @@ public class Trap : NetworkBehaviour
     private void Start()
     {
         originalColor = trapRenderer.material.color;
+        armed = true;
+    }
 
-        //EventManager.lurkerChangedFormEvent.AddListener(OnLurkerGoBackToGhostForm);
-        //int monster = 0;
 
-        // get the kind of monster that is in the game and then call the corrisponding trap logic for the monster
-        /*
-        */
+    private void PhantomRoutine()
+    {
 
     }
 
     public void Trigger()
     {
-        trapSound.Play();
         armed = false;
+    }
+
+
+    public void PlaySound()
+    {
+        trapSound.Play();
     }
 
     public void Arm()

@@ -11,6 +11,7 @@ public class Door : NetworkBehaviour
 {
     // Start is called before the first frame update
     [SerializeField]
+    [SyncVar]
     private int unlockMask = -1;
 
     [SerializeField]
@@ -31,6 +32,7 @@ public class Door : NetworkBehaviour
     [SerializeField]
     private Color outlineColor = Color.yellow;
 
+    [SyncVar]
     private bool locked;
 
     [SerializeField]

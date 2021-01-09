@@ -118,20 +118,23 @@ public class Battery : NetworkBehaviour
     }
 
     // For the Monsters.
+    [Command]
     public void Hide()
     {
-	    batteryCollider.enabled = false;
-	    batteryRenderer.enabled = false;
+        batteryCollider.enabled = false;
+        batteryRenderer.enabled = false;
 
     }
 
     // For the Monsters.
+    [Command]
     public void Show()
     {
-	    batteryCollider.enabled = true;
-	    batteryRenderer.enabled = true;
+        batteryCollider.enabled = true;
+        batteryRenderer.enabled = true;
     }
 
+    [Command]
     public void Pickup()
     {
         NetworkServer.Destroy(this.gameObject);

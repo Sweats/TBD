@@ -32,3 +32,18 @@ public struct PlayerDisconnectMessage
     public string playerName;
 }
 
+#region LOBBY
+
+public struct PlayerChangedCharacterMessage
+{
+    public int clientID;
+    public int character;
+}
+
+public struct HostChangedStageSettingMessage
+{
+    public int newSetting;
+}
+
+#endregion
+

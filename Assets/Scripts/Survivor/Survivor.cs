@@ -5,6 +5,7 @@ using Mirror;
 public class Survivor : NetworkBehaviour
 {
     [SerializeField]
+    [SyncVar]
     private string playerName = "player";
 
     public Insanity insanity;
@@ -27,15 +28,19 @@ public class Survivor : NetworkBehaviour
     private Animator animator;
 
     [SerializeField]
+    [SyncVar]
     private float defaultSpeed;
 
     [SerializeField]
+    [SyncVar]
     private float sprintSpeed;
 
     [SerializeField]
+    [SyncVar]
     private float walkSpeed;
 
     [SerializeField]
+    [SyncVar]
     private float crouchSpeed;
 
     private bool crouched;
@@ -63,10 +68,13 @@ public class Survivor : NetworkBehaviour
 
     private float xRotation;
 
+    [SyncVar]
     public bool matchOver;
 
-    public bool isInEscapeRoom;
+    [SyncVar]
+    private bool isInEscapeRoom;
 
+    [SyncVar]
     public bool dead;
 
     private Vector3 moving;
@@ -95,6 +103,7 @@ public class Survivor : NetworkBehaviour
             this.inventory.enabled = false;
             return;
         }
+
     }
 
     public override void OnStartClient()
@@ -103,6 +112,7 @@ public class Survivor : NetworkBehaviour
         {
             EventManager.playerConnectedEvent.Invoke(playerName);
         }
+
     }
 
     public override void OnStartLocalPlayer()
@@ -110,9 +120,10 @@ public class Survivor : NetworkBehaviour
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
         EventManager.playerSentChatMessageEvent.AddListener(CmdOnPlayerSentMessage);
         EventManager.playerClientChangedNameEvent.AddListener(CmdOnPlayerChangedProfileNameEvent);
-        StartCoroutine(TrapDetectionRoutine());
         Cursor.lockState = CursorLockMode.Locked;
+        StartCoroutine(TrapDetectionRoutine());
         playerName = Settings.PROFILE_NAME;
+        //EventManager.playerClientChangedNameEvent.AddListener(OnPlayerClientChangedProfileName);
     }
 
     private void LateUpdate()
@@ -277,7 +288,7 @@ public class Survivor : NetworkBehaviour
 
                     if (trap.Armed())
                     {
-                        trap.Trigger();
+                        CmdTriggerTrap(trap.netIdentity);
                     }
                 }
             }
@@ -294,6 +305,7 @@ public class Survivor : NetworkBehaviour
 
     // This routine is only started when a lurker has spawned in the stage. An event will be responsible for this.
 
+    [Client]
     private void OnActionGrab()
     {
         RaycastHit hit;
@@ -308,7 +320,6 @@ public class Survivor : NetworkBehaviour
             {
                 KeyObject keyObject = gameObject.GetComponent<KeyObject>();
                 CmdPlayerClickedOnKey(keyObject.netIdentity);
-
             }
 
             else if (gameObject.CompareTag(Tags.DOOR))
@@ -521,16 +532,26 @@ public class Survivor : NetworkBehaviour
         door.PlayLockedSound();
     }
 
+    [Command]
     public void Die()
     {
         RpcDie();
     }
 
+
+    [Command]
+    private void CmdTriggerTrap(NetworkIdentity trapIdentity)
+    {
+        RpcTriggerTrap(trapIdentity);
+    }
+
     [ClientRpc]
-    private void RpcHitTrap(NetworkIdentity trapIdentity)
+    private void RpcTriggerTrap(NetworkIdentity trapIdentity)
     {
         Trap trap = trapIdentity.gameObject.GetComponent<Trap>();
+        trap.Trigger();
         insanity.Increment(trap.HitAmount());
+        trap.PlaySound();
     }
 
     [ClientRpc]
@@ -543,11 +564,8 @@ public class Survivor : NetworkBehaviour
 
         if (!isLocalPlayer)
         {
-            return;
+            deathSound.Play();
         }
-
-
-        deathSound.Play();
     }
 
     [Command]
@@ -562,6 +580,12 @@ public class Survivor : NetworkBehaviour
         RpcPlayerChangedProfileName(oldName, newName);
     }
 
+    //[Client]
+    //private void OnPlayerClientChangedProfileName(string oldName, string newName)
+    //{
+    //    playerName = newName;
+    //}
+
     [ClientRpc]
     private void RpcPlayerRecievedChatMessage(string playerName, string message)
     {
@@ -572,6 +596,54 @@ public class Survivor : NetworkBehaviour
     private void RpcPlayerChangedProfileName(string oldName, string newName)
     {
         EventManager.playerChangedNameEvent.Invoke(oldName, newName);
+    }
+
+
+    // TODO: DO we need the command and targets for these functions?
+    // NOTE: Called if the player is the Lurker.
+    [Command]
+    public void Hide()
+    {
+        TargetHide();
+    }
+
+    [TargetRpc]
+    private void TargetHide()
+    {
+        survivorRenderer.enabled = false;
+        flashlight.Hide();
+    }
+
+    // NOTE: Called if the player is the Lurker.
+    [Command]
+    public void Show()
+    {
+        TargetShow();
+    }
+
+    [TargetRpc]
+    private void TargetShow()
+    {
+        survivorRenderer.enabled = true;
+        flashlight.Show();
+    }
+
+    [Command]
+    private void OnSurvivorsEscapedStageEvent()
+    {
+        RpcOnSurvivorsEscapedStageEvent();
+    }
+
+    [ClientRpc]
+    private void RpcOnSurvivorsEscapedStageEvent()
+    {
+        this.matchOver = true;
+        this.sprint.SetMatchOver(true);
+    }
+
+    public string Name()
+    {
+        return playerName;
     }
 
     public bool Dead()
@@ -586,29 +658,14 @@ public class Survivor : NetworkBehaviour
 
     }
 
-    // Called if the player is the Lurker.
-    public void Hide()
+    public bool Escaped()
     {
-        survivorRenderer.enabled = false;
-        flashlight.Hide();
+        return isInEscapeRoom;
     }
 
-    // Called if the player is the Lurker.
-    public void Show()
+    public void SetEscaped(bool escaped)
     {
-        survivorRenderer.enabled = true;
-        flashlight.Show();
-    }
-
-    private void OnSurvivorsEscapedStageEvent()
-    {
-        matchOver = true;
-        sprint.SetMatchOver(true);
-    }
-
-    public string Name()
-    {
-        return playerName;
+        isInEscapeRoom = escaped;
     }
 
 
