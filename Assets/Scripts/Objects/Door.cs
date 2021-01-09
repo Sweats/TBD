@@ -1,11 +1,20 @@
 ﻿using UnityEngine;
+using Mirror;
 
-public class Door : MonoBehaviour
+public enum DoorType
+{
+    Normal = 0
+}
+
+
+public class Door : NetworkBehaviour
 {
     // Start is called before the first frame update
-    public int unlockMask = -1;
+    [SerializeField]
+    private int unlockMask = -1;
 
-    public string doorName = "door";
+    [SerializeField]
+    private string doorName = "door";
 
     [SerializeField]
     private AudioSource unlockedSound;
@@ -22,7 +31,7 @@ public class Door : MonoBehaviour
     [SerializeField]
     private Color outlineColor = Color.yellow;
 
-    public bool locked;
+    private bool locked;
 
     [SerializeField]
     private Renderer doorRenderer;
@@ -30,7 +39,7 @@ public class Door : MonoBehaviour
     [SerializeField]
     private BoxCollider doorCollider;
 
-    void Start()
+    private void Start()
     {
         locked = true;
     }
@@ -41,10 +50,14 @@ public class Door : MonoBehaviour
         lockedSound.Play();
     }
 
+    public void PlayUnlockedSound()
+    {
+        unlockedSound.Play();
+    }
+
 
     public void Unlock()
     {
-        unlockedSound.Play();
         locked = false;
         doorRenderer.enabled = false;
         doorCollider.enabled = false;
@@ -64,6 +77,17 @@ public class Door : MonoBehaviour
     {
         doorRenderer.enabled = true;
         doorCollider.enabled = true;
+    }
+
+
+    public int UnlockMask()
+    {
+        return unlockMask;
+    }
+
+    public string Name()
+    {
+        return doorName;
     }
 }
 

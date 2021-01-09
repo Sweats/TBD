@@ -5,7 +5,7 @@ public static class EventManager
 
     public static SurvivorPickedUpBatteryEvent survivorPickedUpBatteryEvent = new SurvivorPickedUpBatteryEvent();
 
-    public static SurvivorAlreadyHaveKeyEvent SurvivorAlreadyHaveKeyEvent = new SurvivorAlreadyHaveKeyEvent();
+    public static SurvivorAlreadyHaveKeyEvent survivorAlreadyHasKeyEvent = new SurvivorAlreadyHaveKeyEvent();
 
     public static SurvivorDeathEvent survivorDeathEvent = new SurvivorDeathEvent();
 
@@ -19,36 +19,27 @@ public static class EventManager
 
     public static SurvivorPickedUpKeyEvent survivorPickedUpKeyEvent = new SurvivorPickedUpKeyEvent();
 
-    public static SurvivorSendChatMessageEvent survivorSendChatMessageEvent = new SurvivorSendChatMessageEvent();
+    public static PlayerSentChatMessageEvent playerSentChatMessageEvent = new PlayerSentChatMessageEvent();
 
-    public static SurvivorOpenedChatEvent survivorOpenedChatEvent = new SurvivorOpenedChatEvent();
-
-    public static SurvivorClosedChatEvent survivorClosedChatEvent = new SurvivorClosedChatEvent();
+    public static PlayerRecievedChatMessageEvent playerRecievedChatMessageEvent = new PlayerRecievedChatMessageEvent();
 
     public static SurvivorFailedToUnlockDoorEvent survivorFailedToUnlockDoorEvent = new SurvivorFailedToUnlockDoorEvent();
 
     public static SurvivorUnlockDoorEvent survivorUnlockDoorEvent = new SurvivorUnlockDoorEvent();
 
-
-    public static SurvivorOpenedPlayerStats survivorOpenedPlayerStats = new SurvivorOpenedPlayerStats();
-
-    public static SurvivorClosedPlayerStats survivorClosedPlayerStats = new SurvivorClosedPlayerStats();
-
     public static PlayerConnectedEvent playerConnectedEvent = new PlayerConnectedEvent();
 
-    public static PlayerOpenedConsoleEvent playerOpenedConsoleEvent = new PlayerOpenedConsoleEvent();
 
     public static PlayerDisconnectedEvent playerDisconnectedEvent = new PlayerDisconnectedEvent();
+
+    public static PlayerChangedNameEvent playerChangedNameEvent = new PlayerChangedNameEvent();
+
+    public static PlayerClientChangedNameEvent playerClientChangedNameEvent = new PlayerClientChangedNameEvent();
 
     public static MonsterWonEvent monsterWonEvent = new MonsterWonEvent();
 
     public static FailedToLoadStageEvent failedToLoadStageEvent = new FailedToLoadStageEvent();
 
-    public static PlayerClosedConsoleEvent playerClosedConsoleEvent = new PlayerClosedConsoleEvent();
-
-    public static PlayerOpenedPauseMenuEvent playerOpenedPauseMenuEvent = new PlayerOpenedPauseMenuEvent();
-
-    public static PlayerClosedPauseMenuEvent playerClosedPauseMenuEvent = new PlayerClosedPauseMenuEvent();
 
     public static LurkerChangedFormEvent lurkerChangedFormEvent = new LurkerChangedFormEvent();
 
@@ -61,7 +52,6 @@ public static class EventManager
     public static MaryReadyToTeleportEvent maryReadyToTeleportEvent = new MaryReadyToTeleportEvent();
 
     public static InvalidLobbyNameEvent invalidLobbyNameEvent = new InvalidLobbyNameEvent();
-
 }
 
 
@@ -70,16 +60,16 @@ public static class EventManager
 
 
 [System.Serializable]
-public class SurvivorDeathEvent : UnityEvent<Survivor> { }
+public class SurvivorDeathEvent : UnityEvent<string> { }
 
 [System.Serializable]
-public class SurvivorUnlockDoorEvent : UnityEvent<Survivor, Key, Door> { }
+public class SurvivorUnlockDoorEvent : UnityEvent<string, string, string> { }
 
 [System.Serializable]
 public class SurvivorFailedToUnlockDoorEvent : UnityEvent<Door> { }
 
 [System.Serializable]
-public class SurvivorPickedUpKeyEvent : UnityEvent<Survivor, Key> { }
+public class SurvivorPickedUpKeyEvent : UnityEvent<string, string> { }
 
 [System.Serializable]
 public class SurvivorPickedUpBatteryEvent : UnityEvent<Survivor, Battery> { }
@@ -103,8 +93,9 @@ public class FlashlightEvent : UnityEvent<Flashlight> { }
 public class SurvivorAlreadyHaveKeyEvent : UnityEvent { }
 
 [System.Serializable]
-public class SurvivorSendChatMessageEvent : UnityEvent<ChatMessage> { }
+public class PlayerSentChatMessageEvent : UnityEvent<string, string> { }
 
+public class PlayerRecievedChatMessageEvent : UnityEvent<string, string> { }
 
 
 [System.Serializable]
@@ -132,7 +123,7 @@ public class InsanityEffectEvent : UnityEvent { }
 
 #region TRAP_EVENTS
 
-public class SurvivorTriggeredTrapEvent : UnityEvent<Survivor, Trap> { }
+public class SurvivorTriggeredTrapEvent : UnityEvent<Trap> { }
 
 [System.Serializable]
 public class MonsterArmedTrapEvent : UnityEvent<Trap> { }
@@ -204,31 +195,19 @@ public class InvalidLobbyNameEvent : UnityEvent { }
 
 
 [System.Serializable]
-public class PlayerConnectedEvent : UnityEvent<Survivor> { }
+public class PlayerConnectedEvent : UnityEvent<string> { }
 
 [System.Serializable]
-public class PlayerDisconnectedEvent : UnityEvent<Survivor> { }
+public class PlayerDisconnectedEvent : UnityEvent<string> { }
+
+public class PlayerChangedNameEvent: UnityEvent<string, string>{}
+
+public class PlayerClientChangedNameEvent: UnityEvent<string, string>{}
 
 #endregion
 
 
 
 #region WINDOW_EVENTS
-
-public class PlayerOpenedConsoleEvent : UnityEvent { }
-
-public class PlayerClosedConsoleEvent : UnityEvent { }
-
-public class PlayerOpenedPauseMenuEvent : UnityEvent { }
-
-public class PlayerClosedPauseMenuEvent : UnityEvent { }
-
-public class SurvivorOpenedChatEvent : UnityEvent { }
-
-public class SurvivorClosedChatEvent : UnityEvent { }
-
-public class SurvivorOpenedPlayerStats : UnityEvent { }
-
-public class SurvivorClosedPlayerStats : UnityEvent { }
 
 #endregion

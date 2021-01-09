@@ -40,10 +40,11 @@ public class Windows : MonoBehaviour
             this.enabled = false;
             consoleUI.Show();
             consoleWindowOpened = true;
-
         }
 
-        else if (Keybinds.GetKey(Action.Start))
+
+        //else if (Keybinds.GetKey(Action.Start))
+        else if (Input.GetKey(KeyCode.End))
         {
             chatUI.Show();
             this.enabled = false;
@@ -85,12 +86,23 @@ public class Windows : MonoBehaviour
     public void MarkConsoleWindowClosed()
     {
         consoleWindowOpened = false;
+
     }
 
     public void MarkChatWindowClosed()
     {
         chatWindowOpened = false;
 
+    }
+
+    public Chat ChatUI()
+    {
+        return chatUI;
+    }
+
+    public ConsoleUI ConsoleUI()
+    {
+        return consoleUI;
     }
 
     public bool IsWindowOpen()

@@ -26,6 +26,11 @@ public class Inventory : MonoBehaviour
         keys.Add(key);
     }
 
+    public void Add(Key key)
+    {
+        keys.Add(key);
+    }
+
     public Key[] Keys()
     {
         return keys.ToArray();

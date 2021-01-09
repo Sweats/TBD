@@ -37,39 +37,50 @@ public class Key
         this.pathID = key.pathID;
     }
 
+    public Key (string keyName, int mask, KeyType type)
+    {
+        this.keyName = keyName;
+        this.mask = mask;
+        this.type = type;
+    }
+
+    public Key()
+    {
+
+    }
+
     public int Mask()
     {
         return mask;
 
     }
 
-
     public void SetTexture(Texture texture)
     {
-	    this.keyIcon = texture;
+        this.keyIcon = texture;
     }
 
     public string Name()
     {
-	    return keyName;
+        return keyName;
     }
 
 
     public int PathID()
     {
-	    return pathID;
+        return pathID;
     }
 
 
-    public  KeyType Type()
+    public KeyType Type()
     {
-	    return type;
+        return type;
     }
 
 
     public Texture Texture()
     {
-	    return keyIcon;
+        return keyIcon;
     }
 }
 

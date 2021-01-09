@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using Mirror;
 
 // this class stores the stuff we need to update the mesh itself. The actual key information will be stored in the class key.
-public class KeyObject : MonoBehaviour
+public class KeyObject : NetworkBehaviour
 {
     [SerializeField]
     private Key _key;
@@ -47,13 +48,15 @@ public class KeyObject : MonoBehaviour
     [SerializeField]
     private MeshCollider keyCollider;
 
-    void Start()
+    [Client]
+    private void Start()
     {
         noGlowTimer = maxTimerForGlow;
         keyRenderer.material.SetColor("_Color", glowOutlineColor);
     }
 
-    void Update()
+    [Client]
+    private void Update()
     {
         noGlowTimer -= Time.deltaTime * timeBetweenGlows;
 
@@ -95,14 +98,18 @@ public class KeyObject : MonoBehaviour
     public void Pickup()
     {
         pickedUp = true;
-	pickupSound.Play();
         Hide();
+    }
+
+    public void PlayPickupSound()
+    {
+        pickupSound.Play();
     }
 
     public void Hide()
     {
-	    keyRenderer.enabled = false;
-	    keyCollider.enabled = false;
+        keyRenderer.enabled = false;
+        keyCollider.enabled = false;
     }
 
     public void Show()
@@ -117,14 +124,22 @@ public class KeyObject : MonoBehaviour
 
     public void SetKey(Key key)
     {
-	    _key =  key;
+        _key = key;
     }
 
 
     public Texture Texture()
     {
-	    return keyIcon;
+        return keyIcon;
 
     }
+
+    /*
+    public override bool SerializeSyncVars(NetworkWriter writer, bool initialState) 
+    {
+
+
+    }
+    */
 }
 

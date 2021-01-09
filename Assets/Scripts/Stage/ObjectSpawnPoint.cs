@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
+using Mirror;
 
-public class ObjectSpawnPoint : MonoBehaviour
+public class ObjectSpawnPoint : NetworkBehaviour
 {
     [SerializeField]
     private Key[] keys;
 
-    void Start()
+    private void Start()
     {
         GetComponent<MeshRenderer>().enabled = false;
 
@@ -13,7 +14,7 @@ public class ObjectSpawnPoint : MonoBehaviour
 
     public Key[] Keys()
     {
-	    return keys;
+	      return keys;
     }
 
 }

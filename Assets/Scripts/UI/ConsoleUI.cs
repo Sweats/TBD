@@ -29,11 +29,13 @@ public class ConsoleUI : MonoBehaviour
         EventManager.playerConnectedEvent.AddListener(OnPlayerConnected);
         EventManager.playerDisconnectedEvent.AddListener(OnPlayerDisconnected);
         EventManager.survivorDeathEvent.AddListener(OnSurvivorDeath);
-        EventManager.survivorSendChatMessageEvent.AddListener(OnPlayerSentChatEvent);
+        EventManager.playerSentChatMessageEvent.AddListener(OnPlayerSentChatMessage);
+        EventManager.playerRecievedChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStage);
         EventManager.failedToLoadStageEvent.AddListener(OnFailedToLoadStage);
         EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
         EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
+        EventManager.playerChangedNameEvent.AddListener(OnPlayerChangedProfileName);
     }
 
 
@@ -60,7 +62,6 @@ public class ConsoleUI : MonoBehaviour
     {
         this.enabled = false;
         consoleCanvas.enabled = false;
-        EventManager.playerClosedConsoleEvent.Invoke();
         window.MarkConsoleWindowClosed();
         window.enabled = true;
         Cursor.lockState = CursorLockMode.Locked;
@@ -82,54 +83,33 @@ public class ConsoleUI : MonoBehaviour
     }
 
 
-    private void OnSurvivorDeath(Survivor survivor)
+    private void OnSurvivorDeath(string playerName)
     {
-        float x, y, z;
-        x = survivor.transform.position.x;
-        y = survivor.transform.position.y;
-        z = survivor.transform.position.z;
         stringBuilder.AppendLine();
-        string text = $"Survivor \"{survivor.name}\" died at {x} {y} {z}!";
+        string text = string.Empty;
         UpdateConsoleText(text);
     }
 
 
-    private void OnPlayerConnected(Survivor player)
+    private void OnPlayerConnected(string playerName)
     {
-        string text = $"Player \"{player.survivorName}\" has connected!";
-        UpdateConsoleText(text);
-
-    }
-
-
-    private void OnPlayerDisconnected(Survivor player)
-    {
-        string text = $"Player \"{player.survivorName}\" has disconnected!";
-        UpdateConsoleText(text);
-
-    }
-
-
-    private void OnSurvivorUnlockedDoor(Survivor survivor, Key key, Door door)
-    {
-        float x, y, z;
-        x = survivor.transform.position.x;
-        y = survivor.transform.position.y;
-        z = survivor.transform.position.z;
-        string text = $"Survivor \"{survivor.survivorName}\" has unlocked a door named \"{door.doorName}\" using an item named \"{key.Name()}\" at {x} {y} {z}!";
+        string text = $"Player {playerName} has connected!";
         UpdateConsoleText(text);
     }
 
-
-    private void OnPlayerSentChatEvent(ChatMessage chatMessage)
+    private void OnPlayerDisconnected(string playerName)
     {
-        string message = $"{chatMessage.survivorName}: {chatMessage.text}";
-        UpdateConsoleText(message);
-
+        string text = $"Player {playerName} has disconnected!";
+        UpdateConsoleText(text);
     }
 
+    private void OnSurvivorUnlockedDoor(string survivorName, string doorName, string keyName)
+    {
+        string text = $"Player {survivorName} used a {keyName} to unlock a {doorName}!";
+        UpdateConsoleText(text);
+    }
 
-    private void UpdateConsoleText(string newText)
+    public void UpdateConsoleText(string newText)
     {
         string timestamp = GetTimeStamp();
         stringBuilder.AppendLine($"{timestamp}: {newText}");
@@ -143,17 +123,9 @@ public class ConsoleUI : MonoBehaviour
     }
 
 
-    private void OnSurvivorPickedUpKey(Survivor survivor, Key key)
+    private void OnSurvivorPickedUpKey(string survivorName, string keyName)
     {
-        string keyName = key.Name();
-        float x, y, z;
-        x = survivor.transform.position.x;
-        y = survivor.transform.position.y;
-        z = survivor.transform.position.z;
-        string survivorName = survivor.survivorName;
-        string timestamp = GetTimeStamp();
-        string keyTypeName = Enum.GetName(typeof(KeyType), key.Type());
-        string text = $"Survivor \"{survivorName}\" picked up an item named \"{key}\" of type \"{keyTypeName}\" at {x} {y} {z}";
+        string text = $"Player {survivorName} picked up a {keyName}!";
         UpdateConsoleText(text);
 
     }
@@ -164,6 +136,23 @@ public class ConsoleUI : MonoBehaviour
         return currentDateTime.ToString("HH:mm:ss");
     }
 
+    private void OnPlayerRecievedChatMessage(string playerName, string message)
+    {
+        string text = $"{playerName}: {message}";
+        UpdateConsoleText(text);
+    }
+
+    private void OnPlayerSentChatMessage(string playerName, string message)
+    {
+        string text = $"{playerName}: {message}";
+        UpdateConsoleText(text);
+    }
+
+    private void OnPlayerChangedProfileName(string oldName, string newName)
+    {
+        string text = $"[Server]: {oldName} changed their name to {newName}.";
+        UpdateConsoleText(text);
+    }
 
     public void OnCommandEntered(string command)
     {

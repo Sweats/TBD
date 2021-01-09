@@ -11,13 +11,14 @@ public class GameMessages : MonoBehaviour
 
     // How long should a chat message appear for? 
     [SerializeField]
-    private float chatMessageAppearanceLength;
+    private float gameMessageAppearanceLength;
 
     [SerializeField]
     private InputField messagesBox;
 
     [SerializeField]
     private Canvas gameMessagesCanvas;
+
     private StringBuilder stringBuilder;
 
     void Start()
@@ -49,22 +50,22 @@ public class GameMessages : MonoBehaviour
         messagesBox.text = stringBuilder.ToString();
     }
 
-    private void OnSurvivorGrabbedKey(Survivor who, Key key)
+    private void OnSurvivorGrabbedKey(string survivorName, string keyName)
     {
-        string newMessage = $"{who.survivorName} picked up a {key.Name()}!";
+        string newMessage = $"{survivorName} picked up a {keyName}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnSurvivorUnlockedDoor(Survivor who, Key key, Door door)
+    private void OnSurvivorUnlockedDoor(string survivorName, string doorName, string keyName)
     {
-        string newMessage = $"{who.survivorName} used a {key.Name()} to unlock a {door.doorName}!";
+        string newMessage = $"{survivorName} used a {keyName} to unlock a {doorName}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
 
-    private void OnSurvivorDeath(Survivor who)
+    private void OnSurvivorDeath(string playerName)
     {
-        string newMessage = $"{who.survivorName} died!";
+        string newMessage = playerName;
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
@@ -88,15 +89,15 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnPlayerDisconnect(Survivor who)
+    private void OnPlayerDisconnect(string playerName)
     {
-        string newMessage = $"Player {who.survivorName} has left the game!";
+        string newMessage = $"Player {playerName} has disconnected!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnPlayerConnect(Survivor who)
+    private void OnPlayerConnect(string playerName)
     {
-        string newMessage = $"Player {who.survivorName} has connected!";
+        string newMessage = $"Player {playerName} has connected!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
@@ -130,7 +131,7 @@ public class GameMessages : MonoBehaviour
     {
         messages.Add(newMessage);
         UpdateChatText();
-        yield return new WaitForSeconds(chatMessageAppearanceLength);
+        yield return new WaitForSeconds(gameMessageAppearanceLength);
         messages.Remove(newMessage);
         UpdateChatText();
     }

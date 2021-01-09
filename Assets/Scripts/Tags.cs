@@ -28,4 +28,10 @@ public static class Tags
 
 	public static string OBJECT_SPAWN_POINT = "Object Spawn Point";
 
+
+	public static string SURVIVOR_SPAWN_POINT = "Survivor Spawn Point";
+
+	public static string MONSTER_SPAWN_POINT = "Monster Spawn Point";
+
+
 }

@@ -35,13 +35,15 @@ public class PlayerStatsUI : MonoBehaviour
     private void Start()
     {
         this.enabled = false;
-        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
+        //NOTE: Commented out because I'm working on the survivor networking stuff at the moment.
+        //EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
     }
 
     // TO DO: Make this a lot better?
     public void OnSurvivorPickedUpKey(Survivor survivor, Key key)
     {
-        int id = survivor.survivorID;
+        //uint id = survivor.SurvivorID();
+        uint id = 0;
         int keyType = (int)key.Type();
         Key[] keys = survivor.inventory.Keys();
         int rustyKeyCount = 0, metalKeyCount = 0, oldKeyCount = 0, silverKeyCount = 0;

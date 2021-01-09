@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Mirror;
 
-public class Trap : MonoBehaviour
+public class Trap : NetworkBehaviour
 {
     [SerializeField]
     private AudioSource trapSound;
@@ -10,6 +11,9 @@ public class Trap : MonoBehaviour
 
     [SerializeField]
     private float minTimer;
+
+    [SerializeField]
+    private float trapHitAmount;
 
     public float trapTimer;
 
@@ -47,7 +51,7 @@ public class Trap : MonoBehaviour
     public void Arm()
     {
         armed = true;
-	Unglow();
+        Unglow();
     }
 
     public bool Armed()
@@ -63,16 +67,21 @@ public class Trap : MonoBehaviour
     // For the Lurker monster.
     public void Glow()
     {
-	    Debug.Log("Glowing...");
+        Debug.Log("Glowing...");
         trapRenderer.material.SetColor("_Color", Color.white);
 
     }
 
     public void Unglow()
     {
-	    Debug.Log("Unglowing...");
+        Debug.Log("Unglowing...");
         trapRenderer.material.SetColor("_Color", originalColor);
 
+    }
+
+    public float HitAmount()
+    {
+        return trapHitAmount;
     }
 
 }

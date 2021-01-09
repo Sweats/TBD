@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Mirror;
 
-public class Battery : MonoBehaviour
+public class Battery : NetworkBehaviour
 {
     [SerializeField]
     private string name = "battery";
@@ -44,21 +45,24 @@ public class Battery : MonoBehaviour
     [SerializeField]
     private CapsuleCollider batteryCollider;
 
-
     private float defaultSpecular;
 
     private bool glowing = false;
 
-    void Start()
+    private int batteryID;
+
+    [Client]
+    private void Start()
     {
+        batteryID = Random.Range(0, 10000);
         noGlowTimer = maxTimerForGlow;
         //defaultSpecular = batteryRenderer.material.GetFloat("_Shininess");
         //batteryRenderer.material.SetColor("_Color", originalMeshColor);
 
     }
 
-    // Update is called once per frame
-    void Update()
+    [Client]
+    private void Update()
     {
         noGlowTimer -= Time.deltaTime * timeBetweenGlows;
 
@@ -130,7 +134,12 @@ public class Battery : MonoBehaviour
 
     public void Pickup()
     {
-        Destroy(this.gameObject);
+        NetworkServer.Destroy(this.gameObject);
+    }
+
+    public int BatteryID()
+    {
+        return batteryID;
     }
 
 

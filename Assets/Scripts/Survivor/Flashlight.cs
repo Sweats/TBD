@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Mirror;
 
 // we will use this at some point to tell other clients that we have toggeled the flashlight.
 
@@ -17,7 +18,8 @@ public class Flashlight : MonoBehaviour
     [SerializeField]
     private AudioSource flashlightToggleSound;
 
-    public float charge;
+    [SerializeField]
+    private float charge;
 
     private Light flashlightSource;
 
@@ -59,7 +61,6 @@ public class Flashlight : MonoBehaviour
     {
         flashlightSource.enabled = !flashlightSource.enabled;
         flashlightEnabled = !flashlightEnabled;
-        flashlightToggleSound.Play();
 
         if (flashlightDead)
         {
@@ -101,4 +102,13 @@ public class Flashlight : MonoBehaviour
         }
     }
 
+    public float Charge()
+    {
+        return charge;
+    }
+
+    public void PlayToggleSound()
+    {
+        flashlightToggleSound.Play();
+    }
 }
