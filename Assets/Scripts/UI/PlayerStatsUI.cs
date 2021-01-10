@@ -45,7 +45,7 @@ public class PlayerStatsUI : MonoBehaviour
         //uint id = survivor.SurvivorID();
         uint id = 0;
         int keyType = (int)key.Type();
-        Key[] keys = survivor.inventory.Keys();
+        Key[] keys = survivor.Items().Keys();
         int rustyKeyCount = 0, metalKeyCount = 0, oldKeyCount = 0, silverKeyCount = 0;
         int crowbarCount = 0, hammerCount = 0, codeCount = 0;
 

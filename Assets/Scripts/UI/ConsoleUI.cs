@@ -33,7 +33,7 @@ public class ConsoleUI : MonoBehaviour
         EventManager.playerRecievedChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStage);
         EventManager.failedToLoadStageEvent.AddListener(OnFailedToLoadStage);
-        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
+        EventManager.playerPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
         EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
         EventManager.playerChangedNameEvent.AddListener(OnPlayerChangedProfileName);
     }

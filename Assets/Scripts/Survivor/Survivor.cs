@@ -8,11 +8,23 @@ public class Survivor : NetworkBehaviour
     [SyncVar]
     private string playerName = "player";
 
+    [SyncVar]
+    public bool matchOver;
+
+    [SerializeField]
+    [SyncVar]
+    private bool isInEscapeRoom;
+
+    [SyncVar]
+    public bool dead;
+
     public Insanity insanity;
 
-    public Inventory inventory;
+    [SerializeField]
+    private Inventory inventory;
 
-    public Flashlight flashlight;
+    [SerializeField]
+    private Flashlight flashlight;
 
     [SerializeField]
     private AudioSource deathSound;
@@ -28,20 +40,21 @@ public class Survivor : NetworkBehaviour
     private Animator animator;
 
     [SerializeField]
-    [SyncVar]
     private float defaultSpeed;
 
     [SerializeField]
-    [SyncVar]
     private float sprintSpeed;
 
     [SerializeField]
-    [SyncVar]
     private float walkSpeed;
 
     [SerializeField]
-    [SyncVar]
     private float crouchSpeed;
+
+    private float currentSpeed;
+
+    [SerializeField]
+    private float doorPushStrength;
 
     private bool crouched;
 
@@ -67,15 +80,6 @@ public class Survivor : NetworkBehaviour
     private float trapDistance;
 
     private float xRotation;
-
-    [SyncVar]
-    public bool matchOver;
-
-    [SyncVar]
-    private bool isInEscapeRoom;
-
-    [SyncVar]
-    public bool dead;
 
     private Vector3 moving;
 
@@ -117,13 +121,13 @@ public class Survivor : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
-        EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
         EventManager.playerSentChatMessageEvent.AddListener(CmdOnPlayerSentMessage);
         EventManager.playerClientChangedNameEvent.AddListener(CmdOnPlayerChangedProfileNameEvent);
         Cursor.lockState = CursorLockMode.Locked;
         StartCoroutine(TrapDetectionRoutine());
-        playerName = Settings.PROFILE_NAME;
-        //EventManager.playerClientChangedNameEvent.AddListener(OnPlayerClientChangedProfileName);
+        isInEscapeRoom = false;
+        //playerName = Settings.PROFILE_NAME;
+        CmdSetName(playerName);
     }
 
     private void LateUpdate()
@@ -192,22 +196,21 @@ public class Survivor : NetworkBehaviour
         float z = Input.GetAxis("Vertical");
         Vector3 secondmove = transform.right * x + transform.forward * z;
         bool isMoving = moving != secondmove;
-        float speed;
 
         if (sprint.GetSprinting())
         {
             if (!isMoving)
             {
                 sprint.SetSprinting(false);
-                speed = defaultSpeed;
+                currentSpeed = defaultSpeed;
             }
 
-            speed = sprintSpeed;
+            currentSpeed = sprintSpeed;
         }
 
         else
         {
-            speed = defaultSpeed;
+            currentSpeed = defaultSpeed;
         }
 
         if (Keybinds.GetKey(Action.SwitchFlashlight))
@@ -217,7 +220,7 @@ public class Survivor : NetworkBehaviour
 
         else if (Keybinds.GetKey(Action.Crouch))
         {
-            speed = crouchSpeed;
+            currentSpeed = crouchSpeed;
             crouched = true;
         }
 
@@ -244,20 +247,20 @@ public class Survivor : NetworkBehaviour
 
         else if (Keybinds.GetKey(Action.Crouch, true))
         {
-            speed = defaultSpeed;
+            currentSpeed = defaultSpeed;
             crouched = false;
         }
 
         else if (Keybinds.GetKey(Action.Walk))
         {
-            speed = walkSpeed;
+            currentSpeed = walkSpeed;
             walking = true;
 
         }
 
         else if (Keybinds.GetKey(Action.Walk, true))
         {
-            speed = defaultSpeed;
+            currentSpeed = defaultSpeed;
             walking = false;
         }
 
@@ -267,7 +270,7 @@ public class Survivor : NetworkBehaviour
         }
 
 
-        controller.Move(secondmove * speed * Time.deltaTime);
+        controller.Move(secondmove * currentSpeed * Time.deltaTime);
 
     }
 
@@ -288,7 +291,7 @@ public class Survivor : NetworkBehaviour
 
                     if (trap.Armed())
                     {
-                        CmdTriggerTrap(trap.netIdentity);
+                        trap.CmdTriggerTrap();
                     }
                 }
             }
@@ -302,8 +305,6 @@ public class Survivor : NetworkBehaviour
 
         }
     }
-
-    // This routine is only started when a lurker has spawned in the stage. An event will be responsible for this.
 
     [Client]
     private void OnActionGrab()
@@ -319,19 +320,29 @@ public class Survivor : NetworkBehaviour
             if (gameObject.CompareTag(Tags.KEY))
             {
                 KeyObject keyObject = gameObject.GetComponent<KeyObject>();
-                CmdPlayerClickedOnKey(keyObject.netIdentity);
+                keyObject.CmdPlayerClickedOnKey();
             }
 
             else if (gameObject.CompareTag(Tags.DOOR))
             {
                 Door door = gameObject.GetComponent<Door>();
-                CmdPlayerClickedOnDoor(door.netIdentity);
+
+                if (!door.Unlocked())
+                {
+                    door.CmdPlayerClickedOnLockedDoor();
+                }
+
+                else
+                {
+                    //door.CmdPlayerClickedOnUnlockedDoor();
+
+                }
             }
 
             else if (gameObject.CompareTag(Tags.BATTERY))
             {
                 Battery battery = gameObject.GetComponent<Battery>();
-                CmdPlayerClickedOnBattery(battery.netIdentity);
+                battery.CmdPlayerClickedOnBattery();
             }
 
             else
@@ -347,66 +358,6 @@ public class Survivor : NetworkBehaviour
         RpcFlashlightToggle();
     }
 
-    [Command]
-    private void CmdPlayerClickedOnKey(NetworkIdentity keyObjectNetworkIdentity)
-    {
-        KeyObject foundKey = keyObjectNetworkIdentity.gameObject.GetComponent<KeyObject>();
-        int foundKeyMask = foundKey.Key().Mask();
-        Key[] keys = inventory.Keys();
-        bool found = false;
-
-        for (var i = 0; i < keys.Length; i++)
-        {
-            Key keyInInventory = keys[i];
-
-            if (foundKeyMask == keyInInventory.Mask())
-            {
-                found = true;
-                break;
-            }
-        }
-
-        if (found)
-        {
-            TargetPlayerAlreadyHasKey();
-            return;
-        }
-
-        string foundKeyName = foundKey.Key().Name();
-        string playerwhoPickedUpKey = playerName;
-        inventory.Add(foundKey.Key());
-        foundKey.Pickup();
-
-        if (isLocalPlayer)
-        {
-            playerwhoPickedUpKey = "You";
-            foundKey.PlayPickupSound();
-        }
-
-        PlayerPickedUpKeyMessage message = new PlayerPickedUpKeyMessage
-        {
-            playerName = playerwhoPickedUpKey,
-            keyName = foundKeyName
-        };
-
-        RpcPlayerPickedUpKey(message);
-
-    }
-
-    [TargetRpc]
-    private void TargetPlayerAlreadyHasKey()
-    {
-        EventManager.survivorAlreadyHasKeyEvent.Invoke();
-    }
-
-    [ClientRpc]
-    private void RpcPlayerPickedUpKey(PlayerPickedUpKeyMessage serverMessage)
-    {
-        string playerName = serverMessage.playerName;
-        string keyName = serverMessage.keyName;
-        EventManager.survivorPickedUpKeyEvent.Invoke(playerName, keyName);
-    }
-
     [ClientRpc]
     private void RpcFlashlightToggle()
     {
@@ -419,139 +370,9 @@ public class Survivor : NetworkBehaviour
     }
 
     [Command]
-    private void CmdPlayerClickedOnBattery(NetworkIdentity batteryNetworkIdentity)
-    {
-        Battery battery = batteryNetworkIdentity.gameObject.GetComponent<Battery>();
-
-        if (flashlight.Charge() <= battery.chargeNeededToGrab)
-        {
-            RpcPlayerPickedUpBattery(batteryNetworkIdentity);
-        }
-
-        else
-        {
-            TargetFailedToPickUpBattery();
-        }
-    }
-
-
-    [ClientRpc]
-    private void RpcPlayerPickedUpBattery(NetworkIdentity batteryNetworkIdentity)
-    {
-        Battery battery = batteryNetworkIdentity.gameObject.GetComponent<Battery>();
-        battery.Pickup();
-        flashlight.Recharge();
-        Debug.Log("A player has picked up a battery!");
-    }
-
-
-    [TargetRpc]
-    private void TargetFailedToPickUpBattery()
-    {
-        EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
-        
-    }
-
-    [Command]
-    private void CmdPlayerClickedOnDoor(NetworkIdentity doorNetworkIdentity)
-    {
-        Door door = doorNetworkIdentity.gameObject.GetComponent<Door>();
-        Key[] keys = inventory.Keys();
-        bool found = false;
-        int foundKeyIndex = 0;
-
-        for (var i = 0; i < keys.Length; i++)
-        {
-            int keyMask = keys[i].Mask();
-
-            if (door.UnlockMask() == keyMask)
-            {
-                found = true;
-                foundKeyIndex = i;
-                break;
-            }
-        }
-
-        if (found)
-        {
-            string foundKeyName = keys[foundKeyIndex].Name();
-
-            PlayerUnlockedDoorMessage unlockDoorMessage = new PlayerUnlockedDoorMessage
-            {
-                playerName = this.playerName,
-                doorName = door.Name(),
-                keyName = foundKeyName
-            };
-
-            RpcUnlockDoorMessage(unlockDoorMessage);
-            RpcUnlockDoor(doorNetworkIdentity);
-            return;
-        }
-
-        RpcFailedToUnlockDoor(doorNetworkIdentity);
-    }
-
-    [ClientRpc]
-    private void RpcUnlockDoorMessage(PlayerUnlockedDoorMessage serverMessage)
-    {
-        string playerName = serverMessage.playerName;
-        string doorName = serverMessage.doorName;
-        string keyName = serverMessage.keyName;
-
-        if (isLocalPlayer)
-        {
-            playerName = "You";
-        }
-
-        EventManager.survivorUnlockDoorEvent.Invoke(playerName, doorName, keyName);
-    }
-
-    [ClientRpc]
-    private void RpcUnlockDoor(NetworkIdentity doorNetworkIdentity)
-    {
-        Door door = doorNetworkIdentity.gameObject.GetComponent<Door>();
-        door.Unlock();
-
-        if (!isLocalPlayer)
-        {
-            return;
-        }
-
-        door.PlayUnlockedSound();
-    }
-
-    [ClientRpc]
-    private void RpcFailedToUnlockDoor(NetworkIdentity doorNetworkIdentity)
-    {
-        if (!isLocalPlayer)
-        {
-            return;
-        }
-
-        Door door = doorNetworkIdentity.gameObject.GetComponent<Door>();
-        door.PlayLockedSound();
-    }
-
-    [Command]
     public void Die()
     {
         RpcDie();
-    }
-
-
-    [Command]
-    private void CmdTriggerTrap(NetworkIdentity trapIdentity)
-    {
-        RpcTriggerTrap(trapIdentity);
-    }
-
-    [ClientRpc]
-    private void RpcTriggerTrap(NetworkIdentity trapIdentity)
-    {
-        Trap trap = trapIdentity.gameObject.GetComponent<Trap>();
-        trap.Trigger();
-        insanity.Increment(trap.HitAmount());
-        trap.PlaySound();
     }
 
     [ClientRpc]
@@ -577,14 +398,15 @@ public class Survivor : NetworkBehaviour
     [Command]
     private void CmdOnPlayerChangedProfileNameEvent(string oldName, string newName)
     {
+        playerName = newName;
         RpcPlayerChangedProfileName(oldName, newName);
     }
 
-    //[Client]
-    //private void OnPlayerClientChangedProfileName(string oldName, string newName)
-    //{
-    //    playerName = newName;
-    //}
+    [Command]
+    private void CmdSetName(string newPlayerName)
+    {
+        playerName = newPlayerName;
+    }
 
     [ClientRpc]
     private void RpcPlayerRecievedChatMessage(string playerName, string message)
@@ -628,19 +450,6 @@ public class Survivor : NetworkBehaviour
         flashlight.Show();
     }
 
-    [Command]
-    private void OnSurvivorsEscapedStageEvent()
-    {
-        RpcOnSurvivorsEscapedStageEvent();
-    }
-
-    [ClientRpc]
-    private void RpcOnSurvivorsEscapedStageEvent()
-    {
-        this.matchOver = true;
-        this.sprint.SetMatchOver(true);
-    }
-
     public string Name()
     {
         return playerName;
@@ -668,6 +477,33 @@ public class Survivor : NetworkBehaviour
         isInEscapeRoom = escaped;
     }
 
+    
+    [Client]
+    private void OnControllerColliderHit(ControllerColliderHit controllerColliderHit)
+    {
+        var gameObject = controllerColliderHit.gameObject;
+        string gameObjectTag = gameObject.tag;
 
+        if (gameObject.CompareTag(Tags.DOOR))
+        {
+            Door door = gameObject.GetComponent<Door>();
+
+            if (door.Unlocked())
+            {
+                door.PlayerHitDoor(controllerColliderHit, doorPushStrength);
+            }
+
+        }
+    }
+
+    public Flashlight Light() 
+    {
+        return flashlight;
+    }
+
+    public Inventory Items()
+    {
+        return inventory;
+    }
 
 }

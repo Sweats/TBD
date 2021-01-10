@@ -113,11 +113,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  _key:
-    keyName: 
-    mask: 0
-    type: 0
-    pathID: 0
+  keyName: 
+  mask: 0
+  type: 0
+  pathID: 0
   groupColor: {r: 0, g: 0, b: 0, a: 0}
   timeBetweenGlows: 45
   glowTimerLength: 115
@@ -127,7 +126,7 @@ MonoBehaviour:
   glowTimer: 0
   pickupSound: {fileID: 7618881199863961559}
   keyIcon: {fileID: 2800000, guid: 4a5d688cd5f4d9b4ab0679e8e4bddd74, type: 3}
-  glowOutlineColor: {r: 1, g: 0.65882355, b: 0.14901961, a: 1}
+  glowOutlineColor: {r: 1, g: 0, b: 0, a: 1}
   glowColor: {r: 1, g: 1, b: 1, a: 1}
   keyRenderer: {fileID: 5178968228491196101}
   keyCollider: {fileID: 5773317355448987542}
@@ -144,7 +143,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneId: 0
-  serverOnly: 1
+  serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
 --- !u!114 &7065921066825804839

@@ -20,6 +20,7 @@ public class Trap : NetworkBehaviour
     public float trapTimerRate;
 
     [SerializeField]
+
     [SyncVar]
     private bool armed;
 
@@ -90,4 +91,18 @@ public class Trap : NetworkBehaviour
         return trapHitAmount;
     }
 
+    [Command(ignoreAuthority=true)]
+    public void CmdTriggerTrap(NetworkConnectionToClient sender = null)
+    {
+        Survivor survivor = sender.identity.GetComponent<Survivor>();
+        survivor.insanity.Increment(trapHitAmount);
+        armed = false;
+        RpcTriggerTrap();
+    }
+
+    [ClientRpc]
+    private void RpcTriggerTrap()
+    {
+        trapSound.Play();
+    }
 }

@@ -3,6 +3,7 @@ using Mirror;
 
 public class Escape : NetworkBehaviour
 {
+    [Client]
     void OnTriggerEnter(Collider collider)
     {
         GameObject gameObject = collider.gameObject;
@@ -10,22 +11,21 @@ public class Escape : NetworkBehaviour
         if (gameObject.CompareTag(Tags.SURVIVOR))
         {
             Survivor survivor = gameObject.GetComponent<Survivor>();
-            CmdSurvivorEnteredEscapeRoom(survivor.netIdentity);
+            CmdSurvivorEnteredEscapeRoom();
         }
     }
 
-    [Command]
-    private void CmdSurvivorEnteredEscapeRoom(NetworkIdentity survivorIdentity)
+    [Command(ignoreAuthority=true)]
+    private void CmdSurvivorEnteredEscapeRoom(NetworkConnectionToClient sender = null)
     {
-        Survivor survivor = survivorIdentity.gameObject.GetComponent<Survivor>();
-        survivor.SetEscaped(true);
-
+        Survivor survivor = sender.identity.GetComponent<Survivor>();
         GameObject[] survivors = GameObject.FindGameObjectsWithTag(Tags.SURVIVOR);
-
-        bool canEscape = true;
+        survivor.SetEscaped(true);
+        int escapeCount = 0;
 
         for (var i = 0; i < survivors.Length; i++)
         {
+            Debug.Log($"Survivor escaped: {survivor.Escaped()} ");
             Survivor otherSurvivor = survivors[i].GetComponent<Survivor>();
 
             if (survivor.dead)
@@ -33,25 +33,25 @@ public class Escape : NetworkBehaviour
                 continue;
             }
 
-            if (!survivor.Escaped())
+            else if (survivor.Escaped())
             {
-                canEscape = false;
-                break;
+                escapeCount++;
             }
+
         }
 
-        if (canEscape)
+        Debug.Log($"{escapeCount}");
+
+        if (escapeCount >= survivors.Length)
         {
             RpcSurvivorsEscapedStageEvent();
         }
-
     }
 
-
-    [Command]
-    private void CmdSurviorLeftEscapeRoom(NetworkIdentity survivorIdentity)
+    [Command(ignoreAuthority=true)]
+    private void CmdSurviorLeftEscapeRoom(NetworkConnectionToClient sender = null)
     {
-        Survivor survivor = survivorIdentity.gameObject.GetComponent<Survivor>();
+        Survivor survivor = sender.identity.GetComponent<Survivor>();
         survivor.SetEscaped(false);
     }
 
@@ -70,7 +70,7 @@ public class Escape : NetworkBehaviour
         if (gameObject.CompareTag(Tags.SURVIVOR))
         {
             Survivor survivor = gameObject.GetComponent<Survivor>();
-            CmdSurviorLeftEscapeRoom(survivor.netIdentity);
+            CmdSurviorLeftEscapeRoom();
         }
     }
 }

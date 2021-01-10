@@ -3,12 +3,14 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
+    [SerializeField]
     private List<Key> keys;
+
     private Rect currentPosition;
 
     private Canvas inventoryCanvas;
 
-    void Start()
+    private void Start()
     {
         // TO DO: Get the size of the Keylist and 
         keys = new List<Key>();
@@ -18,11 +20,11 @@ public class Inventory : MonoBehaviour
             height = 30,
             width = 30
         };
+
     }
 
     public void Add(Key key, Texture keyIcon)
     {
-        key.SetTexture(keyIcon);
         keys.Add(key);
     }
 
@@ -41,19 +43,6 @@ public class Inventory : MonoBehaviour
         keys.Clear();
     }
 
-    public void Remove(Key key)
-    {
-        for (int i = 0; i < keys.Count; i++)
-        {
-            if (keys[i].Mask() == key.Mask())
-            {
-                keys.RemoveAt(i);
-                break;
-            }
-        }
-
-    }
-
     public void Draw()
     {
         int currentX = Screen.width - 20;
@@ -61,7 +50,7 @@ public class Inventory : MonoBehaviour
 
         for (var i = 0; i < keys.Count; i++)
         {
-            Texture itemIcon = keys[i].Texture();
+            //Texture itemIcon = keys[i].Texture();
 
             if (i % 8 == 0)
             {
@@ -72,10 +61,9 @@ public class Inventory : MonoBehaviour
 
             currentPosition.x = currentX;
             currentPosition.y = currentY;
-            GUI.DrawTexture(currentPosition, itemIcon);
+            //GUI.DrawTexture(currentPosition, itemIcon);
             currentY += 35;
 
         }
     }
-
 }

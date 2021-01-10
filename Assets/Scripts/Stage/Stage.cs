@@ -15,13 +15,7 @@ public class Stage : NetworkManager
     private int choosenKeyPath;
 
     [SerializeField]
-    private KeyObject keyPrefab;
-
-    [SerializeField]
     private GameObject batteryPrefab;
-
-
-    private ObjectSpawnPoint[] _objectSpawnPoints;
 
     private SurvivorSpawnPoint[] survivorSpawnPoints;
 
@@ -49,7 +43,6 @@ public class Stage : NetworkManager
     public override void OnStartServer()
     {
         base.OnStartServer();
-        SetObjectSpawnPoints();
         SetSurvivorSpawnPoints();
         ChoosePath();
         SpawnKeys();
@@ -111,127 +104,6 @@ public class Stage : NetworkManager
 
     }
 
-
-    /*
-     [Server]
-     private bool IsASurvivorAvailable()
-     {
-         bool available = true;
-
-         for (var i = 0; i < survivorPrefabs.Length; i++)
-         {
-             Survivor survivor = survivorPrefabs[i];
-
-             if (survivor.Dead() || survivor.Disconnected())
-             {
-                 continue;
-             }
-
-             available = false;
-         }
-
-         return available;
-     }
-
-
-     */
-
-
-    /*
-    [Server]
-    private void SpawnSurvivor(int survivorIndex)
-    {
-        bool anySurvivorsLeft = false;
-
-        for (var i = 0; i < survivors.Length; i++)
-        {
-            Survivor survivor = survivors[i];
-
-            if (survivor.Dead() || survivor.Disconnected())
-            {
-                continue;
-            }
-
-            anySurvivorsLeft = true;
-
-            for (var j = 0; j < survivorSpawnPoints.Length; j++)
-            {
-                SurvivorSpawnPoint survivorSpawnPoint = survivorSpawnPoints[j];
-
-                if (survivorSpawnPoint.Used())
-                {
-                    continue;
-                }
-
-                Survivor newSurvivor = Instantiate(survivors[i], survivorSpawnPoint.gameObject.transform.position, Quaternion.identity);
-                NetworkServer.Spawn(newSurvivor);
-            }
-        }
-
-        if (!anySurvivorsLeft)
-        {
-            //TODO: Offer the survivor the chance to spectate.
-        }
-    }
-    */
-
-    /*
-    [Server]
-    private void SpawnSurvivors()
-    {
-        // NOTE: Not sure if I want it so survivors are randomly spawned on certain spawn points or give each one its own unique spawn point.
-        //
-        GameObject[] gameObjects = GameObject.FindGameObjectsWithTag(Tags.SURVIVOR_SPAWN_POINT);
-    }
-    */
-
-
-    /*
-    [Server]
-    private void SpawnMonster(int monster)
-    {
-        GameObject[] gameObjects = GameObject.FindGameObjectsWithTag(Tags.MONSTER_SPAWN_POINT);
-        int choice = Random.Range(0, gameObjects.Length);
-
-        switch (monster)
-        {
-            case MONSTER_LURKER:
-                GameObject lurker = Instantiate(lurkerPrefab, gameObjects[choice].transform.position, Quaternion.identity);
-                NetworkServer.Spawn(lurker.gameObject);
-                break;
-            case MONSTER_PHANTOM:
-                GameObject phantom = Instantiate(phantomPrefab, gameObjects[choice].transform.position, Quaternion.identity);
-                NetworkServer.Spawn(phantomPrefab.gameObject);
-                break;
-            case MONSTER_MARY:
-                GameObject mary = Instantiate(maryPrefab, gameObjects[choice].transform.position, Quaternion.identity);
-                NetworkServer.Spawn(maryPrefab.gameObject);
-                break;
-            //case MONSTER_FALLEN:
-            //    fallenPrefab = Instantiate(fallenPrefab, gameObjects[choice].transform.position, Quaternion.identity );
-            //    break;
-            default:
-                break;
-        }
-    }
-    */
-
-    [Server]
-    private void SetObjectSpawnPoints()
-    {
-        GameObject[] gameObjects = GameObject.FindGameObjectsWithTag(Tags.OBJECT_SPAWN_POINT);
-        List<ObjectSpawnPoint> objectSpawnPoints = new List<ObjectSpawnPoint>();
-
-        for (var i = 0; i < gameObjects.Length; i++)
-        {
-            ObjectSpawnPoint spawnPoint = gameObjects[i].GetComponent<ObjectSpawnPoint>();
-            objectSpawnPoints.Add(spawnPoint);
-        }
-
-        _objectSpawnPoints = objectSpawnPoints.ToArray();
-    }
-
-
     [Server]
     private void SetSurvivorSpawnPoints()
     {
@@ -267,97 +139,104 @@ public class Stage : NetworkManager
     [Server]
     private void SpawnKeys()
     {
-        List<int> ignoreMaskList = new List<int>();
+        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag(Tags.KEY_SPAWN_POINT);
+        List<int> maskIgnoreList = new List<int>();
+        //List<KeySpawnPoint> spawnerList = new List<KeySpawnPoint>();
 
-        for (var i = 0; i < _objectSpawnPoints.Length; i++)
+        for (var i = 0; i < spawnPoints.Length; i++)
         {
-            ObjectSpawnPoint spawnPoint = _objectSpawnPoints[i];
-            Key[] keys = spawnPoint.Keys();
+            KeysAtSpawnPoint[] keysAtSpawnPoint = spawnPoints[i].GetComponent<KeySpawnPoint>().SpawnableKeysAtPoint();
 
-            for (var j = 0; j < keys.Length; j++)
+            for (var j = 0; j < keysAtSpawnPoint.Length; j++)
             {
-                Key key = keys[j];
-                int keyPathID = key.PathID();
-                int maskID = key.Mask();
+                KeysAtSpawnPoint spawnableKeys = keysAtSpawnPoint[j];
 
-                // TODO: How should we make it so we can have multiple keys of the same mask on the stage at a time?
-                // Only keys with a unique mask can be spawned. Any duplicates will be ignored.
-
-                bool ignore = ShouldIgnore(ignoreMaskList, maskID);
-
-                if (keyPathID == choosenKeyPath && !ignore)
+                if (spawnableKeys.pathID != choosenKeyPath)
                 {
-                    ignoreMaskList.Add(maskID);
-                    SpawnKey(key);
-
+                    continue;
                 }
+
+                bool ignore = Ignore(maskIgnoreList, spawnableKeys.mask);
+
+                if (ignore)
+                {
+                    Debug.Log($"Key with mask {spawnableKeys.mask} has already spawned! Skipping...");
+                    continue;
+                }
+
+                //spawnerList.Add(spawnPoints[i]);
+                Vector3 spawnLocation = GetRandomSpawnLocation(spawnPoints, spawnableKeys.mask);
+                maskIgnoreList.Add(spawnableKeys.mask);
+                SpawnKey(spawnableKeys, spawnLocation);
             }
         }
     }
 
 
     [Server]
-    private bool ShouldIgnore(List<int> ignoreMaskList, int maskID)
+    private bool Ignore(List<int> ignoreList, int maskID)
     {
         bool found = false;
 
-        for (var i = 0; i < ignoreMaskList.Count; i++)
+        for (var i = 0; i < ignoreList.Count; i++)
         {
-            int foundIgnoreMaskID = ignoreMaskList[i];
+            int ignoreListMask = ignoreList[i];
 
-            if (maskID == foundIgnoreMaskID)
+            if (maskID == ignoreListMask)
             {
                 found = true;
                 break;
             }
         }
 
-
         return found;
     }
 
-    [Server]
-    private void SpawnKey(Key key)
-    {
-        Debug.Log($"Key spawned mask = {key.Mask()} ");
-        ObjectSpawnPoint[] potentialSpawnPoints = GetSpawnPointsForKey(key);
-        int randomNumber = Random.Range(0, potentialSpawnPoints.Length);
-        ObjectSpawnPoint pickedSpawnPoint = potentialSpawnPoints[randomNumber];
-        KeyObject spawnedKeyObject = Instantiate(keyPrefab, pickedSpawnPoint.transform.position, Quaternion.identity);
-        spawnedKeyObject.SetKey(key);
-        NetworkServer.Spawn(spawnedKeyObject.gameObject);
-    }
 
     [Server]
-    private ObjectSpawnPoint[] GetSpawnPointsForKey(Key key)
+    private Vector3 GetRandomSpawnLocation(GameObject[] spawnPoints, int maskIdToSpawn)
     {
-        List<ObjectSpawnPoint> objectSpawnPoints = new List<ObjectSpawnPoint>();
+        List<Vector3> potentialKeySpawns = new List<Vector3>();
 
-        for (var i = 0; i < _objectSpawnPoints.Length; i++)
+        for (var i = 0; i < spawnPoints.Length; i++)
         {
-            ObjectSpawnPoint foundObjectSpawnPoint = _objectSpawnPoints[i];
-            Key[] keys = _objectSpawnPoints[i].Keys();
+            KeySpawnPoint spawnPointObject = spawnPoints[i].GetComponent<KeySpawnPoint>();
+            KeysAtSpawnPoint[] keysAtSpawnPoint = spawnPointObject.SpawnableKeysAtPoint();
 
-            for (var j = 0; j < keys.Length; j++)
+            for (var j = 0; j < keysAtSpawnPoint.Length; j++)
             {
-                Key foundKey = keys[j];
-                int foundKeyMaskID = foundKey.Mask();
-                int foundKeyPathID = foundKey.PathID();
+                KeysAtSpawnPoint spawnableKeys = keysAtSpawnPoint[j];
 
-                int keyPathID = key.PathID();
-                int keyMask = key.Mask();
-
-                if (foundKeyMaskID == keyMask && keyPathID == foundKeyPathID)
+                if (spawnableKeys.pathID == choosenKeyPath && spawnableKeys.mask == maskIdToSpawn)
                 {
-                    objectSpawnPoints.Add(foundObjectSpawnPoint);
+                    Vector3 spawnPointToAdd = spawnPoints[i].GetComponent<KeySpawnPoint>().transform.position;
+                    potentialKeySpawns.Add(spawnPointToAdd);
+                    break;
+
                 }
             }
         }
 
-        return objectSpawnPoints.ToArray();
+        int randomNumber = Random.Range(0, potentialKeySpawns.Count);
+        return potentialKeySpawns[randomNumber];
 
     }
 
+
+    [Server]
+    private void SpawnKey(KeysAtSpawnPoint spawner, Vector3 spawnPointPosition)
+    {
+        string keyName = spawner.keyName;
+        int pathID = spawner.pathID;
+        int mask = spawner.mask;
+        KeyType type = spawner.type;
+        GameObject keyPrefab = (GameObject)Resources.Load("Key");
+        KeyObject key = Instantiate(keyPrefab, spawnPointPosition, Quaternion.identity).GetComponent<KeyObject>();
+        key.SetMask(mask);
+        key.SetName(keyName);
+        key.SetType(type);
+        NetworkServer.Spawn(key.gameObject);
+    }
 
     [Server]
     private int GetMaxPaths()
@@ -365,3 +244,19 @@ public class Stage : NetworkManager
         return 0;
     }
 }
+
+    /*
+NOTE: When we get more prefabs, uncomment this.
+    private GameObject DetermineKeyType(KeyType type)
+    {
+        switch (type)
+        {
+            case KeyType.Rusty:
+                return (GameObject)Resources.Load("Key");
+            default:
+                break;
+        }
+
+    }
+    */
+    

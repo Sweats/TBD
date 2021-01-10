@@ -65,11 +65,10 @@ MonoBehaviour:
   - {fileID: 6692235084364240656, guid: 726d905e991b126139e10d59084c41d4, type: 3}
   - {fileID: 424282626034555676, guid: 924e4ad1b4ae4b4478759c05ab9f7e2c, type: 3}
   - {fileID: 5170028035910589657, guid: 7f8935340521d426780fc2df4c6f40fe, type: 3}
+  - {fileID: 5581115987714718923, guid: 01ca81388ae57934f89053f027448bc9, type: 3}
   batterySpawnChance: 0
   forcedPathID: 1
   choosenKeyPath: 0
-  keyPrefab: {fileID: 6692235084364240656, guid: 726d905e991b126139e10d59084c41d4,
-    type: 3}
   batteryPrefab: {fileID: 424282626034555676, guid: 924e4ad1b4ae4b4478759c05ab9f7e2c,
     type: 3}
 --- !u!114 &447196919649657876

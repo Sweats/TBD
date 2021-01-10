@@ -17,6 +17,7 @@ TagManager:
   - Phantom
   - Object Spawn Point
   - Survivor Spawn Point
+  - Key Spawn Point
   layers:
   - Default
   - TransparentFX

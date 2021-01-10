@@ -4,12 +4,6 @@
     public string text;
 }
 
-public struct PlayerPickedUpKeyMessage
-{
-    public string playerName;
-    public string keyName;
-}
-
 public struct PlayerUnlockedDoorMessage
 {
     public string playerName;
@@ -43,6 +37,12 @@ public struct PlayerChangedCharacterMessage
 public struct HostChangedStageSettingMessage
 {
     public int newSetting;
+}
+
+
+public struct PlayerAddKeyToInventoryMessage
+{
+    public KeyObject key;
 }
 
 #endregion

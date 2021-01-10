@@ -127,22 +127,46 @@ public class Battery : NetworkBehaviour
     }
 
     // For the Monsters.
-    [Command]
     public void Show()
     {
         batteryCollider.enabled = true;
         batteryRenderer.enabled = true;
     }
 
-    [Command]
-    public void Pickup()
-    {
-        NetworkServer.Destroy(this.gameObject);
-    }
-
     public int BatteryID()
     {
         return batteryID;
+    }
+
+    [Command(ignoreAuthority=true)]
+    public void CmdPlayerClickedOnBattery(NetworkConnectionToClient sender = null)
+    {
+        Survivor survivor = sender.identity.GetComponent<Survivor>();
+        Flashlight flashlight = survivor.Light();
+
+        if (flashlight.Charge() <= chargeNeededToGrab)
+        {
+            RpcPlayerPickedUpBattery();
+            NetworkServer.Destroy(this.gameObject);
+        }
+
+        else
+        {
+            TargetFailedToPickUpBattery();
+        }
+    }
+
+    [TargetRpc]
+    private void TargetFailedToPickUpBattery()
+    {
+        EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
+    }
+
+    [ClientRpc]
+    private void RpcPlayerPickedUpBattery()
+    {
+        Debug.Log("A survivor picked up a battery!");
+
     }
 
 

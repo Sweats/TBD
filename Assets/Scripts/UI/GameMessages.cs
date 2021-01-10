@@ -28,7 +28,7 @@ public class GameMessages : MonoBehaviour
 
         EventManager.survivorDeathEvent.AddListener(OnSurvivorDeath);
         EventManager.survivorFailedToPickUpBatteryEvent.AddListener(OnFailedToPickUpBatteryEvent);
-        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorGrabbedKey);
+        EventManager.playerPickedUpKeyEvent.AddListener(OnSurvivorGrabbedKey);
         EventManager.survivorPickedUpBatteryEvent.AddListener(OnPickedUpBatteryEvent);
         EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
         EventManager.playerConnectedEvent.AddListener(OnPlayerConnect);

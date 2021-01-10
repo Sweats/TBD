@@ -15,7 +15,16 @@ public class Door : NetworkBehaviour
     private int unlockMask = -1;
 
     [SerializeField]
+    [SyncVar]
     private string doorName = "door";
+
+    [SyncVar]
+    [SerializeField]
+    private bool unlocked;
+
+    [SyncVar]
+    [SerializeField]
+    private bool grabbed;
 
     [SerializeField]
     private AudioSource unlockedSound;
@@ -32,18 +41,30 @@ public class Door : NetworkBehaviour
     [SerializeField]
     private Color outlineColor = Color.yellow;
 
-    [SyncVar]
-    private bool locked;
-
     [SerializeField]
     private Renderer doorRenderer;
 
     [SerializeField]
     private BoxCollider doorCollider;
 
+    private Rigidbody doorRigidBody;
+
+    private HingeJoint doorJoint;
+
     private void Start()
     {
-        locked = true;
+        doorRigidBody = GetComponent<Rigidbody>();
+        doorJoint = GetComponent<HingeJoint>();
+
+        if (unlocked)
+        {
+            doorJoint.enableCollision = true;
+        }
+
+        else
+        {
+            doorJoint.enableCollision = false;
+        }
     }
 
     // for now we will play the locked sound in here. We may want to move it out at some point.
@@ -56,15 +77,6 @@ public class Door : NetworkBehaviour
     {
         unlockedSound.Play();
     }
-
-
-    public void Unlock()
-    {
-        locked = false;
-        doorRenderer.enabled = false;
-        doorCollider.enabled = false;
-    }
-
 
     // Hide from the Lurker and the Phantom.
     public void Hide()
@@ -81,16 +93,103 @@ public class Door : NetworkBehaviour
         doorCollider.enabled = true;
     }
 
+    public bool Unlocked()
+    {
+        return unlocked;
+    }
+
 
     public int UnlockMask()
     {
         return unlockMask;
     }
 
+    public bool Grabbed()
+    {
+        return grabbed;
+    }
+
+    [Command(ignoreAuthority = true)]
+    public void CmdPlayerClickedOnLockedDoor(NetworkConnectionToClient sender = null)
+    {
+        Survivor survivor = sender.identity.GetComponent<Survivor>();
+        Key[] keys = survivor.Items().Keys();
+        bool found = false;
+        int foundKeyIndex = 0;
+
+        for (var i = 0; i < keys.Length; i++)
+        {
+            int keyMask = keys[i].Mask();
+
+            if (this.unlockMask == keyMask)
+            {
+                found = true;
+                foundKeyIndex = i;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            string foundKeyName = keys[foundKeyIndex].Name();
+
+            PlayerUnlockedDoorMessage unlockDoorMessage = new PlayerUnlockedDoorMessage
+            {
+                playerName = survivor.Name(),
+                doorName = this.doorName,
+                keyName = foundKeyName
+            };
+
+            RpcUnlockDoorMessage(unlockDoorMessage);
+            unlocked = true;
+            return;
+        }
+
+        RpcFailedToUnlockDoor();
+    }
+
+    [ClientRpc]
+    private void RpcFailedToUnlockDoor()
+    {
+        lockedSound.Play();
+    }
+
+    [ClientRpc]
+    private void RpcUnlockDoorMessage(PlayerUnlockedDoorMessage serverMessage)
+    {
+        unlockedSound.Play();
+        doorJoint.enableCollision = true;
+        string playerName = serverMessage.playerName;
+        string doorName = serverMessage.doorName;
+        string keyName = serverMessage.keyName;
+        EventManager.survivorUnlockDoorEvent.Invoke(playerName, doorName, keyName);
+    }
+
+
+
     public string Name()
     {
         return doorName;
     }
+
+    [Client]
+    public void PlayerHitDoor(ControllerColliderHit hit, float pushStrength)
+    {
+        GameObject hitGameobject = hit.gameObject;
+        Vector3 newDoorMoveDirection = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
+        Vector3 velocity = newDoorMoveDirection * pushStrength;
+        CmdPlayerHitDoor(velocity);
+    }
+
+    [Command(ignoreAuthority=true)]
+    private void CmdPlayerHitDoor(Vector3 velocity)
+    {
+        RpcPlayerHitDoor(velocity);
+    }
+
+    [ClientRpc]
+    private void RpcPlayerHitDoor(Vector3 velocity)
+    {
+        doorRigidBody.AddForce(velocity);
+    }
 }
-
-

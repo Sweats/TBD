@@ -17,7 +17,7 @@ public static class EventManager
 
     public static SurvivorToggleFlashlightEvent survivorToggledFlashlightEvent;
 
-    public static SurvivorPickedUpKeyEvent survivorPickedUpKeyEvent = new SurvivorPickedUpKeyEvent();
+    public static PlayerPickedUpKeyEvent playerPickedUpKeyEvent = new PlayerPickedUpKeyEvent();
 
     public static PlayerSentChatMessageEvent playerSentChatMessageEvent = new PlayerSentChatMessageEvent();
 
@@ -55,7 +55,6 @@ public static class EventManager
 }
 
 
-
 #region Survivor_Events
 
 
@@ -68,8 +67,6 @@ public class SurvivorUnlockDoorEvent : UnityEvent<string, string, string> { }
 [System.Serializable]
 public class SurvivorFailedToUnlockDoorEvent : UnityEvent<Door> { }
 
-[System.Serializable]
-public class SurvivorPickedUpKeyEvent : UnityEvent<string, string> { }
 
 [System.Serializable]
 public class SurvivorPickedUpBatteryEvent : UnityEvent<Survivor, Battery> { }
@@ -178,9 +175,6 @@ public class MaryReadyToTeleportEvent : UnityEvent { }
 
 #region LOBBY_EVENTS
 
-//[System.Serializable]
-//public class ReturnToLobbyEvent: UnityEvent {}
-
 #endregion
 
 
@@ -204,10 +198,7 @@ public class PlayerChangedNameEvent: UnityEvent<string, string>{}
 
 public class PlayerClientChangedNameEvent: UnityEvent<string, string>{}
 
-#endregion
-
-
-
-#region WINDOW_EVENTS
+public class PlayerPickedUpKeyEvent : UnityEvent<string, string> { }
 
 #endregion
+

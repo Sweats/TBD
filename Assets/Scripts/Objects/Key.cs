@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public enum KeyType
 {
@@ -15,32 +15,22 @@ public enum KeyType
 public class Key
 {
     [SerializeField]
-    private string keyName = "Rusty Key";
+    private string keyName;
 
     [SerializeField]
     private int mask;
 
     [SerializeField]
-    private KeyType type;
-
-    [SerializeField]
     private int pathID;
 
-    private Texture keyIcon;
+    [SerializeField]
+    private KeyType type;
 
-
-    public Key(Key key)
-    {
-        this.keyName = key.keyName;
-        this.mask = key.mask;
-        this.type = key.type;
-        this.pathID = key.pathID;
-    }
-
-    public Key (string keyName, int mask, KeyType type)
+    public Key(string keyName, int mask, int pathID, KeyType type)
     {
         this.keyName = keyName;
         this.mask = mask;
+        this.pathID = pathID;
         this.type = type;
     }
 
@@ -49,38 +39,23 @@ public class Key
 
     }
 
-    public int Mask()
-    {
-        return mask;
-
-    }
-
-    public void SetTexture(Texture texture)
-    {
-        this.keyIcon = texture;
-    }
-
     public string Name()
     {
         return keyName;
     }
 
+    public int Mask()
+    {
+        return mask;
+    }
 
     public int PathID()
     {
         return pathID;
     }
 
-
     public KeyType Type()
     {
         return type;
     }
-
-
-    public Texture Texture()
-    {
-        return keyIcon;
-    }
 }
-

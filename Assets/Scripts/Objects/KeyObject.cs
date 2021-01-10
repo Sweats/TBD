@@ -1,12 +1,26 @@
 ﻿using UnityEngine;
 using Mirror;
 
-// this class stores the stuff we need to update the mesh itself. The actual key information will be stored in the class key.
 public class KeyObject : NetworkBehaviour
 {
     [SerializeField]
     [SyncVar]
-    private Key _key;
+    private string keyName;
+
+    [SerializeField]
+    [SyncVar]
+    private int mask;
+
+    [SerializeField]
+    [SyncVar]
+    private KeyType type;
+
+    [SerializeField]
+    [SyncVar]
+    private int pathID;
+
+    [SyncVar]
+    private bool pickedUp = false;
 
     [SerializeField]
     private Color groupColor;
@@ -28,7 +42,6 @@ public class KeyObject : NetworkBehaviour
     [SerializeField]
     private float glowTimer;
 
-    private bool pickedUp = false;
 
     [SerializeField]
     private AudioSource pickupSound;
@@ -48,6 +61,7 @@ public class KeyObject : NetworkBehaviour
 
     [SerializeField]
     private MeshCollider keyCollider;
+
 
     [Client]
     private void Start()
@@ -78,9 +92,16 @@ public class KeyObject : NetworkBehaviour
 
     }
 
-    public Key Key()
+    public KeyObject(string keyName, int mask, int pathID, KeyType type)
     {
-        return _key;
+        this.keyName = keyName;
+        this.mask = mask;
+        this.pathID = pathID;
+        this.type = type;
+    }
+
+    public KeyObject()
+    {
 
     }
 
@@ -122,12 +143,22 @@ public class KeyObject : NetworkBehaviour
         }
     }
 
-
-    public void SetKey(Key key)
+    public void SetName(string name)
     {
-        _key = key;
+        this.keyName = name;
+
     }
 
+    public void SetMask(int mask)
+    {
+        this.mask = mask;
+
+    }
+
+    public void SetType(KeyType type)
+    {
+        this.type = type;
+    }
 
     public Texture Texture()
     {
@@ -135,12 +166,69 @@ public class KeyObject : NetworkBehaviour
 
     }
 
-    /*
-    public override bool SerializeSyncVars(NetworkWriter writer, bool initialState) 
+    public int Mask()
     {
-
-
+        return mask;
     }
-    */
+
+    public int PathID()
+    {
+        return pathID;
+    }
+
+    public string Name()
+    {
+        return keyName;
+    }
+
+    public KeyType Type()
+    {
+        return type;
+    }
+
+    [Command(ignoreAuthority=true)]
+    public void CmdPlayerClickedOnKey(NetworkConnectionToClient sender = null)
+    {
+        Survivor survivor = sender.identity.GetComponent<Survivor>();
+        Inventory survivorInventory = survivor.Items();
+        Key[] keys = survivorInventory.Keys();
+        bool found = false;
+
+        for (var i = 0; i < keys.Length; i++)
+        {
+            Key keyInInventory = keys[i];
+
+            if (mask == keyInInventory.Mask())
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            TargetPlayerAlreadyHasKey();
+            return;
+        }
+
+        RpcAddKeyToInventory(sender.identity);
+    }
+
+    [ClientRpc]
+    private void RpcAddKeyToInventory(NetworkIdentity clientIdentity)
+    {
+        NetworkServer.Destroy(this.gameObject);
+        Survivor survivor = clientIdentity.GetComponent<Survivor>();
+        string playerName = survivor.Name();
+        Key key = new Key(keyName, mask, pathID, type);
+        survivor.Items().Add(key);
+        EventManager.playerPickedUpKeyEvent.Invoke(playerName, key.Name());
+    }
+
+    [TargetRpc]
+    private void TargetPlayerAlreadyHasKey()
+    {
+        EventManager.survivorAlreadyHasKeyEvent.Invoke();
+    }
 }
 
