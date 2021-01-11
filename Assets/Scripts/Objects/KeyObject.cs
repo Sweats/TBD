@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+using System.Collections;
 using Mirror;
+
 
 public class KeyObject : NetworkBehaviour
 {
@@ -190,11 +193,10 @@ public class KeyObject : NetworkBehaviour
     public void CmdPlayerClickedOnKey(NetworkConnectionToClient sender = null)
     {
         Survivor survivor = sender.identity.GetComponent<Survivor>();
-        Inventory survivorInventory = survivor.Items();
-        Key[] keys = survivorInventory.Keys();
+        var keys = survivor.Items();
         bool found = false;
 
-        for (var i = 0; i < keys.Length; i++)
+        for (var i = 0; i < keys.Count; i++)
         {
             Key keyInInventory = keys[i];
 
@@ -210,19 +212,25 @@ public class KeyObject : NetworkBehaviour
             TargetPlayerAlreadyHasKey();
             return;
         }
+        
+        Key key = new Key(keyName, mask, pathID, type);
+        keys.Add(key);
 
-        RpcAddKeyToInventory(sender.identity);
+        PlayerPickedUpKeyMessage playerPickedUpKeyMessage = new PlayerPickedUpKeyMessage
+        {
+            playerName = survivor.Name(),
+            keyName = key.Name()
+        };
+
+        RpcAddKeyToInventory(playerPickedUpKeyMessage);
+
+        NetworkServer.Destroy(this.gameObject);
     }
 
     [ClientRpc]
-    private void RpcAddKeyToInventory(NetworkIdentity clientIdentity)
+    private void RpcAddKeyToInventory(PlayerPickedUpKeyMessage serverMessage)
     {
-        NetworkServer.Destroy(this.gameObject);
-        Survivor survivor = clientIdentity.GetComponent<Survivor>();
-        string playerName = survivor.Name();
-        Key key = new Key(keyName, mask, pathID, type);
-        survivor.Items().Add(key);
-        EventManager.playerPickedUpKeyEvent.Invoke(playerName, key.Name());
+        EventManager.playerPickedUpKeyEvent.Invoke(serverMessage.playerName, serverMessage.keyName);
     }
 
     [TargetRpc]

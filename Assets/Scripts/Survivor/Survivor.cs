@@ -16,15 +16,13 @@ public class Survivor : NetworkBehaviour
     private bool isInEscapeRoom;
 
     [SyncVar]
+    [SerializeField]
+    readonly private SyncList<Key> keys = new SyncList<Key>();
+
+    [SyncVar]
     public bool dead;
 
     public Insanity insanity;
-
-    [SerializeField]
-    private Inventory inventory;
-
-    [SerializeField]
-    private Flashlight flashlight;
 
     [SerializeField]
     private AudioSource deathSound;
@@ -32,13 +30,11 @@ public class Survivor : NetworkBehaviour
     [SerializeField]
     private Sprint sprint;
 
-    [SerializeField]
-    private Camera survivorCamera;
-
     private CharacterController controller;
 
     private Animator animator;
 
+    [Header("Speed Settigs.")]
     [SerializeField]
     private float defaultSpeed;
 
@@ -53,8 +49,6 @@ public class Survivor : NetworkBehaviour
 
     private float currentSpeed;
 
-    [SerializeField]
-    private float doorPushStrength;
 
     private bool crouched;
 
@@ -62,6 +56,7 @@ public class Survivor : NetworkBehaviour
 
     private Rect crouchingAndWalkingIconPosition;
 
+    [Header("Camera Settings")]
     [SerializeField]
     private float minimumX;
 
@@ -69,17 +64,57 @@ public class Survivor : NetworkBehaviour
     private float maximumX;
 
     [SerializeField]
+    private Camera survivorCamera;
+
+    private float xRotation;
+
+    [Header("Physics Settings")]
+    [SerializeField]
     private float gravity;
+
+    [SerializeField]
+    private float doorPushStrength;
 
     private Vector3 velocity;
 
+    [Header("Distance Settings")]
     [SerializeField]
     private float grabDistance;
 
     [SerializeField]
     private float trapDistance;
 
-    private float xRotation;
+    [Header("Flashlight Settings")]
+    [SerializeField]
+    private float maxCharge;
+
+    [SerializeField]
+    private float minCharge;
+
+    [SerializeField]
+    private float dischargeRate;
+
+    [SerializeField]
+    private AudioSource flashlightToggleSound;
+
+    [SerializeField]
+    private Light flashlight;
+
+    [SerializeField]
+    [SyncVar(hook = nameof(SurvivorFlashlightChargeChanged))]
+    private float charge;
+
+    [SyncVar(hook = nameof(SurvivorToggledFlashlight))]
+    [SerializeField]
+    private bool toggled;
+
+    [SyncVar]
+    [SerializeField]
+    private bool flashlightDead;
+
+    private Light flashlightSource;
+
+    private IEnumerator flashlightRoutine;
 
     private Vector3 moving;
 
@@ -104,17 +139,15 @@ public class Survivor : NetworkBehaviour
             controller.enabled = false;
             windows.enabled = false;
             this.insanity.enabled = false;
-            this.inventory.enabled = false;
             return;
         }
-
     }
 
     public override void OnStartClient()
     {
         if (!isLocalPlayer)
         {
-            EventManager.playerConnectedEvent.Invoke(playerName);
+           EventManager.playerConnectedEvent.Invoke(playerName);
         }
 
     }
@@ -125,8 +158,9 @@ public class Survivor : NetworkBehaviour
         EventManager.playerClientChangedNameEvent.AddListener(CmdOnPlayerChangedProfileNameEvent);
         Cursor.lockState = CursorLockMode.Locked;
         StartCoroutine(TrapDetectionRoutine());
-        isInEscapeRoom = false;
-        //playerName = Settings.PROFILE_NAME;
+        flashlightRoutine = FlashlightRoutine();
+        StartCoroutine(flashlightRoutine);
+        playerName = Settings.PROFILE_NAME;
         CmdSetName(playerName);
     }
 
@@ -215,7 +249,7 @@ public class Survivor : NetworkBehaviour
 
         if (Keybinds.GetKey(Action.SwitchFlashlight))
         {
-            CmdFlashlightToggle();
+            CmdToggleFlashlight();
         }
 
         else if (Keybinds.GetKey(Action.Crouch))
@@ -352,22 +386,6 @@ public class Survivor : NetworkBehaviour
         }
     }
 
-    [Command]
-    private void CmdFlashlightToggle()
-    {
-        RpcFlashlightToggle();
-    }
-
-    [ClientRpc]
-    private void RpcFlashlightToggle()
-    {
-        flashlight.Toggle();
-
-        if (isLocalPlayer)
-        {
-            flashlight.PlayToggleSound();
-        }
-    }
 
     [Command]
     public void Die()
@@ -433,7 +451,6 @@ public class Survivor : NetworkBehaviour
     private void TargetHide()
     {
         survivorRenderer.enabled = false;
-        flashlight.Hide();
     }
 
     // NOTE: Called if the player is the Lurker.
@@ -447,7 +464,6 @@ public class Survivor : NetworkBehaviour
     private void TargetShow()
     {
         survivorRenderer.enabled = true;
-        flashlight.Show();
     }
 
     public string Name()
@@ -496,14 +512,83 @@ public class Survivor : NetworkBehaviour
         }
     }
 
-    public Flashlight Light() 
+
+    public SyncList<Key> Items()
     {
-        return flashlight;
+        return keys;
     }
 
-    public Inventory Items()
+    [Client]
+    private IEnumerator FlashlightRoutine()
     {
-        return inventory;
+        while (true)
+        {
+            if (toggled && !flashlightDead)
+            {
+                CmdUpdateFlashlight();
+            }
+
+            else if (matchOver || dead)
+            {
+                yield break;
+            }
+
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    [Command]
+    private void CmdUpdateFlashlight()
+    {
+        charge -= dischargeRate;
+        
+        if (charge <= minCharge)
+        {
+            charge = minCharge;
+            flashlightDead = true;
+        }
+    }
+
+    [Command]
+    public void CmdToggleFlashlight()
+    {
+        toggled = !toggled;
+    }
+
+    [Client]
+    private void SurvivorToggledFlashlight(bool oldToggle, bool newToggle) 
+    {
+        flashlightToggleSound.Play();
+        flashlight.enabled = toggled;
+    }
+
+    [Client]
+    private void SurvivorFlashlightChargeChanged(float oldValue, float newValue)
+    {
+        flashlight.intensity = newValue;
+    }
+
+    public float FlashlightCharge()
+    {
+        return charge;
+    }
+
+    public bool FlashlightToggled()
+    {
+        return toggled;
+    }
+
+    public bool FlashlightDead()
+    {
+        return flashlightDead;
+    }
+
+    [Command]
+    public void RechargeFlashlight()
+    {
+        charge = maxCharge;
+        flashlightSource.intensity = maxCharge;
+        flashlightDead = false;
     }
 
 }

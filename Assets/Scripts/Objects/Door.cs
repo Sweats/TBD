@@ -113,11 +113,11 @@ public class Door : NetworkBehaviour
     public void CmdPlayerClickedOnLockedDoor(NetworkConnectionToClient sender = null)
     {
         Survivor survivor = sender.identity.GetComponent<Survivor>();
-        Key[] keys = survivor.Items().Keys();
+        var keys = survivor.Items();
         bool found = false;
         int foundKeyIndex = 0;
 
-        for (var i = 0; i < keys.Length; i++)
+        for (var i = 0; i < keys.Count; i++)
         {
             int keyMask = keys[i].Mask();
 

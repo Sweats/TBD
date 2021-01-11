@@ -45,11 +45,11 @@ public class PlayerStatsUI : MonoBehaviour
         //uint id = survivor.SurvivorID();
         uint id = 0;
         int keyType = (int)key.Type();
-        Key[] keys = survivor.Items().Keys();
+        var keys = survivor.Items();
         int rustyKeyCount = 0, metalKeyCount = 0, oldKeyCount = 0, silverKeyCount = 0;
         int crowbarCount = 0, hammerCount = 0, codeCount = 0;
 
-        for (var i = 0; i < keys.Length; i++)
+        for (var i = 0; i < keys.Count; i++)
         {
             Key currentKey = keys[i];
             int type = (int)currentKey.Type();

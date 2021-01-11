@@ -142,11 +142,10 @@ public class Battery : NetworkBehaviour
     public void CmdPlayerClickedOnBattery(NetworkConnectionToClient sender = null)
     {
         Survivor survivor = sender.identity.GetComponent<Survivor>();
-        Flashlight flashlight = survivor.Light();
 
-        if (flashlight.Charge() <= chargeNeededToGrab)
+        if (survivor.FlashlightCharge() <= chargeNeededToGrab)
         {
-            RpcPlayerPickedUpBattery();
+            survivor.RechargeFlashlight();
             NetworkServer.Destroy(this.gameObject);
         }
 

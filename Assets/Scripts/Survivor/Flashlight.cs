@@ -23,15 +23,21 @@ public class Flashlight : MonoBehaviour
 
     private Light flashlightSource;
 
-    private bool flashlightDead = false;
+    private bool flashlightDead;
 
-    // May seem like an unneeded variable but this is used for the Lurker. We don't want to accidentally show the flashlight to the Lurker if the survivor has their actual flashlight off.
-    private bool flashlightEnabled = true;
+    private bool toggled;
 
     private IEnumerator flashlightRoutine;
 
-    void Start()
+    public Flashlight(float charge, float intensity, bool toggled, bool dead)
     {
+
+    }
+
+    public void ClientStart()
+    {
+        toggled = true;
+        flashlightDead = false;
         flashlightSource = GetComponent<Light>();
         flashlightRoutine = FlashlightRoutine();
         StartCoroutine(flashlightRoutine);
@@ -60,23 +66,33 @@ public class Flashlight : MonoBehaviour
     public void Toggle()
     {
         flashlightSource.enabled = !flashlightSource.enabled;
-        flashlightEnabled = !flashlightEnabled;
+        toggled = !toggled;
 
         if (flashlightDead)
         {
             return;
         }
 
-        if (flashlightEnabled && charge > minCharge)
+        if (toggled && charge > minCharge)
         {
             StartCoroutine(flashlightRoutine);
         }
 
-        else if (!flashlightEnabled && charge > minCharge)
+        else if (!toggled && charge > minCharge)
         {
             StopCoroutine(flashlightRoutine);
         }
 
+    }
+
+    public bool Toggled()
+    {
+        return toggled;
+    }
+
+    public bool Dead()
+    {
+        return flashlightDead;
     }
 
     public void Recharge()
@@ -95,7 +111,7 @@ public class Flashlight : MonoBehaviour
     // For the Monsters
     public void Show()
     {
-        if (flashlightEnabled)
+        if (toggled)
         {
             flashlightSource.enabled = true;
 
@@ -111,4 +127,30 @@ public class Flashlight : MonoBehaviour
     {
         flashlightToggleSound.Play();
     }
+}
+
+namespace FlashlightExtension
+{
+    public static class FlashlightCustomExtension
+    {
+        public static void WriteFlashlight(this NetworkWriter writer, Flashlight value)
+        {
+            writer.WriteSingle(value.Charge());
+            writer.WriteSingle(value.Charge());
+            writer.WriteBoolean(value.Toggled());
+            writer.WriteBoolean(value.Dead());
+        }
+
+        public static Flashlight ReadFlashlight(this NetworkReader reader)
+        {
+            float charge = reader.ReadSingle();
+            float intensity = reader.ReadSingle();
+            bool toggled = reader.ReadBoolean();
+            bool dead = reader.ReadBoolean();
+            return new Flashlight(charge, intensity, toggled, dead);
+
+        }
+
+    }
+
 }

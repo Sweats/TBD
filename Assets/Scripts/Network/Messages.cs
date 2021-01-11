@@ -11,6 +11,12 @@ public struct PlayerUnlockedDoorMessage
     public string keyName;
 }
 
+public struct PlayerPickedUpKeyMessage
+{
+    public string playerName;
+    public string keyName;
+}
+
 public struct PlayerConnectMessage
 {
     public string playerName;

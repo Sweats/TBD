@@ -8,7 +8,6 @@ public class Inventory : MonoBehaviour
 
     private Rect currentPosition;
 
-    private Canvas inventoryCanvas;
 
     private void Start()
     {
