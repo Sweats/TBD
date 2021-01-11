@@ -1,59 +1,71 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections;
-using UnityEngine;
+﻿using UnityEngine;
+using Mirror;
 
-public class DarnedObject : MonoBehaviour
+public class DarnedObject : NetworkBehaviour
 {
 
     [SerializeField]
     private bool physicsEnabled;
 
     [SerializeField]
-    private float gravity;
-
-    [SerializeField]
     private float mass;
 
     private bool grabbed;
 
-    public enum DarnedObjectType
+    private GameObject playerGrabbingObject;
+
+
+    [SerializeField]
+    private float grabStrength;
+
+    private Quaternion lookRotation;
+
+    private Rigidbody rigidBody;
+
+    [SyncVar]
+    private Vector3 velocity;
+
+    private void Update()
     {
-        None = 0,
-        Key,
-        Door,
-        Misc
+        if (!grabbed)
+        {
+            return;
+        }
+
+        velocity = (playerGrabbingObject.transform.position - rigidBody.position) * grabStrength;
+        CmdVelocity(velocity);
+    }
+
+    [Command(ignoreAuthority=true)]
+    private void CmdVelocity(Vector3 velocity)
+    {
+        rigidBody.velocity = velocity;
+
     }
     
-
-    private Rigidbody rigidbody;
-
-    void Start()
+    private void Start()
     {
-        rigidbody = GetComponent<Rigidbody>();
-
-        if (gravity > 0)
-        {
-            rigidbody.useGravity = true;
-        }
-        
+        rigidBody = GetComponent<Rigidbody>();
     }
-    public void Grab()
-    {
-        grabbed = true;
 
+    public void Grab(GameObject playerGrabbingObject)
+    {
+        this.playerGrabbingObject = playerGrabbingObject;
+        grabbed = true;
+        rigidBody.useGravity = false;
     }
 
     public void Drop()
     {
         grabbed = false;
+        this.playerGrabbingObject = null;
+        rigidBody.useGravity = true;
     }
 
-
-    public void Handle()
+    public bool Grabbed()
     {
+        return grabbed;
 
     }
-    
 }
 

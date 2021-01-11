@@ -29,5 +29,7 @@ public static class Tags
 
 	public static string MONSTER_SPAWN_POINT = "Monster Spawn Point";
 
+	public static string DARNED_OJBECT = "Darned Object";
+
 
 }

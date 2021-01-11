@@ -118,6 +118,12 @@ public class Survivor : NetworkBehaviour
 
     private Vector3 moving;
 
+    [SerializeField]
+    private bool grabbingAnObject;
+
+    [SerializeField]
+    private DarnedObject grabbedObject;
+
     // NOTE: Did someone join and then disconnect and die?
     private bool disconnected;
 
@@ -127,6 +133,8 @@ public class Survivor : NetworkBehaviour
     [SerializeField]
     private Windows windows;
 
+    [SerializeField]
+    private GameObject hand;
 
     private void Start()
     {
@@ -199,6 +207,7 @@ public class Survivor : NetworkBehaviour
         transform.Rotate(Vector3.up * mouseX);
         survivorCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
         flashlight.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        //hand.transform.RotateAround(survivorCamera.transform.position, Vector3.up, 20 * Time.deltaTime);
     }
 
     private void Update()
@@ -303,6 +312,14 @@ public class Survivor : NetworkBehaviour
             OnActionGrab();
         }
 
+        else if (Keybinds.GetKey(Action.Grab, true))
+        {
+            if (grabbingAnObject)
+            {
+                grabbedObject.Drop();
+            }
+        }
+
 
         controller.Move(secondmove * currentSpeed * Time.deltaTime);
 
@@ -379,9 +396,25 @@ public class Survivor : NetworkBehaviour
                 battery.CmdPlayerClickedOnBattery();
             }
 
-            else
+            else if (gameObject.CompareTag(Tags.DARNED_OJBECT))
             {
-                // TO DO: add in non important objects in here.
+                grabbedObject = gameObject.GetComponent<DarnedObject>();
+                float distanceFromObject = Vector3.Distance(grabbedObject.transform.position, this.transform.position);
+
+                if (distanceFromObject > grabDistance)
+                {
+                    return;
+                }
+
+                //TODO: Test this with multiple people.
+                //This should hit if someone else is already grabbing the object.
+                //
+                if (grabbedObject.Grabbed())
+                {
+                    return;
+                }
+                grabbedObject.Grab(hand);
+                grabbingAnObject = true;
             }
         }
     }
