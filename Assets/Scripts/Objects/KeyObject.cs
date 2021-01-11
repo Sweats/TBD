@@ -192,6 +192,12 @@ public class KeyObject : NetworkBehaviour
     [Command(ignoreAuthority=true)]
     public void CmdPlayerClickedOnKey(NetworkConnectionToClient sender = null)
     {
+        StartCoroutine(PlayerClickedOnKeyRoutine(sender));
+    }
+
+    [Server]
+    private IEnumerator PlayerClickedOnKeyRoutine(NetworkConnectionToClient sender)
+    {
         Survivor survivor = sender.identity.GetComponent<Survivor>();
         var keys = survivor.Items();
         bool found = false;
@@ -210,7 +216,7 @@ public class KeyObject : NetworkBehaviour
         if (found)
         {
             TargetPlayerAlreadyHasKey();
-            return;
+            yield break;
         }
         
         Key key = new Key(keyName, mask, pathID, type);
@@ -222,13 +228,18 @@ public class KeyObject : NetworkBehaviour
             keyName = key.Name()
         };
 
-        RpcAddKeyToInventory(playerPickedUpKeyMessage);
+        RpcPlayerPickedUpKeyMessage(playerPickedUpKeyMessage);
 
+        //NOTE: We need to skip a frame or else the RPC will never get sent! 
+        //Good thing that I was able to look at the mirror examples on github...
+
+        yield return null;
         NetworkServer.Destroy(this.gameObject);
+
     }
 
     [ClientRpc]
-    private void RpcAddKeyToInventory(PlayerPickedUpKeyMessage serverMessage)
+    private void RpcPlayerPickedUpKeyMessage(PlayerPickedUpKeyMessage serverMessage)
     {
         EventManager.playerPickedUpKeyEvent.Invoke(serverMessage.playerName, serverMessage.keyName);
     }

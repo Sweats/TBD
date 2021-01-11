@@ -201,7 +201,7 @@ public class Survivor : NetworkBehaviour
         flashlight.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
     }
 
-    void Update()
+    private void Update()
     {
         if (!isLocalPlayer)
         {
