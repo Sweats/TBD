@@ -18,11 +18,11 @@ public class Door : NetworkBehaviour
     [SyncVar]
     private string doorName = "door";
 
-    [SyncVar]
+    [SyncVar(hook = nameof(HookSurvivorUnlockedDoor))]
     [SerializeField]
     private bool unlocked;
 
-    [SyncVar]
+    [SyncVar(hook = nameof(HookSurvivorGrabbedDoor))]
     [SerializeField]
     private bool grabbed;
 
@@ -51,6 +51,9 @@ public class Door : NetworkBehaviour
 
     private HingeJoint doorJoint;
 
+    private GameObject playerGrabDoorObject;
+
+    [ServerCallback]
     private void Start()
     {
         doorRigidBody = GetComponent<Rigidbody>();
@@ -59,60 +62,43 @@ public class Door : NetworkBehaviour
         if (unlocked)
         {
             doorJoint.enableCollision = true;
+            doorRigidBody.detectCollisions = true;
         }
 
         else
         {
             doorJoint.enableCollision = false;
+            //doorRigidBody.detectCollisions = false;
         }
     }
 
-    // for now we will play the locked sound in here. We may want to move it out at some point.
-    public void PlayLockedSound()
+    /*
+    [Server]
+    private void Update()
     {
-        lockedSound.Play();
+        if (!grabbed)
+        {
+            return;
+        }
+
+        Transform position = playerGrabDoorObject.transform.position;
+        Transform doorPosition = this.transform.position;
+
     }
+    */
 
-    public void PlayUnlockedSound()
-    {
-        unlockedSound.Play();
-    }
-
-    // Hide from the Lurker and the Phantom.
-    public void Hide()
-    {
-        doorRenderer.enabled = false;
-        doorCollider.enabled = false;
-    }
-
-
-    // Called for the Lurker monster. Later we will want to change it so doors behave like they do in the other game.
-    public void Show()
-    {
-        doorRenderer.enabled = true;
-        doorCollider.enabled = true;
-    }
-
-    public bool Unlocked()
-    {
-        return unlocked;
-    }
-
-
-    public int UnlockMask()
-    {
-        return unlockMask;
-    }
-
-    public bool Grabbed()
-    {
-        return grabbed;
-    }
-
-    [Command(ignoreAuthority = true)]
+    [Command(ignoreAuthority=true)]
     public void CmdPlayerClickedOnLockedDoor(NetworkConnectionToClient sender = null)
     {
         Survivor survivor = sender.identity.GetComponent<Survivor>();
+
+        //NOTE: If null, it must be a monster
+        if (survivor == null)
+        {
+            RpcFailedToUnlockDoor();
+            return;
+        }
+
         var keys = survivor.Items();
         bool found = false;
         int foundKeyIndex = 0;
@@ -148,48 +134,79 @@ public class Door : NetworkBehaviour
         RpcFailedToUnlockDoor();
     }
 
-    [ClientRpc]
-    private void RpcFailedToUnlockDoor()
+    [Command(ignoreAuthority = true)]
+    public void CmdPlayerHitDoor(Vector3 moveDirection, float pushStrength)
     {
-        lockedSound.Play();
+        if (unlocked)
+        {
+            Vector3 newMoveDirection = new Vector3(moveDirection.x, 0, moveDirection.z);
+            Vector3 velocity = newMoveDirection * pushStrength;
+            doorRigidBody.AddForce(velocity);
+        }
     }
 
     [ClientRpc]
     private void RpcUnlockDoorMessage(PlayerUnlockedDoorMessage serverMessage)
     {
-        unlockedSound.Play();
-        doorJoint.enableCollision = true;
         string playerName = serverMessage.playerName;
         string doorName = serverMessage.doorName;
         string keyName = serverMessage.keyName;
         EventManager.survivorUnlockDoorEvent.Invoke(playerName, doorName, keyName);
     }
 
+    [ClientRpc]
+    private void RpcFailedToUnlockDoor()
+    {
+        lockedSound.Play();
+    }
 
+    [Client]
+    private void HookSurvivorUnlockedDoor(bool oldValue, bool newValue)
+    {
+        unlockedSound.Play();
+        doorJoint.enableCollision = newValue;
+        doorRigidBody.detectCollisions = newValue;
+    }
+
+
+    [Client]
+    private void HookSurvivorGrabbedDoor(bool oldValue, bool newValue)
+    {
+        doorJoint.enableCollision = newValue;
+        doorRigidBody.detectCollisions = newValue;
+    }
+
+    public void Hide()
+    {
+        doorRenderer.enabled = false;
+        doorCollider.enabled = false;
+    }
+
+    //NOTE: Lurker
+    public void Show()
+    {
+        doorRenderer.enabled = true;
+        doorCollider.enabled = true;
+    }
+
+    public bool Unlocked()
+    {
+        return unlocked;
+    }
+
+
+    public int UnlockMask()
+    {
+        return unlockMask;
+    }
+
+    public bool Grabbed()
+    {
+        return grabbed;
+    }
 
     public string Name()
     {
         return doorName;
-    }
-
-    [Client]
-    public void PlayerHitDoor(ControllerColliderHit hit, float pushStrength)
-    {
-        GameObject hitGameobject = hit.gameObject;
-        Vector3 newDoorMoveDirection = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
-        Vector3 velocity = newDoorMoveDirection * pushStrength;
-        CmdPlayerHitDoor(velocity);
-    }
-
-    [Command(ignoreAuthority=true)]
-    private void CmdPlayerHitDoor(Vector3 velocity)
-    {
-        RpcPlayerHitDoor(velocity);
-    }
-
-    [ClientRpc]
-    private void RpcPlayerHitDoor(Vector3 velocity)
-    {
-        doorRigidBody.AddForce(velocity);
     }
 }

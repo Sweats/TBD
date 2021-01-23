@@ -136,6 +136,10 @@ public class Survivor : NetworkBehaviour
     [SerializeField]
     private GameObject hand;
 
+    private Vector3 mPrevPos = Vector3.zero;
+
+    private Vector3 mPosDelta = Vector3.zero;
+
     private void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -155,7 +159,7 @@ public class Survivor : NetworkBehaviour
     {
         if (!isLocalPlayer)
         {
-           EventManager.playerConnectedEvent.Invoke(playerName);
+            EventManager.playerConnectedEvent.Invoke(playerName);
         }
 
     }
@@ -316,7 +320,7 @@ public class Survivor : NetworkBehaviour
         {
             if (grabbingAnObject)
             {
-                grabbedObject.Drop();
+                grabbedObject.CmdDrop();
             }
         }
 
@@ -353,7 +357,6 @@ public class Survivor : NetworkBehaviour
             }
 
             yield return new WaitForSeconds(0.5f);
-
         }
     }
 
@@ -381,12 +384,7 @@ public class Survivor : NetworkBehaviour
                 if (!door.Unlocked())
                 {
                     door.CmdPlayerClickedOnLockedDoor();
-                }
-
-                else
-                {
-                    //door.CmdPlayerClickedOnUnlockedDoor();
-
+                    return;
                 }
             }
 
@@ -396,24 +394,10 @@ public class Survivor : NetworkBehaviour
                 battery.CmdPlayerClickedOnBattery();
             }
 
-            else if (gameObject.CompareTag(Tags.DARNED_OJBECT))
+            else if (gameObject.CompareTag(Tags.DARNED_OBJECT))
             {
                 grabbedObject = gameObject.GetComponent<DarnedObject>();
-                float distanceFromObject = Vector3.Distance(grabbedObject.transform.position, this.transform.position);
-
-                if (distanceFromObject > grabDistance)
-                {
-                    return;
-                }
-
-                //TODO: Test this with multiple people.
-                //This should hit if someone else is already grabbing the object.
-                //
-                if (grabbedObject.Grabbed())
-                {
-                    return;
-                }
-                grabbedObject.Grab(hand);
+                grabbedObject.CmdGrab();
                 grabbingAnObject = true;
             }
         }
@@ -526,26 +510,6 @@ public class Survivor : NetworkBehaviour
         isInEscapeRoom = escaped;
     }
 
-    
-    [Client]
-    private void OnControllerColliderHit(ControllerColliderHit controllerColliderHit)
-    {
-        var gameObject = controllerColliderHit.gameObject;
-        string gameObjectTag = gameObject.tag;
-
-        if (gameObject.CompareTag(Tags.DOOR))
-        {
-            Door door = gameObject.GetComponent<Door>();
-
-            if (door.Unlocked())
-            {
-                door.PlayerHitDoor(controllerColliderHit, doorPushStrength);
-            }
-
-        }
-    }
-
-
     public SyncList<Key> Items()
     {
         return keys;
@@ -574,7 +538,7 @@ public class Survivor : NetworkBehaviour
     private void CmdUpdateFlashlight()
     {
         charge -= dischargeRate;
-        
+
         if (charge <= minCharge)
         {
             charge = minCharge;
@@ -589,10 +553,10 @@ public class Survivor : NetworkBehaviour
     }
 
     [Client]
-    private void SurvivorToggledFlashlight(bool oldToggle, bool newToggle) 
+    private void SurvivorToggledFlashlight(bool oldToggle, bool newToggle)
     {
         flashlightToggleSound.Play();
-        flashlight.enabled = toggled;
+        flashlight.enabled = newToggle;
     }
 
     [Client]
@@ -616,12 +580,39 @@ public class Survivor : NetworkBehaviour
         return flashlightDead;
     }
 
-    [Command]
-    public void RechargeFlashlight()
+    public GameObject Hand()
+    {
+        return hand;
+    }
+
+    public float GrabDistance()
+    {
+        return grabDistance;
+    }
+
+    public float DoorPushStrength()
+    {
+        return doorPushStrength;
+    }
+
+    [Server]
+    public void ServerRechargeFlashlight()
     {
         charge = maxCharge;
         flashlightSource.intensity = maxCharge;
         flashlightDead = false;
     }
 
+    [Client]
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        var gameObject = hit.gameObject;
+
+        if (gameObject.CompareTag(Tags.DOOR))
+        {
+            Door door = gameObject.GetComponent<Door>();
+            Vector3 moveDirection = hit.moveDirection;
+            door.CmdPlayerHitDoor(moveDirection, doorPushStrength);
+        }
+    }
 }

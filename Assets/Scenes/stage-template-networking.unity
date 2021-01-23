@@ -217,11 +217,6 @@ PrefabInstance:
       propertyPath: sceneId
       value: 215144828
       objectReference: {fileID: 0}
-    - target: {fileID: 428484246038873263, guid: bcea7775366e78d4e9da77cbab7f8a42,
-        type: 3}
-      propertyPath: clientAuthority
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1255532794101285128, guid: bcea7775366e78d4e9da77cbab7f8a42,
         type: 3}
       propertyPath: m_Name
@@ -687,40 +682,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
---- !u!1 &656352687 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1255532794101285128, guid: bcea7775366e78d4e9da77cbab7f8a42,
-    type: 3}
-  m_PrefabInstance: {fileID: 188896511}
-  m_PrefabAsset: {fileID: 0}
---- !u!54 &656352689 stripped
-Rigidbody:
-  m_CorrespondingSourceObject: {fileID: 3062491758038901713, guid: bcea7775366e78d4e9da77cbab7f8a42,
-    type: 3}
-  m_PrefabInstance: {fileID: 188896511}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &656352697
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 656352687}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 83392ae5c1b731446909f252fd494ae4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  target: {fileID: 656352689}
-  clientAuthority: 0
-  syncVelocity: 1
-  clearVelocity: 0
-  velocitySensitivity: 0.1
-  syncAngularVelocity: 1
-  clearAngularVelocity: 0
-  angularVelocitySensitivity: 0.1
 --- !u!1001 &1090098525
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1199,20 +1160,15 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8187922377815101290, guid: 4d6d149a222b096579368783b94ac685,
+    - target: {fileID: 8187922377815101289, guid: 4d6d149a222b096579368783b94ac685,
         type: 3}
-      propertyPath: clientAuthority
-      value: 0
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8187922377815101291, guid: 4d6d149a222b096579368783b94ac685,
         type: 3}
       propertyPath: sceneId
       value: 4175840690
-      objectReference: {fileID: 0}
-    - target: {fileID: 8633933331310122144, guid: 4d6d149a222b096579368783b94ac685,
-        type: 3}
-      propertyPath: clientAuthority
-      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d6d149a222b096579368783b94ac685, type: 3}

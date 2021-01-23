@@ -27,12 +27,21 @@ public class JoinGameUI : MonoBehaviour
     private Button backButton;
 
     [SerializeField]
+    private Button directConnectButton;
+
+
+    [SerializeField]
     private MainMenuUI mainMenuUI;
+
+    [SerializeField]
+    private DirectConnectUI directConnectUI;
 
     [SerializeField]
     private LobbyUI lobbyUI;
 
     private List<Lobby> lobbies;
+
+
 
     private void Update()
     {
@@ -69,12 +78,16 @@ public class JoinGameUI : MonoBehaviour
         //lobbies = GetLobbies();
 
     }
-
-
     public void OnJoinGameBackButtonClicked()
     {
         Hide();
         mainMenuUI.Show();
+    }
+
+    public void OnJoinGameDirectConnectButtonClicked()
+    {
+        Hide();
+        directConnectUI.Show();
     }
 
     public void OnConnectButtonClicked()

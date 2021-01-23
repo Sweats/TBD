@@ -80,7 +80,7 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnPointerEnterButton(Button button)
     {
-        if (!button.enabled)
+        if (!button.enabled || !button.interactable)
         {
             return;
         }
@@ -90,7 +90,7 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnPointerExitButton(Button button)
     {
-        if (!button.enabled)
+        if (!button.enabled || !button.interactable)
         {
             return;
         }

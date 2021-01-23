@@ -15,7 +15,9 @@ public class Trap : NetworkBehaviour
     [SerializeField]
     private float trapHitAmount;
 
-    public float trapTimer;
+    [SyncVar]
+    [SerializeField]
+    private float trapTimer;
 
     public float trapTimerRate;
 
@@ -38,27 +40,16 @@ public class Trap : NetworkBehaviour
         armed = true;
     }
 
-
-    private void PhantomRoutine()
-    {
-
-    }
-
-    public void Trigger()
+    [Command(ignoreAuthority=true)]
+    public void CmdTrigger()
     {
         armed = false;
     }
 
-
-    public void PlaySound()
-    {
-        trapSound.Play();
-    }
-
-    public void Arm()
+    [Command(ignoreAuthority=true)]
+    public void CmdArm()
     {
         armed = true;
-        Unglow();
     }
 
     public bool Armed()
@@ -72,6 +63,7 @@ public class Trap : NetworkBehaviour
     }
 
     // For the Lurker monster.
+    [Client]
     public void Glow()
     {
         Debug.Log("Glowing...");
@@ -79,11 +71,11 @@ public class Trap : NetworkBehaviour
 
     }
 
+    [Client]
     public void Unglow()
     {
         Debug.Log("Unglowing...");
         trapRenderer.material.SetColor("_Color", originalColor);
-
     }
 
     public float HitAmount()
@@ -97,7 +89,6 @@ public class Trap : NetworkBehaviour
         Survivor survivor = sender.identity.GetComponent<Survivor>();
         survivor.insanity.Increment(trapHitAmount);
         armed = false;
-        RpcTriggerTrap();
     }
 
     [ClientRpc]
@@ -105,4 +96,5 @@ public class Trap : NetworkBehaviour
     {
         trapSound.Play();
     }
+
 }

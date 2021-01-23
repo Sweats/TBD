@@ -21,13 +21,12 @@ public class Stages
     private static Dictionary<StageName, string> stagesDict = new Dictionary<StageName, string>()
     {
         {StageName.Template, "stage-template"},
-        {StageName.Template_Fallen, "stage-template-fallen"},
-        {StageName.Template_Phantom, "stage-template-phantom"},
-        {StageName.Template_Mary, "stage-template-mary"},
         {StageName.Template_Lurker, "stage-template-lurker"},
+        {StageName.Template_Mary, "stage-template-mary"},
+        {StageName.Template_Phantom, "stage-template-phantom"},
+        {StageName.Template_Fallen, "stage-template-fallen"},
         {StageName.Menu, "menu"}
     };
-
 
     public static void Load(StageName stageName)
     {

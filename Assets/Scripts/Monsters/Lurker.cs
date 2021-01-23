@@ -280,13 +280,13 @@ public class Lurker : MonoBehaviour
                     }
 
                     trapArmSound.Play();
-                    trap.Arm();
+                    trap.CmdArm();
                 }
 
                 else if (hitGameObject.CompareTag(Tags.DOOR))
                 {
                     Door door = hitGameObject.GetComponent<Door>();
-                    door.PlayLockedSound();
+                    door.CmdPlayerClickedOnLockedDoor();
                 }
             }
         }
@@ -307,7 +307,7 @@ public class Lurker : MonoBehaviour
                     }
 
                     trapArmSound.Play();
-                    trap.Arm();
+                    trap.CmdArm();
                 }
             }
         }

@@ -36,6 +36,9 @@ public class GameMessages : MonoBehaviour
         EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
         EventManager.maryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
         EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
+        EventManager.lobbyOtherPlayerConnectEvent.AddListener(OnPlayerJoinedLobby);
+        EventManager.lobbyOtherPlayerDisconnectedEvent.AddListener(OnPlayerLeftLobby);
+        EventManager.lobbyClientFailedToConnectToHostEvent.AddListener(OnPlayerFailedToConnectToRemoteHost);
     }
 
     private void UpdateChatText()
@@ -124,6 +127,24 @@ public class GameMessages : MonoBehaviour
     private void OnMaryReadyToTeleport()
     {
         string newMessage = $"Click {Keybinds.GetKey(Action.Teleport)} to teleport.";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnPlayerJoinedLobby(string playerName)
+    {
+        string newMessage = $"Player {playerName} connected!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnPlayerLeftLobby(string playerName, int netId)
+    {
+        string newMessage = $"Player {playerName} disconnected!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnPlayerFailedToConnectToRemoteHost(int errorCode)
+    {
+        string newMessage = $"Failed to connect to the remote host. Error code = {errorCode}";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 

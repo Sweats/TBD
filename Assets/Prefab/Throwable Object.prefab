@@ -128,8 +128,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  physicsEnabled: 0
-  mass: 0
   grabStrength: 10
 --- !u!114 &8187922377815101291
 MonoBehaviour:
@@ -178,7 +176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
-  syncInterval: 0.1
+  syncInterval: 0.02
   target: {fileID: 8187922377815101284}
   clientAuthority: 0
   syncVelocity: 1

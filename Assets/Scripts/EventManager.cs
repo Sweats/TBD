@@ -19,6 +19,23 @@ public static class EventManager
 
     public static PlayerPickedUpKeyEvent playerPickedUpKeyEvent = new PlayerPickedUpKeyEvent();
 
+    public static LobbyHostPlayerConnectedEvent lobbyHostPlayerConnectedEvent = new LobbyHostPlayerConnectedEvent();
+
+    public static LobbyHostPlayerDisconnectedEvent lobbyHostPlayerDisconnectedEvent = new LobbyHostPlayerDisconnectedEvent();
+
+    public static LobbyHostBeginHostingEvent lobbyHostBeginHostingEvent = new LobbyHostBeginHostingEvent();
+
+    public static LobbyClientFailedToConnectToHostEvent lobbyClientFailedToConnectToHostEvent = new LobbyClientFailedToConnectToHostEvent();
+
+
+    public static LobbyClientPlayerConnectedToLobbyEvent lobbyClientPlayerConnectedToLobbyEvent = new LobbyClientPlayerConnectedToLobbyEvent();
+
+    public static LobbyClientPlayerDisconnectFromLobbyEvent lobbyClientPlayerDisconnectFromLobbyEvent = new LobbyClientPlayerDisconnectFromLobbyEvent();
+
+    public static LobbyOtherPlayerConnectEvent lobbyOtherPlayerConnectEvent = new LobbyOtherPlayerConnectEvent();
+
+    public static LobbyOtherPlayerDisconnectedEvent lobbyOtherPlayerDisconnectedEvent = new LobbyOtherPlayerDisconnectedEvent();
+
     public static PlayerSentChatMessageEvent playerSentChatMessageEvent = new PlayerSentChatMessageEvent();
 
     public static PlayerRecievedChatMessageEvent playerRecievedChatMessageEvent = new PlayerRecievedChatMessageEvent();
@@ -29,7 +46,6 @@ public static class EventManager
 
     public static PlayerConnectedEvent playerConnectedEvent = new PlayerConnectedEvent();
 
-
     public static PlayerDisconnectedEvent playerDisconnectedEvent = new PlayerDisconnectedEvent();
 
     public static PlayerChangedNameEvent playerChangedNameEvent = new PlayerChangedNameEvent();
@@ -39,7 +55,6 @@ public static class EventManager
     public static MonsterWonEvent monsterWonEvent = new MonsterWonEvent();
 
     public static FailedToLoadStageEvent failedToLoadStageEvent = new FailedToLoadStageEvent();
-
 
     public static LurkerChangedFormEvent lurkerChangedFormEvent = new LurkerChangedFormEvent();
 
@@ -199,6 +214,30 @@ public class PlayerChangedNameEvent: UnityEvent<string, string>{}
 public class PlayerClientChangedNameEvent: UnityEvent<string, string>{}
 
 public class PlayerPickedUpKeyEvent : UnityEvent<string, string> { }
+
+
+#region LOBBY
+
+//NOTE: Host events.
+
+public class LobbyHostPlayerConnectedEvent: UnityEvent<string, int>{}
+
+public class LobbyHostPlayerDisconnectedEvent: UnityEvent<string, int>{}
+
+public class LobbyHostBeginHostingEvent: UnityEvent{}
+
+//NOTE: Client events.
+public class LobbyClientFailedToConnectToHostEvent: UnityEvent<int>{}
+
+public class LobbyClientPlayerConnectedToLobbyEvent: UnityEvent{}
+
+public class LobbyClientPlayerDisconnectFromLobbyEvent: UnityEvent{}
+
+public class LobbyOtherPlayerConnectEvent: UnityEvent<string>{};
+
+public class LobbyOtherPlayerDisconnectedEvent: UnityEvent<string, int>{}
+
+#endregion
 
 #endregion
 

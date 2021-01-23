@@ -145,7 +145,7 @@ public class Battery : NetworkBehaviour
 
         if (survivor.FlashlightCharge() <= chargeNeededToGrab)
         {
-            survivor.RechargeFlashlight();
+            survivor.ServerRechargeFlashlight();
             NetworkServer.Destroy(this.gameObject);
         }
 

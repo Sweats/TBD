@@ -3,28 +3,17 @@ using Mirror;
 
 public class DarnedObject : NetworkBehaviour
 {
-
-    [SerializeField]
-    private bool physicsEnabled;
-
-    [SerializeField]
-    private float mass;
-
+    [SyncVar(hook = nameof(OnObjectGrabbed))]
     private bool grabbed;
 
     private GameObject playerGrabbingObject;
 
-
     [SerializeField]
     private float grabStrength;
 
-    private Quaternion lookRotation;
-
     private Rigidbody rigidBody;
 
-    [SyncVar]
-    private Vector3 velocity;
-
+    [ServerCallback]
     private void Update()
     {
         if (!grabbed)
@@ -32,40 +21,59 @@ public class DarnedObject : NetworkBehaviour
             return;
         }
 
-        velocity = (playerGrabbingObject.transform.position - rigidBody.position) * grabStrength;
-        CmdVelocity(velocity);
-    }
-
-    [Command(ignoreAuthority=true)]
-    private void CmdVelocity(Vector3 velocity)
-    {
+        Vector3 velocity = (playerGrabbingObject.transform.position - rigidBody.position) * grabStrength;
         rigidBody.velocity = velocity;
-
     }
-    
+
+    [ServerCallback]
     private void Start()
     {
         rigidBody = GetComponent<Rigidbody>();
+        this.enabled = false;
     }
 
-    public void Grab(GameObject playerGrabbingObject)
+    [Command(ignoreAuthority = true)]
+    public void CmdGrab(NetworkConnectionToClient sender = null)
     {
-        this.playerGrabbingObject = playerGrabbingObject;
+        if (grabbed)
+        {
+            return;
+        }
+
+        Survivor survivor = sender.identity.GetComponent<Survivor>();
+        GameObject hand = survivor.Hand();
+        float grabDistance = survivor.GrabDistance();
+        this.playerGrabbingObject = sender.identity.GetComponent<Survivor>().Hand();
+
+        float distanceFromObject = Vector3.Distance(survivor.transform.position, this.transform.position);
+
+        if (distanceFromObject > grabDistance)
+        {
+            return;
+        }
+
+        //TODO: Test this with multiple people.
+        //This should hit if someone else is already grabbing the object.
+        //
         grabbed = true;
         rigidBody.useGravity = false;
+        this.enabled = true;
     }
 
-    public void Drop()
+    [Command(ignoreAuthority = true)]
+    public void CmdDrop()
     {
         grabbed = false;
         this.playerGrabbingObject = null;
         rigidBody.useGravity = true;
+        this.enabled = false;
     }
 
-    public bool Grabbed()
+    [Client]
+    private void OnObjectGrabbed(bool oldValue, bool newValue)
     {
-        return grabbed;
-
+        this.enabled = newValue;
     }
+
 }
 
