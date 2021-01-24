@@ -1,11 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
 
-public class SurvivorSpawnPoint : NetworkBehaviour
+public class SurvivorSpawnPoint : MonoBehaviour
 {
-    private bool spawnPointUsed;
+    private bool spawnPointUsed = false;
 
     private void Start()
     {

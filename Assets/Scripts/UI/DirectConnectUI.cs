@@ -15,13 +15,7 @@ public class DirectConnectUI : MonoBehaviour
     private Canvas directConnectCanvas;
 
     [SerializeField]
-    private NetworkManager networkManager;
-
-    [SerializeField]
     private JoinGameUI joinGameUI;
-
-    [SerializeField]
-    private LobbyUI lobbyUI;
 
     [SerializeField]
     private InputField hostnameField;
@@ -40,12 +34,16 @@ public class DirectConnectUI : MonoBehaviour
 
     [SerializeField]
     private InputField portField;
+    
+    [SerializeField]
+    private NetworkManager networkManager;
+
+    [SerializeField]
+    private LobbyUI lobbyUI;
 
     private void Start()
     {
         this.enabled = false;
-        EventManager.lobbyClientFailedToConnectToHostEvent.AddListener(OnFailedToConnectToHost);
-        EventManager.lobbyClientPlayerConnectedToLobbyEvent.AddListener(OnSuccesfullyConnectedToHost);
     }
 
     // Update is called once per frame
@@ -63,7 +61,6 @@ public class DirectConnectUI : MonoBehaviour
             Hide();
             joinGameUI.Show();
         }
-        
     }
 
     private void Hide()
@@ -84,30 +81,10 @@ public class DirectConnectUI : MonoBehaviour
     {
         string uriString = $"{hostname}:{port}";
         Uri uri = new Uri(uriString);
-        DisableControls();
         networkManager.StartClient(uri);
-        //StartCoroutine(ConnectRoutine());
-    }
-
-    // NOTE: We want to show the lobby when we connect. We use this because there can be a delay to reaching the host.
-    /*
-    private IEnumerator ConnectRoutine()
-    {
-        while (true)
-        {
-            if (NetworkClient.active)
-            {
-                break;
-            }
-
-            yield return new WaitForSeconds(0.1f);
-        }
-
         lobbyUI.Show(false);
         Hide();
     }
-    */
-    
 
     private void OnFailedToConnectToHost(int errorCode)
     {
@@ -133,21 +110,6 @@ public class DirectConnectUI : MonoBehaviour
         Hide();
         joinGameUI.Show();
     }
-
-    private void OnSuccesfullyConnectedToHost()
-    {
-        //NOTE: Have to put this here or else this code will be called. A host is also a client.
-        if (lobbyUI.Hosting())
-        {
-            //Debug.Log("TEST");
-            return;
-        }
-
-        Debug.Log("Successfully connected to the remote host!");
-        Hide();
-        lobbyUI.Show(false);
-    }
-
 
     private void DisableControls()
     {

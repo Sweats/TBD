@@ -21,7 +21,7 @@ public class GameMessages : MonoBehaviour
 
     private StringBuilder stringBuilder;
 
-    void Start()
+    private void Start()
     {
         stringBuilder = new StringBuilder();
         messages = new List<string>();
@@ -36,9 +36,9 @@ public class GameMessages : MonoBehaviour
         EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
         EventManager.maryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
         EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
-        EventManager.lobbyOtherPlayerConnectEvent.AddListener(OnPlayerJoinedLobby);
-        EventManager.lobbyOtherPlayerDisconnectedEvent.AddListener(OnPlayerLeftLobby);
-        EventManager.lobbyClientFailedToConnectToHostEvent.AddListener(OnPlayerFailedToConnectToRemoteHost);
+        EventManager.lobbyHostKickedPlayerEvent.AddListener(OnLobbyHostKickedPlayer);
+        EventManager.lobbyHostKickdYouEvent.AddListener(OnLobbyHostKickedYou);
+        EventManager.lobbyPlayerJoinedLobbyEvent.AddListener(OnPlayerJoinedLobby);
     }
 
     private void UpdateChatText()
@@ -130,13 +130,13 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnPlayerJoinedLobby(string playerName)
+    private void OnPlayerJoinedLobby(int index, string playerName)
     {
         string newMessage = $"Player {playerName} connected!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnPlayerLeftLobby(string playerName, int netId)
+    private void OnPlayerLeftLobby(int index, string playerName)
     {
         string newMessage = $"Player {playerName} disconnected!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
@@ -145,6 +145,18 @@ public class GameMessages : MonoBehaviour
     private void OnPlayerFailedToConnectToRemoteHost(int errorCode)
     {
         string newMessage = $"Failed to connect to the remote host. Error code = {errorCode}";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnLobbyHostKickedPlayer(string playerName)
+    {
+        string newMessage = $"{playerName} has been kicked from the lobby!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnLobbyHostKickedYou()
+    {
+        string newMessage = "You have been kicked!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 

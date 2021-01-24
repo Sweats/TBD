@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System;
+using Mirror;
 
 public class HostGameUI : MonoBehaviour
 {
@@ -22,6 +23,9 @@ public class HostGameUI : MonoBehaviour
 
     [SerializeField]
     private LobbyUI lobbyUI;
+
+    [SerializeField]
+    private NetworkManager networkManager;
 
     private void Start()
     {
@@ -75,6 +79,7 @@ public class HostGameUI : MonoBehaviour
         }
 
         Hide();
+        networkManager.StartHost();
         lobbyUI.Show(true);
     }
 

@@ -52,6 +52,7 @@ public struct LobbyHostClientCharacterChangedMessage: NetworkMessage
 {
     public int character;
     public int playerNumber;
+    public string playerName;
 }
 
 public struct PlayerOneCharacterChanged : NetworkMessage
@@ -125,9 +126,11 @@ public struct LobbyHostClientConnected: NetworkMessage
     public string playerName;
 }
 
-public struct LobbyPlayerMessage: NetworkMessage
+public struct HostKickedPlayerMessage: NetworkMessage
 {
-    public LobbyPlayer[] players;
+    public int lobbyPlayerNumber;
+    public string lobbyPlayerName;
+
 }
 
 

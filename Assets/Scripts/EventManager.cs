@@ -1,4 +1,5 @@
 using UnityEngine.Events;
+using Mirror;
 
 public static class EventManager
 {
@@ -19,22 +20,39 @@ public static class EventManager
 
     public static PlayerPickedUpKeyEvent playerPickedUpKeyEvent = new PlayerPickedUpKeyEvent();
 
-    public static LobbyHostPlayerConnectedEvent lobbyHostPlayerConnectedEvent = new LobbyHostPlayerConnectedEvent();
-
-    public static LobbyHostPlayerDisconnectedEvent lobbyHostPlayerDisconnectedEvent = new LobbyHostPlayerDisconnectedEvent();
-
     public static LobbyHostBeginHostingEvent lobbyHostBeginHostingEvent = new LobbyHostBeginHostingEvent();
 
-    public static LobbyClientFailedToConnectToHostEvent lobbyClientFailedToConnectToHostEvent = new LobbyClientFailedToConnectToHostEvent();
+    public static LobbyHostKickedPlayerEvent lobbyHostKickedPlayerEvent = new LobbyHostKickedPlayerEvent();
 
+    public static LobbyHostKickdYouEvent lobbyHostKickdYouEvent = new LobbyHostKickdYouEvent();
 
-    public static LobbyClientPlayerConnectedToLobbyEvent lobbyClientPlayerConnectedToLobbyEvent = new LobbyClientPlayerConnectedToLobbyEvent();
+    public static LobbyHostPlayerChangedCharacterEvent lobbyHostPlayerChangedCharacterEvent = new LobbyHostPlayerChangedCharacterEvent() ;
 
-    public static LobbyClientPlayerDisconnectFromLobbyEvent lobbyClientPlayerDisconnectFromLobbyEvent = new LobbyClientPlayerDisconnectFromLobbyEvent();
+    public static LobbyPlayerLeftLobbyEvent lobbyPlayerLeftLobbyEvent = new LobbyPlayerLeftLobbyEvent();
 
-    public static LobbyOtherPlayerConnectEvent lobbyOtherPlayerConnectEvent = new LobbyOtherPlayerConnectEvent();
+    public static LobbyPlayerJoinedLobbyEvent lobbyPlayerJoinedLobbyEvent = new LobbyPlayerJoinedLobbyEvent();
 
-    public static LobbyOtherPlayerDisconnectedEvent lobbyOtherPlayerDisconnectedEvent = new LobbyOtherPlayerDisconnectedEvent();
+    public static LobbyYouChangedCharacterEvent lobbyYouChangedCharacterEvent = new LobbyYouChangedCharacterEvent();
+
+    public static LobbyHostChangedInsanityOptionEvent lobbyHostChangedInsanityOptionEvent = new LobbyHostChangedInsanityOptionEvent();
+
+    public static LobbyHostChangedAllRandomOptionEvent lobbyHostChangedAllRandomOptionEvent = new LobbyHostChangedAllRandomOptionEvent();
+    
+    public static LobbyHostChangedAllowSpectatorEvent lobbyHostChangedAllowSpectatorEvent = new LobbyHostChangedAllowSpectatorEvent(); 
+
+    public static LobbyHostChangedStageEvent lobbyHostChangedStageEvent = new LobbyHostChangedStageEvent();
+
+    public static LobbyHostChangedGamemodeEvent lobbyHostChangedGamemodeEvent = new LobbyHostChangedGamemodeEvent();
+
+    public static LobbyClientHostChangedGamemodeEvent lobbyClientHostChangedGamemodeEvent = new LobbyClientHostChangedGamemodeEvent();
+
+    public static LobbyClientHostChangedStageEvent lobbyClientHostChangedStageEvent = new LobbyClientHostChangedStageEvent();
+
+    public static LobbyClientHostChangedAllowSpectatorEvent lobbyClientHostChangedAllowSpectatorEvent = new LobbyClientHostChangedAllowSpectatorEvent();
+
+    public static LobbyClientHostChangedAllRandomEvent lobbyClientHostChangedAllRandomEvent = new LobbyClientHostChangedAllRandomEvent();
+
+    public static LobbyClientHostChangedInsanityOptionEvent lobbyClientHostChangedInsanityOptionEvent = new LobbyClientHostChangedInsanityOptionEvent();
 
     public static PlayerSentChatMessageEvent playerSentChatMessageEvent = new PlayerSentChatMessageEvent();
 
@@ -220,22 +238,42 @@ public class PlayerPickedUpKeyEvent : UnityEvent<string, string> { }
 
 //NOTE: Host events.
 
-public class LobbyHostPlayerConnectedEvent: UnityEvent<string, int>{}
-
-public class LobbyHostPlayerDisconnectedEvent: UnityEvent<string, int>{}
-
 public class LobbyHostBeginHostingEvent: UnityEvent{}
 
-//NOTE: Client events.
-public class LobbyClientFailedToConnectToHostEvent: UnityEvent<int>{}
+public class LobbyHostKickedPlayerEvent: UnityEvent<string>{}
 
-public class LobbyClientPlayerConnectedToLobbyEvent: UnityEvent{}
+public class LobbyHostKickdYouEvent: UnityEvent{}
 
-public class LobbyClientPlayerDisconnectFromLobbyEvent: UnityEvent{}
+public class LobbyHostPlayerChangedCharacterEvent: UnityEvent<Character, string, int>{}
 
-public class LobbyOtherPlayerConnectEvent: UnityEvent<string>{};
+public class LobbyPlayerLeftLobbyEvent: UnityEvent<int, string>{}
 
-public class LobbyOtherPlayerDisconnectedEvent: UnityEvent<string, int>{}
+public class LobbyPlayerJoinedLobbyEvent: UnityEvent<int, string>{}
+
+public class LobbyYouChangedCharacterEvent: UnityEvent<Character>{}
+
+public class LobbyHostChangedInsanityOptionEvent: UnityEvent<bool>{}
+
+public class LobbyHostChangedAllRandomOptionEvent: UnityEvent<bool>{}
+
+public class LobbyHostChangedAllowSpectatorEvent: UnityEvent<bool>{}
+
+public class LobbyHostChangedStageEvent: UnityEvent<int>{}
+
+public class LobbyHostChangedGamemodeEvent: UnityEvent<int>{}
+
+
+public class LobbyClientHostChangedInsanityOptionEvent: UnityEvent<bool>{}
+
+public class LobbyClientHostChangedAllRandomEvent: UnityEvent<bool>{}
+
+public class LobbyClientHostChangedAllowSpectatorEvent: UnityEvent<bool>{}
+
+public class LobbyClientHostChangedStageEvent: UnityEvent<int>{}
+
+public class LobbyClientHostChangedGamemodeEvent: UnityEvent<int>{}
+
+
 
 #endregion
 

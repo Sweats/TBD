@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Mirror;
+using System;
 
 
 #region HOST
@@ -11,16 +10,16 @@ public class NetworkRoom : NetworkManager
     public override void OnServerConnect(NetworkConnection connection)
     {
         base.OnServerConnect(connection);
-        int netId = connection.connectionId;
-        EventManager.lobbyHostPlayerConnectedEvent.Invoke(Settings.PROFILE_NAME, netId);
+        //EventManager.lobbyHostPlayerConnectedEvent.Invoke(Settings.PROFILE_NAME, connection);
     }
+    
 
     public override void OnServerDisconnect(NetworkConnection connection)
     {
         base.OnServerDisconnect(connection);
-        int netId = connection.connectionId;
-        EventManager.lobbyHostPlayerDisconnectedEvent.Invoke(Settings.PROFILE_NAME, netId);
+        //EventManager.lobbyHostPlayerDisconnectedEvent.Invoke(Settings.PROFILE_NAME, connection);
     }
+
 
 #endregion
 
@@ -29,20 +28,27 @@ public class NetworkRoom : NetworkManager
     public override void OnClientError(NetworkConnection connection, int errorCode)
     {
         base.OnClientError(connection, errorCode);
-        EventManager.lobbyClientFailedToConnectToHostEvent.Invoke(errorCode);
+        //EventManager.lobbyClientFailedToConnectToHostEvent.Invoke(errorCode);
     }
 
     public override void OnClientDisconnect(NetworkConnection connection)
     {
         base.OnClientDisconnect(connection);
         int errorCode = 0;
-        EventManager.lobbyClientFailedToConnectToHostEvent.Invoke(errorCode);
+        //EventManager.lobbyClientFailedToConnectToHostEvent.Invoke(errorCode);
     }
 
     public override void OnClientConnect(NetworkConnection connection)
     {
         base.OnClientConnect(connection);
-        EventManager.lobbyClientPlayerConnectedToLobbyEvent.Invoke();
+        //EventManager.lobbyClientPlayerConnectedToLobbyEvent.Invoke();
+    }
+
+    public void Join(string hostname, string port)
+    {
+        string uriString = $"{hostname}:{port}";
+        Uri uri = new Uri(uriString);
+        StartClient(uri);
     }
 }
 

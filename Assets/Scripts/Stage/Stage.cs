@@ -42,11 +42,11 @@ public class Stage : NetworkManager
 
     public override void OnStartServer()
     {
+        survivors = new List<Survivor>();
         base.OnStartServer();
         SetSurvivorSpawnPoints();
         ChoosePath();
         SpawnKeys();
-        survivors = new List<Survivor>();
     }
 
     // NOTE: Called when a new client connects to the server.
@@ -89,6 +89,7 @@ public class Stage : NetworkManager
 
             if (survivorSpawnPoint.Used())
             {
+                Debug.Log("Skipping survivor spawn point");
                 continue;
             }
 
