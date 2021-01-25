@@ -80,6 +80,7 @@ public class Stage : NetworkManager
 
     }
 
+
     [Server]
     private void SpawnSurvivor(NetworkConnection connection)
     {
