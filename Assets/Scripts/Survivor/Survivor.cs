@@ -1,14 +1,28 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Mirror;
 
-public class Survivor : MonoBehaviour
+public class Survivor : NetworkBehaviour
 {
+    [SerializeField]
+    [SyncVar]
+    private string playerName = "player";
 
-    public string survivorName = "player";
+    [SyncVar]
+    public bool matchOver;
+
+    [SerializeField]
+    [SyncVar]
+    private bool isInEscapeRoom;
+
+    [SyncVar]
+    [SerializeField]
+    readonly private SyncList<Key> keys = new SyncList<Key>();
+
+    [SyncVar]
+    public bool dead;
+
     public Insanity insanity;
-    public Inventory inventory;
-    public Flashlight flashlight;
-    public int survivorID;
 
     [SerializeField]
     private AudioSource deathSound;
@@ -16,14 +30,11 @@ public class Survivor : MonoBehaviour
     [SerializeField]
     private Sprint sprint;
 
-
-    [SerializeField]
-    private Camera survivorCamera;
-
     private CharacterController controller;
 
     private Animator animator;
 
+    [Header("Speed Settigs.")]
     [SerializeField]
     private float defaultSpeed;
 
@@ -36,15 +47,16 @@ public class Survivor : MonoBehaviour
     [SerializeField]
     private float crouchSpeed;
 
+    private float currentSpeed;
+
+
     private bool crouched;
 
     private bool walking;
 
     private Rect crouchingAndWalkingIconPosition;
 
-    [SerializeField]
-    private Windows playerWindows;
-
+    [Header("Camera Settings")]
     [SerializeField]
     private float minimumX;
 
@@ -52,48 +64,131 @@ public class Survivor : MonoBehaviour
     private float maximumX;
 
     [SerializeField]
+    private Camera survivorCamera;
+
+    private float xRotation;
+
+    [Header("Physics Settings")]
+    [SerializeField]
     private float gravity;
+
+    [SerializeField]
+    private float doorPushStrength;
 
     private Vector3 velocity;
 
+    [Header("Distance Settings")]
     [SerializeField]
     private float grabDistance;
 
     [SerializeField]
     private float trapDistance;
 
-    private float xRotation;
+    [Header("Flashlight Settings")]
+    [SerializeField]
+    private float maxCharge;
 
-    public bool matchOver;
+    [SerializeField]
+    private float minCharge;
 
-    public bool isInEscapeRoom;
+    [SerializeField]
+    private float dischargeRate;
 
-    public bool dead;
+    [SerializeField]
+    private AudioSource flashlightToggleSound;
+
+    [SerializeField]
+    private Light flashlight;
+
+    [SerializeField]
+    [SyncVar(hook = nameof(SurvivorFlashlightChargeChanged))]
+    private float charge;
+
+    [SyncVar(hook = nameof(SurvivorToggledFlashlight))]
+    [SerializeField]
+    private bool toggled;
+
+    [SyncVar]
+    [SerializeField]
+    private bool flashlightDead;
+
+    private Light flashlightSource;
+
+    private IEnumerator flashlightRoutine;
 
     private Vector3 moving;
 
     [SerializeField]
+    private bool grabbingAnObject;
+
+    [SerializeField]
+    private DarnedObject grabbedObject;
+
+    // NOTE: Did someone join and then disconnect and die?
+    private bool disconnected;
+
+    [SerializeField]
     private Renderer survivorRenderer;
 
+    [SerializeField]
+    private Windows windows;
 
-    void Start()
+    [SerializeField]
+    private GameObject hand;
+
+    private Vector3 mPrevPos = Vector3.zero;
+
+    private Vector3 mPosDelta = Vector3.zero;
+
+    private void Start()
     {
         controller = GetComponent<CharacterController>();
-        animator = GetComponent<Animator>();
-        Cursor.lockState = CursorLockMode.Locked;
-        moving = new Vector3();
-        EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
-        StartCoroutine(TrapDetectionRoutine());
+
+        if (!isLocalPlayer)
+        {
+            survivorCamera.enabled = false;
+            survivorCamera.GetComponent<AudioListener>().enabled = false;
+            controller.enabled = false;
+            windows.enabled = false;
+            this.insanity.enabled = false;
+            return;
+        }
     }
 
-    void LateUpdate()
+    public override void OnStartClient()
     {
+        if (!isLocalPlayer)
+        {
+            EventManager.playerConnectedEvent.Invoke(playerName);
+        }
+
+    }
+
+    public override void OnStartLocalPlayer()
+    {
+        EventManager.playerSentChatMessageEvent.AddListener(CmdOnPlayerSentMessage);
+        EventManager.playerClientChangedNameEvent.AddListener(CmdOnPlayerChangedProfileNameEvent);
+        Cursor.lockState = CursorLockMode.Locked;
+        StartCoroutine(TrapDetectionRoutine());
+        flashlightRoutine = FlashlightRoutine();
+        StartCoroutine(flashlightRoutine);
+        playerName = Settings.PROFILE_NAME;
+        CmdSetName(playerName);
+    }
+
+    private void LateUpdate()
+    {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
         if (matchOver)
         {
             return;
         }
 
-        if (playerWindows.IsWindowOpen())
+        if (windows.IsWindowOpen())
         {
             return;
         }
@@ -111,16 +206,21 @@ public class Survivor : MonoBehaviour
             mouseY *= -1;
         }
 
-
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, minimumX, maximumX);
         transform.Rotate(Vector3.up * mouseX);
         survivorCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
         flashlight.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        //hand.transform.RotateAround(survivorCamera.transform.position, Vector3.up, 20 * Time.deltaTime);
     }
 
-    void Update()
+    private void Update()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
         velocity.y -= gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
 
@@ -134,7 +234,7 @@ public class Survivor : MonoBehaviour
             return;
         }
 
-        if (playerWindows.IsWindowOpen())
+        if (windows.IsWindowOpen())
         {
             return;
         }
@@ -143,35 +243,32 @@ public class Survivor : MonoBehaviour
         float z = Input.GetAxis("Vertical");
         Vector3 secondmove = transform.right * x + transform.forward * z;
         bool isMoving = moving != secondmove;
-        float speed;
 
         if (sprint.GetSprinting())
         {
             if (!isMoving)
             {
                 sprint.SetSprinting(false);
-                speed = defaultSpeed;
+                currentSpeed = defaultSpeed;
             }
 
-            speed = sprintSpeed;
-
+            currentSpeed = sprintSpeed;
         }
 
         else
         {
-            speed = defaultSpeed;
+            currentSpeed = defaultSpeed;
         }
 
         if (Keybinds.GetKey(Action.SwitchFlashlight))
         {
-            flashlight.Toggle();
+            CmdToggleFlashlight();
         }
 
         else if (Keybinds.GetKey(Action.Crouch))
         {
-            speed = crouchSpeed;
+            currentSpeed = crouchSpeed;
             crouched = true;
-
         }
 
 
@@ -197,20 +294,20 @@ public class Survivor : MonoBehaviour
 
         else if (Keybinds.GetKey(Action.Crouch, true))
         {
-            speed = defaultSpeed;
+            currentSpeed = defaultSpeed;
             crouched = false;
         }
 
         else if (Keybinds.GetKey(Action.Walk))
         {
-            speed = walkSpeed;
+            currentSpeed = walkSpeed;
             walking = true;
 
         }
 
         else if (Keybinds.GetKey(Action.Walk, true))
         {
-            speed = defaultSpeed;
+            currentSpeed = defaultSpeed;
             walking = false;
         }
 
@@ -219,11 +316,20 @@ public class Survivor : MonoBehaviour
             OnActionGrab();
         }
 
+        else if (Keybinds.GetKey(Action.Grab, true))
+        {
+            if (grabbingAnObject)
+            {
+                grabbedObject.CmdDrop();
+            }
+        }
 
-        controller.Move(secondmove * speed * Time.deltaTime);
+
+        controller.Move(secondmove * currentSpeed * Time.deltaTime);
 
     }
 
+    [Client]
     private IEnumerator TrapDetectionRoutine()
     {
         while (true)
@@ -240,7 +346,7 @@ public class Survivor : MonoBehaviour
 
                     if (trap.Armed())
                     {
-                        trap.Trigger();
+                        trap.CmdTriggerTrap();
                     }
                 }
             }
@@ -251,12 +357,10 @@ public class Survivor : MonoBehaviour
             }
 
             yield return new WaitForSeconds(0.5f);
-
         }
     }
 
-    // This routine is only started when a lurker has spawned in the stage. An event will be responsible for this.
-
+    [Client]
     private void OnActionGrab()
     {
         RaycastHit hit;
@@ -270,123 +374,245 @@ public class Survivor : MonoBehaviour
             if (gameObject.CompareTag(Tags.KEY))
             {
                 KeyObject keyObject = gameObject.GetComponent<KeyObject>();
-                OnClickedOnKey(keyObject);
+                keyObject.CmdPlayerClickedOnKey();
             }
 
             else if (gameObject.CompareTag(Tags.DOOR))
             {
                 Door door = gameObject.GetComponent<Door>();
-                OnClickedOnDoor(door);
+
+                if (!door.Unlocked())
+                {
+                    door.CmdPlayerClickedOnLockedDoor();
+                    return;
+                }
             }
 
             else if (gameObject.CompareTag(Tags.BATTERY))
             {
                 Battery battery = gameObject.GetComponent<Battery>();
-                OnSurvivorClickedOnBattery(battery);
+                battery.CmdPlayerClickedOnBattery();
             }
 
-            else
+            else if (gameObject.CompareTag(Tags.DARNED_OBJECT))
             {
-                // TO DO: add in non important objects in here.
+                grabbedObject = gameObject.GetComponent<DarnedObject>();
+                grabbedObject.CmdGrab();
+                grabbingAnObject = true;
             }
         }
     }
 
-    private void OnClickedOnKey(KeyObject foundKey)
-    {
-        Key[] keysInInventory = inventory.Keys();
-        bool found = false;
 
-        for (var i = 0; i < keysInInventory.Length; i++)
-        {
-            Key key = keysInInventory[i];
-            int foundKeyMask = foundKey.Key().Mask();
-            int currentInventoryKeyMask = key.Mask();
-
-            if (foundKeyMask == currentInventoryKeyMask)
-            {
-                found = true;
-                EventManager.SurvivorAlreadyHaveKeyEvent.Invoke();
-                break;
-
-            }
-        }
-
-        if (!found)
-        {
-            Key key = foundKey.Key();
-            Texture texture = foundKey.Texture();
-            inventory.Add(key, texture);
-            foundKey.Pickup();
-            EventManager.survivorPickedUpKeyEvent.Invoke(this, key);
-        }
-    }
-
-    private void OnClickedOnDoor(Door door)
-    {
-        Key[] keys = inventory.Keys();
-        bool found = false;
-
-        for (var i = 0; i < keys.Length; i++)
-        {
-            int unlockMask = keys[i].Mask();
-
-            if (door.unlockMask == unlockMask)
-            {
-                Key key = keys[i];
-                found = true;
-                door.Unlock();
-                EventManager.survivorUnlockDoorEvent.Invoke(this, key, door);
-                break;
-            }
-        }
-
-        if (!found)
-        {
-            door.PlayLockedSound();
-        }
-    }
-
-    private void OnSurvivorClickedOnBattery(Battery battery)
-    {
-        if (flashlight.charge <= battery.chargeNeededToGrab)
-        {
-            flashlight.Recharge();
-        }
-
-        else
-        {
-            EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
-        }
-    }
-
+    [Command]
     public void Die()
+    {
+        RpcDie();
+    }
+
+    [ClientRpc]
+    private void RpcDie()
     {
         dead = true;
         sprint.SetDead(dead);
-        insanity.Reset();
-        deathSound.Play();
-        EventManager.survivorDeathEvent.Invoke(this);
+        string playerName = this.playerName;
+        EventManager.survivorDeathEvent.Invoke(playerName);
+
+        if (!isLocalPlayer)
+        {
+            deathSound.Play();
+        }
     }
 
-    // Called if the player is the Lurker.
+    [Command]
+    private void CmdOnPlayerSentMessage(string playerName, string message)
+    {
+        RpcPlayerRecievedChatMessage(playerName, message);
+    }
+
+    [Command]
+    private void CmdOnPlayerChangedProfileNameEvent(string oldName, string newName)
+    {
+        playerName = newName;
+        RpcPlayerChangedProfileName(oldName, newName);
+    }
+
+    [Command]
+    private void CmdSetName(string newPlayerName)
+    {
+        playerName = newPlayerName;
+    }
+
+    [ClientRpc]
+    private void RpcPlayerRecievedChatMessage(string playerName, string message)
+    {
+        EventManager.playerRecievedChatMessageEvent.Invoke(playerName, message);
+    }
+
+    [ClientRpc]
+    private void RpcPlayerChangedProfileName(string oldName, string newName)
+    {
+        EventManager.playerChangedNameEvent.Invoke(oldName, newName);
+    }
+
+
+    // TODO: DO we need the command and targets for these functions?
+    // NOTE: Called if the player is the Lurker.
+    [Command]
     public void Hide()
     {
-        survivorRenderer.enabled = false;
-        flashlight.Hide();
+        TargetHide();
     }
 
-    // Called if the player is the Lurker.
+    [TargetRpc]
+    private void TargetHide()
+    {
+        survivorRenderer.enabled = false;
+    }
+
+    // NOTE: Called if the player is the Lurker.
+    [Command]
     public void Show()
     {
-        survivorRenderer.enabled = true;
-        flashlight.Show();
+        TargetShow();
     }
 
-    private void OnSurvivorsEscapedStageEvent()
+    [TargetRpc]
+    private void TargetShow()
     {
-        matchOver = true;
-        sprint.SetMatchOver(true);
+        survivorRenderer.enabled = true;
     }
 
+    public string Name()
+    {
+        return playerName;
+    }
+
+    public bool Dead()
+    {
+        return dead;
+
+    }
+
+    public bool Disconnected()
+    {
+        return disconnected;
+
+    }
+
+    public bool Escaped()
+    {
+        return isInEscapeRoom;
+    }
+
+    public void SetEscaped(bool escaped)
+    {
+        isInEscapeRoom = escaped;
+    }
+
+    public SyncList<Key> Items()
+    {
+        return keys;
+    }
+
+    [Client]
+    private IEnumerator FlashlightRoutine()
+    {
+        while (true)
+        {
+            if (toggled && !flashlightDead)
+            {
+                CmdUpdateFlashlight();
+            }
+
+            else if (matchOver || dead)
+            {
+                yield break;
+            }
+
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    [Command]
+    private void CmdUpdateFlashlight()
+    {
+        charge -= dischargeRate;
+
+        if (charge <= minCharge)
+        {
+            charge = minCharge;
+            flashlightDead = true;
+        }
+    }
+
+    [Command]
+    public void CmdToggleFlashlight()
+    {
+        toggled = !toggled;
+    }
+
+    [Client]
+    private void SurvivorToggledFlashlight(bool oldToggle, bool newToggle)
+    {
+        flashlightToggleSound.Play();
+        flashlight.enabled = newToggle;
+    }
+
+    [Client]
+    private void SurvivorFlashlightChargeChanged(float oldValue, float newValue)
+    {
+        flashlight.intensity = newValue;
+    }
+
+    public float FlashlightCharge()
+    {
+        return charge;
+    }
+
+    public bool FlashlightToggled()
+    {
+        return toggled;
+    }
+
+    public bool FlashlightDead()
+    {
+        return flashlightDead;
+    }
+
+    public GameObject Hand()
+    {
+        return hand;
+    }
+
+    public float GrabDistance()
+    {
+        return grabDistance;
+    }
+
+    public float DoorPushStrength()
+    {
+        return doorPushStrength;
+    }
+
+    [Server]
+    public void ServerRechargeFlashlight()
+    {
+        charge = maxCharge;
+        flashlightSource.intensity = maxCharge;
+        flashlightDead = false;
+    }
+
+    [Client]
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        var gameObject = hit.gameObject;
+
+        if (gameObject.CompareTag(Tags.DOOR))
+        {
+            Door door = gameObject.GetComponent<Door>();
+            Vector3 moveDirection = hit.moveDirection;
+            door.CmdPlayerHitDoor(moveDirection, doorPushStrength);
+        }
+    }
 }

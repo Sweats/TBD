@@ -1,11 +1,12 @@
 using UnityEngine.Events;
+using Mirror;
 
 public static class EventManager
 {
 
     public static SurvivorPickedUpBatteryEvent survivorPickedUpBatteryEvent = new SurvivorPickedUpBatteryEvent();
 
-    public static SurvivorAlreadyHaveKeyEvent SurvivorAlreadyHaveKeyEvent = new SurvivorAlreadyHaveKeyEvent();
+    public static SurvivorAlreadyHaveKeyEvent survivorAlreadyHasKeyEvent = new SurvivorAlreadyHaveKeyEvent();
 
     public static SurvivorDeathEvent survivorDeathEvent = new SurvivorDeathEvent();
 
@@ -17,38 +18,61 @@ public static class EventManager
 
     public static SurvivorToggleFlashlightEvent survivorToggledFlashlightEvent;
 
-    public static SurvivorPickedUpKeyEvent survivorPickedUpKeyEvent = new SurvivorPickedUpKeyEvent();
+    public static PlayerPickedUpKeyEvent playerPickedUpKeyEvent = new PlayerPickedUpKeyEvent();
 
-    public static SurvivorSendChatMessageEvent survivorSendChatMessageEvent = new SurvivorSendChatMessageEvent();
+    public static LobbyHostBeginHostingEvent lobbyHostBeginHostingEvent = new LobbyHostBeginHostingEvent();
 
-    public static SurvivorOpenedChatEvent survivorOpenedChatEvent = new SurvivorOpenedChatEvent();
+    public static LobbyHostKickedPlayerEvent lobbyHostKickedPlayerEvent = new LobbyHostKickedPlayerEvent();
 
-    public static SurvivorClosedChatEvent survivorClosedChatEvent = new SurvivorClosedChatEvent();
+    public static LobbyHostKickdYouEvent lobbyHostKickdYouEvent = new LobbyHostKickdYouEvent();
+
+    public static LobbyHostPlayerChangedCharacterEvent lobbyHostPlayerChangedCharacterEvent = new LobbyHostPlayerChangedCharacterEvent() ;
+
+    public static LobbyPlayerLeftLobbyEvent lobbyPlayerLeftLobbyEvent = new LobbyPlayerLeftLobbyEvent();
+
+    public static LobbyPlayerJoinedLobbyEvent lobbyPlayerJoinedLobbyEvent = new LobbyPlayerJoinedLobbyEvent();
+
+    public static LobbyYouChangedCharacterEvent lobbyYouChangedCharacterEvent = new LobbyYouChangedCharacterEvent();
+
+    public static LobbyHostChangedInsanityOptionEvent lobbyHostChangedInsanityOptionEvent = new LobbyHostChangedInsanityOptionEvent();
+
+    public static LobbyHostChangedAllRandomOptionEvent lobbyHostChangedAllRandomOptionEvent = new LobbyHostChangedAllRandomOptionEvent();
+    
+    public static LobbyHostChangedAllowSpectatorEvent lobbyHostChangedAllowSpectatorEvent = new LobbyHostChangedAllowSpectatorEvent(); 
+
+    public static LobbyHostChangedStageEvent lobbyHostChangedStageEvent = new LobbyHostChangedStageEvent();
+
+    public static LobbyHostChangedGamemodeEvent lobbyHostChangedGamemodeEvent = new LobbyHostChangedGamemodeEvent();
+
+    public static LobbyClientHostChangedGamemodeEvent lobbyClientHostChangedGamemodeEvent = new LobbyClientHostChangedGamemodeEvent();
+
+    public static LobbyClientHostChangedStageEvent lobbyClientHostChangedStageEvent = new LobbyClientHostChangedStageEvent();
+
+    public static LobbyClientHostChangedAllowSpectatorEvent lobbyClientHostChangedAllowSpectatorEvent = new LobbyClientHostChangedAllowSpectatorEvent();
+
+    public static LobbyClientHostChangedAllRandomEvent lobbyClientHostChangedAllRandomEvent = new LobbyClientHostChangedAllRandomEvent();
+
+    public static LobbyClientHostChangedInsanityOptionEvent lobbyClientHostChangedInsanityOptionEvent = new LobbyClientHostChangedInsanityOptionEvent();
+
+    public static PlayerSentChatMessageEvent playerSentChatMessageEvent = new PlayerSentChatMessageEvent();
+
+    public static PlayerRecievedChatMessageEvent playerRecievedChatMessageEvent = new PlayerRecievedChatMessageEvent();
 
     public static SurvivorFailedToUnlockDoorEvent survivorFailedToUnlockDoorEvent = new SurvivorFailedToUnlockDoorEvent();
 
     public static SurvivorUnlockDoorEvent survivorUnlockDoorEvent = new SurvivorUnlockDoorEvent();
 
-
-    public static SurvivorOpenedPlayerStats survivorOpenedPlayerStats = new SurvivorOpenedPlayerStats();
-
-    public static SurvivorClosedPlayerStats survivorClosedPlayerStats = new SurvivorClosedPlayerStats();
-
     public static PlayerConnectedEvent playerConnectedEvent = new PlayerConnectedEvent();
 
-    public static PlayerOpenedConsoleEvent playerOpenedConsoleEvent = new PlayerOpenedConsoleEvent();
-
     public static PlayerDisconnectedEvent playerDisconnectedEvent = new PlayerDisconnectedEvent();
+
+    public static PlayerChangedNameEvent playerChangedNameEvent = new PlayerChangedNameEvent();
+
+    public static PlayerClientChangedNameEvent playerClientChangedNameEvent = new PlayerClientChangedNameEvent();
 
     public static MonsterWonEvent monsterWonEvent = new MonsterWonEvent();
 
     public static FailedToLoadStageEvent failedToLoadStageEvent = new FailedToLoadStageEvent();
-
-    public static PlayerClosedConsoleEvent playerClosedConsoleEvent = new PlayerClosedConsoleEvent();
-
-    public static PlayerOpenedPauseMenuEvent playerOpenedPauseMenuEvent = new PlayerOpenedPauseMenuEvent();
-
-    public static PlayerClosedPauseMenuEvent playerClosedPauseMenuEvent = new PlayerClosedPauseMenuEvent();
 
     public static LurkerChangedFormEvent lurkerChangedFormEvent = new LurkerChangedFormEvent();
 
@@ -61,25 +85,21 @@ public static class EventManager
     public static MaryReadyToTeleportEvent maryReadyToTeleportEvent = new MaryReadyToTeleportEvent();
 
     public static InvalidLobbyNameEvent invalidLobbyNameEvent = new InvalidLobbyNameEvent();
-
 }
-
 
 
 #region Survivor_Events
 
 
 [System.Serializable]
-public class SurvivorDeathEvent : UnityEvent<Survivor> { }
+public class SurvivorDeathEvent : UnityEvent<string> { }
 
 [System.Serializable]
-public class SurvivorUnlockDoorEvent : UnityEvent<Survivor, Key, Door> { }
+public class SurvivorUnlockDoorEvent : UnityEvent<string, string, string> { }
 
 [System.Serializable]
 public class SurvivorFailedToUnlockDoorEvent : UnityEvent<Door> { }
 
-[System.Serializable]
-public class SurvivorPickedUpKeyEvent : UnityEvent<Survivor, Key> { }
 
 [System.Serializable]
 public class SurvivorPickedUpBatteryEvent : UnityEvent<Survivor, Battery> { }
@@ -103,8 +123,9 @@ public class FlashlightEvent : UnityEvent<Flashlight> { }
 public class SurvivorAlreadyHaveKeyEvent : UnityEvent { }
 
 [System.Serializable]
-public class SurvivorSendChatMessageEvent : UnityEvent<ChatMessage> { }
+public class PlayerSentChatMessageEvent : UnityEvent<string, string> { }
 
+public class PlayerRecievedChatMessageEvent : UnityEvent<string, string> { }
 
 
 [System.Serializable]
@@ -132,7 +153,7 @@ public class InsanityEffectEvent : UnityEvent { }
 
 #region TRAP_EVENTS
 
-public class SurvivorTriggeredTrapEvent : UnityEvent<Survivor, Trap> { }
+public class SurvivorTriggeredTrapEvent : UnityEvent<Trap> { }
 
 [System.Serializable]
 public class MonsterArmedTrapEvent : UnityEvent<Trap> { }
@@ -187,9 +208,6 @@ public class MaryReadyToTeleportEvent : UnityEvent { }
 
 #region LOBBY_EVENTS
 
-//[System.Serializable]
-//public class ReturnToLobbyEvent: UnityEvent {}
-
 #endregion
 
 
@@ -204,31 +222,60 @@ public class InvalidLobbyNameEvent : UnityEvent { }
 
 
 [System.Serializable]
-public class PlayerConnectedEvent : UnityEvent<Survivor> { }
+public class PlayerConnectedEvent : UnityEvent<string> { }
 
 [System.Serializable]
-public class PlayerDisconnectedEvent : UnityEvent<Survivor> { }
+public class PlayerDisconnectedEvent : UnityEvent<string> { }
+
+public class PlayerChangedNameEvent: UnityEvent<string, string>{}
+
+public class PlayerClientChangedNameEvent: UnityEvent<string, string>{}
+
+public class PlayerPickedUpKeyEvent : UnityEvent<string, string> { }
+
+
+#region LOBBY
+
+//NOTE: Host events.
+
+public class LobbyHostBeginHostingEvent: UnityEvent{}
+
+public class LobbyHostKickedPlayerEvent: UnityEvent<string>{}
+
+public class LobbyHostKickdYouEvent: UnityEvent{}
+
+public class LobbyHostPlayerChangedCharacterEvent: UnityEvent<Character, string, int>{}
+
+public class LobbyPlayerLeftLobbyEvent: UnityEvent<int, string>{}
+
+public class LobbyPlayerJoinedLobbyEvent: UnityEvent<int, string>{}
+
+public class LobbyYouChangedCharacterEvent: UnityEvent<Character>{}
+
+public class LobbyHostChangedInsanityOptionEvent: UnityEvent<bool>{}
+
+public class LobbyHostChangedAllRandomOptionEvent: UnityEvent<bool>{}
+
+public class LobbyHostChangedAllowSpectatorEvent: UnityEvent<bool>{}
+
+public class LobbyHostChangedStageEvent: UnityEvent<int>{}
+
+public class LobbyHostChangedGamemodeEvent: UnityEvent<int>{}
+
+
+public class LobbyClientHostChangedInsanityOptionEvent: UnityEvent<bool>{}
+
+public class LobbyClientHostChangedAllRandomEvent: UnityEvent<bool>{}
+
+public class LobbyClientHostChangedAllowSpectatorEvent: UnityEvent<bool>{}
+
+public class LobbyClientHostChangedStageEvent: UnityEvent<int>{}
+
+public class LobbyClientHostChangedGamemodeEvent: UnityEvent<int>{}
+
+
 
 #endregion
 
-
-
-#region WINDOW_EVENTS
-
-public class PlayerOpenedConsoleEvent : UnityEvent { }
-
-public class PlayerClosedConsoleEvent : UnityEvent { }
-
-public class PlayerOpenedPauseMenuEvent : UnityEvent { }
-
-public class PlayerClosedPauseMenuEvent : UnityEvent { }
-
-public class SurvivorOpenedChatEvent : UnityEvent { }
-
-public class SurvivorClosedChatEvent : UnityEvent { }
-
-public class SurvivorOpenedPlayerStats : UnityEvent { }
-
-public class SurvivorClosedPlayerStats : UnityEvent { }
-
 #endregion
+

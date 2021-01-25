@@ -14,25 +14,29 @@ public enum InsanityEffects
 
 public class Insanity : MonoBehaviour
 {
-    public float maxInsanity;
-    public float insanityRate;
-    public float insanityValue;
-    public bool insanityEnabled;
-    private bool maxed;
+    [SerializeField]
+    private float maxInsanity;
 
     [SerializeField]
-    private float insanityHitTrapAmount;
+    private float insanityRate;
+
+    [SerializeField]
+    private float insanityValue;
+
+    [SerializeField]
+    private bool insanityEnabled;
 
     [SerializeField]
     private float insanitySurvivorDeathAmount;
 
     [SerializeField]
     private InsanityEffect[] insanityEffects;
-    
+
+    private bool maxed;
+
     private void Start()
     {
         EventManager.survivorDeathEvent.AddListener(OnSurvivorDeath);
-        EventManager.survivorTriggeredTrapEvent.AddListener(OnSurvivorTriggeredTrap);
     }
 
     void Update()
@@ -84,15 +88,22 @@ public class Insanity : MonoBehaviour
 
     }
 
-    private void OnSurvivorDeath(Survivor survivor)
+    public void Increment(float amount)
     {
-        survivor.insanity.insanityValue += insanitySurvivorDeathAmount;
+        if (insanityEnabled)
+        {
+            this.insanityValue += amount;
+
+        }
     }
 
-
-    private void OnSurvivorTriggeredTrap(Survivor survivor, Trap trap)
+    private void OnSurvivorDeath(string playerName)
     {
-        survivor.insanity.insanityValue += insanityHitTrapAmount;
-    }
+        if (insanityEnabled)
+        {
+            this.insanityValue += insanitySurvivorDeathAmount;
 
+        }
+
+    }
 }

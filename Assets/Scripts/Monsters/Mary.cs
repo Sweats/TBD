@@ -358,7 +358,7 @@ public class Mary : MonoBehaviour
                 if (hitGameObject.CompareTag(Tags.DOOR))
                 {
                     Door door = hitGameObject.GetComponent<Door>();
-                    door.PlayLockedSound();
+                    door.CmdPlayerClickedOnLockedDoor();
                 }
             }
         }
@@ -381,7 +381,7 @@ public class Mary : MonoBehaviour
                 else if (hitGameObject.CompareTag(Tags.DOOR))
                 {
                     Door door = hitGameObject.GetComponent<Door>();
-                    door.PlayLockedSound();
+                    door.CmdPlayerClickedOnLockedDoor();;
                 }
             }
         }
@@ -443,7 +443,7 @@ public class Mary : MonoBehaviour
             if (trapObject.CompareTag(Tags.TRAP))
             {
                 Trap trap = trapObject.GetComponent<Trap>();
-                trap.Arm();
+                trap.CmdArm();
                 oldTraps.Add(trap);
             }
         }

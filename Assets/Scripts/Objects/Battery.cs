@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Mirror;
 
-public class Battery : MonoBehaviour
+public class Battery : NetworkBehaviour
 {
     [SerializeField]
     private string name = "battery";
@@ -44,21 +45,24 @@ public class Battery : MonoBehaviour
     [SerializeField]
     private CapsuleCollider batteryCollider;
 
-
     private float defaultSpecular;
 
     private bool glowing = false;
 
-    void Start()
+    private int batteryID;
+
+    [Client]
+    private void Start()
     {
+        batteryID = Random.Range(0, 10000);
         noGlowTimer = maxTimerForGlow;
         //defaultSpecular = batteryRenderer.material.GetFloat("_Shininess");
         //batteryRenderer.material.SetColor("_Color", originalMeshColor);
 
     }
 
-    // Update is called once per frame
-    void Update()
+    [Client]
+    private void Update()
     {
         noGlowTimer -= Time.deltaTime * timeBetweenGlows;
 
@@ -114,23 +118,54 @@ public class Battery : MonoBehaviour
     }
 
     // For the Monsters.
+    [Command]
     public void Hide()
     {
-	    batteryCollider.enabled = false;
-	    batteryRenderer.enabled = false;
+        batteryCollider.enabled = false;
+        batteryRenderer.enabled = false;
 
     }
 
     // For the Monsters.
     public void Show()
     {
-	    batteryCollider.enabled = true;
-	    batteryRenderer.enabled = true;
+        batteryCollider.enabled = true;
+        batteryRenderer.enabled = true;
     }
 
-    public void Pickup()
+    public int BatteryID()
     {
-        Destroy(this.gameObject);
+        return batteryID;
+    }
+
+    [Command(ignoreAuthority=true)]
+    public void CmdPlayerClickedOnBattery(NetworkConnectionToClient sender = null)
+    {
+        Survivor survivor = sender.identity.GetComponent<Survivor>();
+
+        if (survivor.FlashlightCharge() <= chargeNeededToGrab)
+        {
+            survivor.ServerRechargeFlashlight();
+            NetworkServer.Destroy(this.gameObject);
+        }
+
+        else
+        {
+            TargetFailedToPickUpBattery();
+        }
+    }
+
+    [TargetRpc]
+    private void TargetFailedToPickUpBattery()
+    {
+        EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
+    }
+
+    [ClientRpc]
+    private void RpcPlayerPickedUpBattery()
+    {
+        Debug.Log("A survivor picked up a battery!");
+
     }
 
 

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Mirror;
 
-public class Trap : MonoBehaviour
+public class Trap : NetworkBehaviour
 {
     [SerializeField]
     private AudioSource trapSound;
@@ -11,10 +12,18 @@ public class Trap : MonoBehaviour
     [SerializeField]
     private float minTimer;
 
-    public float trapTimer;
+    [SerializeField]
+    private float trapHitAmount;
+
+    [SyncVar]
+    [SerializeField]
+    private float trapTimer;
 
     public float trapTimerRate;
 
+    [SerializeField]
+
+    [SyncVar]
     private bool armed;
 
     [SerializeField]
@@ -28,26 +37,19 @@ public class Trap : MonoBehaviour
     private void Start()
     {
         originalColor = trapRenderer.material.color;
-
-        //EventManager.lurkerChangedFormEvent.AddListener(OnLurkerGoBackToGhostForm);
-        //int monster = 0;
-
-        // get the kind of monster that is in the game and then call the corrisponding trap logic for the monster
-        /*
-        */
-
+        armed = true;
     }
 
-    public void Trigger()
+    [Command(ignoreAuthority=true)]
+    public void CmdTrigger()
     {
-        trapSound.Play();
         armed = false;
     }
 
-    public void Arm()
+    [Command(ignoreAuthority=true)]
+    public void CmdArm()
     {
         armed = true;
-	Unglow();
     }
 
     public bool Armed()
@@ -61,18 +63,38 @@ public class Trap : MonoBehaviour
     }
 
     // For the Lurker monster.
+    [Client]
     public void Glow()
     {
-	    Debug.Log("Glowing...");
+        Debug.Log("Glowing...");
         trapRenderer.material.SetColor("_Color", Color.white);
 
     }
 
+    [Client]
     public void Unglow()
     {
-	    Debug.Log("Unglowing...");
+        Debug.Log("Unglowing...");
         trapRenderer.material.SetColor("_Color", originalColor);
+    }
 
+    public float HitAmount()
+    {
+        return trapHitAmount;
+    }
+
+    [Command(ignoreAuthority=true)]
+    public void CmdTriggerTrap(NetworkConnectionToClient sender = null)
+    {
+        Survivor survivor = sender.identity.GetComponent<Survivor>();
+        survivor.insanity.Increment(trapHitAmount);
+        armed = false;
+    }
+
+    [ClientRpc]
+    private void RpcTriggerTrap()
+    {
+        trapSound.Play();
     }
 
 }

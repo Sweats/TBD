@@ -15,6 +15,10 @@ TagManager:
   - Mary
   - Mary Teleport Location
   - Phantom
+  - Object Spawn Point
+  - Survivor Spawn Point
+  - Key Spawn Point
+  - Darned Object
   layers:
   - Default
   - TransparentFX

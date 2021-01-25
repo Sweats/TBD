@@ -1,16 +1,18 @@
 ﻿using System.Text;
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class Chat : MonoBehaviour
 {
 
     [SerializeField]
-    private float chatAppearanceLength;
+    private int chatAppearanceLength;
 
-    private float currentChatApperanceLength;
+    private int chatAppearanceLengthTimer;
 
     [SerializeField]
     private Canvas chatCanvas;
@@ -19,8 +21,7 @@ public class Chat : MonoBehaviour
     private InputField chatMessageBoxInput;
 
     [SerializeField]
-    private InputField chatMessageBox;
-
+    private TMP_InputField chatMessageBox;
 
     [SerializeField]
     private Windows window;
@@ -30,67 +31,77 @@ public class Chat : MonoBehaviour
     private StringBuilder stringBuilder;
 
 
-
     private void Start()
     {
+        chatAppearanceLengthTimer = chatAppearanceLength;
         this.enabled = false;
         stringBuilder = new StringBuilder();
-        currentChatApperanceLength = 0f;
         chatMessageBoxInput.text = string.Empty;
-        EventManager.survivorSendChatMessageEvent.AddListener(OnSurviorRecievedChat);
+        EventManager.playerRecievedChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
+        EventManager.playerChangedNameEvent.AddListener(OnPlayerChangedProfileNameEvent);
+        StartCoroutine(ChatRoutine());
+    }
+
+    private IEnumerator ChatRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+
+            if (chatAppearanceLengthTimer > 0)
+            {
+                chatAppearanceLengthTimer--;
+
+                if (chatAppearanceLengthTimer <= 0)
+                {
+                    chatCanvas.enabled = false;
+                }
+            }
+        }
     }
 
     private void Update()
     {
         if (Keybinds.GetKey(Action.GuiReturn))
         {
-            Hide();
+            DeselectChatInput();
         }
 
-        if (currentChatApperanceLength >= 0f)
+        // TODO: Change this keybinding to something else. This is just for testing.
+        else if (Input.GetKey(KeyCode.Home))
         {
-            currentChatApperanceLength -= Time.deltaTime;
+            string text = chatMessageBoxInput.text;
 
-            if (currentChatApperanceLength <= 0)
+            if (text != string.Empty)
             {
-                HideChatMessageBox();
+                string playerName = Settings.PROFILE_NAME;
+                string message = chatMessageBoxInput.text;
+                chatMessageBoxInput.text = string.Empty;
+                chatMessageBoxInput.Select();
+                EventManager.playerSentChatMessageEvent.Invoke(playerName, message);
             }
         }
     }
 
-
     public void Show()
     {
+        Cursor.lockState = CursorLockMode.Confined;
         this.enabled = true;
         chatCanvas.enabled = true;
-        Cursor.lockState = CursorLockMode.Confined;
+        chatMessageBoxInput.interactable = true;
+        chatMessageBoxInput.Select();
     }
 
-    public void Hide()
+    private void DeselectChatInput()
     {
-        this.enabled = false;
-        chatCanvas.enabled = false;
-        window.MarkChatWindowClosed();
+        UnselectChatMessageBox();
+        chatMessageBoxInput.interactable = false;
         Cursor.lockState = CursorLockMode.Locked;
-    }
-
-    public void OnSurvivorSendChat(string chatMessageText)
-    {
-        if (chatMessageBoxInput.text != string.Empty)
-        {
-            ChatMessage chatMessage = new ChatMessage()
-            {
-                // TO DO: Figure out the best way to get the player name. Maybe use a global variable?
-                survivorName = "player",
-                text = chatMessageText,
-                // TO DO: Figure out how we can get the survivor ID in the lobby.
-                survivorID = 0
-            };
-
-            chatMessageBoxInput.text = string.Empty;
-            EventManager.survivorSendChatMessageEvent.Invoke(chatMessage);
-            chatMessageBoxInput.Select();
-        }
+        this.enabled = false;
+        window.enabled = true;
+        chatMessageBoxInput.text = string.Empty;
+        chatAppearanceLengthTimer = chatAppearanceLength;
+        window.MarkChatWindowClosed();
     }
 
     private void UnselectChatMessageBox()
@@ -98,60 +109,20 @@ public class Chat : MonoBehaviour
         chatMessageBoxInput.OnDeselect(new BaseEventData(EventSystem.current));
     }
 
-
-    private void OnSurviorRecievedChat(ChatMessage chatMessage)
-    {
-        currentChatApperanceLength = chatAppearanceLength;
-        UpdateChatMessagesBox(chatMessage.text);
-        ShowChatMessageBox();
-    }
-
-
-    private void ShowChatMessageInputBox()
-    {
-        chatMessageBoxInput.interactable = true;
-        Cursor.lockState = CursorLockMode.Confined;
-    }
-
-    private void HideChatMessageInputBox()
-    {
-        chatMessageBoxInput.interactable = false;
-        chatMessageBoxInput.text = string.Empty;
-        Cursor.lockState = CursorLockMode.Locked;
-    }
-
-    private void HideChatMessageBox()
-    {
-        chatMessageBox.enabled = false;
-        chatMessageBox.image.enabled = false;
-        chatMessageBox.textComponent.enabled = false;
-        currentChatApperanceLength = 0f;
-    }
-
-    private void ShowChatMessageBox()
-    {
-        currentChatApperanceLength = chatAppearanceLength;
-        chatMessageBox.image.enabled = true;
-        chatMessageBox.textComponent.enabled = true;
-        chatMessageBox.enabled = true;
-    }
-
     private void UpdateChatMessagesBox(string chatMessageText)
     {
-        currentChatApperanceLength = chatAppearanceLength;
-        string timestamp = GetTimestamp();
-        stringBuilder.AppendLine($"{timestamp}: {chatMessageText}");
+        chatAppearanceLengthTimer = chatAppearanceLength;
+        chatCanvas.enabled = true;
+        stringBuilder.AppendLine($"{chatMessageText}");
         chatMessageBox.text = stringBuilder.ToString();
     }
 
 
     private void OnInsanityCvarChanged(bool newValue)
     {
-        string timestamp = GetTimestamp();
         string text = $"[SERVER] Cvar \"insanity\" was set to \"{newValue}\"";
         UpdateChatMessagesBox(text);
     }
-
 
     private void OnVoiceChatCvarChanged()
     {
@@ -178,4 +149,16 @@ public class Chat : MonoBehaviour
         return currentDateTime.ToString("HH:mm:ss");
     }
 
+    private void OnPlayerRecievedChatMessage(string playerName, string message)
+    {
+        string text = $"{playerName}: {message}";
+        UpdateChatMessagesBox(text);
+    }
+
+
+    private void OnPlayerChangedProfileNameEvent(string oldName, string newName)
+    {
+        string text = $"[Server]: {oldName} changed their name to {newName}.";
+        UpdateChatMessagesBox(text);
+    }
 }

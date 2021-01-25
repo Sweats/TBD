@@ -11,23 +11,24 @@ public class GameMessages : MonoBehaviour
 
     // How long should a chat message appear for? 
     [SerializeField]
-    private float chatMessageAppearanceLength;
+    private float gameMessageAppearanceLength;
 
     [SerializeField]
     private InputField messagesBox;
 
     [SerializeField]
     private Canvas gameMessagesCanvas;
+
     private StringBuilder stringBuilder;
 
-    void Start()
+    private void Start()
     {
         stringBuilder = new StringBuilder();
         messages = new List<string>();
 
         EventManager.survivorDeathEvent.AddListener(OnSurvivorDeath);
         EventManager.survivorFailedToPickUpBatteryEvent.AddListener(OnFailedToPickUpBatteryEvent);
-        EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorGrabbedKey);
+        EventManager.playerPickedUpKeyEvent.AddListener(OnSurvivorGrabbedKey);
         EventManager.survivorPickedUpBatteryEvent.AddListener(OnPickedUpBatteryEvent);
         EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
         EventManager.playerConnectedEvent.AddListener(OnPlayerConnect);
@@ -35,6 +36,9 @@ public class GameMessages : MonoBehaviour
         EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
         EventManager.maryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
         EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
+        EventManager.lobbyHostKickedPlayerEvent.AddListener(OnLobbyHostKickedPlayer);
+        EventManager.lobbyHostKickdYouEvent.AddListener(OnLobbyHostKickedYou);
+        EventManager.lobbyPlayerJoinedLobbyEvent.AddListener(OnPlayerJoinedLobby);
     }
 
     private void UpdateChatText()
@@ -49,22 +53,22 @@ public class GameMessages : MonoBehaviour
         messagesBox.text = stringBuilder.ToString();
     }
 
-    private void OnSurvivorGrabbedKey(Survivor who, Key key)
+    private void OnSurvivorGrabbedKey(string survivorName, string keyName)
     {
-        string newMessage = $"{who.survivorName} picked up a {key.Name()}!";
+        string newMessage = $"{survivorName} picked up a {keyName}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnSurvivorUnlockedDoor(Survivor who, Key key, Door door)
+    private void OnSurvivorUnlockedDoor(string survivorName, string doorName, string keyName)
     {
-        string newMessage = $"{who.survivorName} used a {key.Name()} to unlock a {door.doorName}!";
+        string newMessage = $"{survivorName} used a {keyName} to unlock a {doorName}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
 
-    private void OnSurvivorDeath(Survivor who)
+    private void OnSurvivorDeath(string playerName)
     {
-        string newMessage = $"{who.survivorName} died!";
+        string newMessage = playerName;
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
@@ -88,15 +92,15 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnPlayerDisconnect(Survivor who)
+    private void OnPlayerDisconnect(string playerName)
     {
-        string newMessage = $"Player {who.survivorName} has left the game!";
+        string newMessage = $"Player {playerName} has disconnected!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnPlayerConnect(Survivor who)
+    private void OnPlayerConnect(string playerName)
     {
-        string newMessage = $"Player {who.survivorName} has connected!";
+        string newMessage = $"Player {playerName} has connected!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
@@ -126,11 +130,41 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
+    private void OnPlayerJoinedLobby(int index, string playerName)
+    {
+        string newMessage = $"Player {playerName} connected!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnPlayerLeftLobby(int index, string playerName)
+    {
+        string newMessage = $"Player {playerName} disconnected!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnPlayerFailedToConnectToRemoteHost(int errorCode)
+    {
+        string newMessage = $"Failed to connect to the remote host. Error code = {errorCode}";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnLobbyHostKickedPlayer(string playerName)
+    {
+        string newMessage = $"{playerName} has been kicked from the lobby!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnLobbyHostKickedYou()
+    {
+        string newMessage = "You have been kicked!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
     private IEnumerator AddAndRemoveGameMessage(string newMessage)
     {
         messages.Add(newMessage);
         UpdateChatText();
-        yield return new WaitForSeconds(chatMessageAppearanceLength);
+        yield return new WaitForSeconds(gameMessageAppearanceLength);
         messages.Remove(newMessage);
         UpdateChatText();
     }

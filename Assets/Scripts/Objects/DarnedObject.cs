@@ -1,59 +1,79 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections;
-using UnityEngine;
+﻿using UnityEngine;
+using Mirror;
 
-public class DarnedObject : MonoBehaviour
+public class DarnedObject : NetworkBehaviour
 {
-
-    [SerializeField]
-    private bool physicsEnabled;
-
-    [SerializeField]
-    private float gravity;
-
-    [SerializeField]
-    private float mass;
-
+    [SyncVar(hook = nameof(OnObjectGrabbed))]
     private bool grabbed;
 
-    public enum DarnedObjectType
+    private GameObject playerGrabbingObject;
+
+    [SerializeField]
+    private float grabStrength;
+
+    private Rigidbody rigidBody;
+
+    [ServerCallback]
+    private void Update()
     {
-        None = 0,
-        Key,
-        Door,
-        Misc
-    }
-    
-
-    private Rigidbody rigidbody;
-
-    void Start()
-    {
-        rigidbody = GetComponent<Rigidbody>();
-
-        if (gravity > 0)
+        if (!grabbed)
         {
-            rigidbody.useGravity = true;
+            return;
         }
-        
+
+        Vector3 velocity = (playerGrabbingObject.transform.position - rigidBody.position) * grabStrength;
+        rigidBody.velocity = velocity;
     }
-    public void Grab()
+
+    [ServerCallback]
+    private void Start()
     {
-        grabbed = true;
-
+        rigidBody = GetComponent<Rigidbody>();
+        this.enabled = false;
     }
 
-    public void Drop()
+    [Command(ignoreAuthority = true)]
+    public void CmdGrab(NetworkConnectionToClient sender = null)
+    {
+        if (grabbed)
+        {
+            return;
+        }
+
+        Survivor survivor = sender.identity.GetComponent<Survivor>();
+        GameObject hand = survivor.Hand();
+        float grabDistance = survivor.GrabDistance();
+        this.playerGrabbingObject = sender.identity.GetComponent<Survivor>().Hand();
+
+        float distanceFromObject = Vector3.Distance(survivor.transform.position, this.transform.position);
+
+        if (distanceFromObject > grabDistance)
+        {
+            return;
+        }
+
+        //TODO: Test this with multiple people.
+        //This should hit if someone else is already grabbing the object.
+        //
+        grabbed = true;
+        rigidBody.useGravity = false;
+        this.enabled = true;
+    }
+
+    [Command(ignoreAuthority = true)]
+    public void CmdDrop()
     {
         grabbed = false;
+        this.playerGrabbingObject = null;
+        rigidBody.useGravity = true;
+        this.enabled = false;
     }
 
-
-    public void Handle()
+    [Client]
+    private void OnObjectGrabbed(bool oldValue, bool newValue)
     {
-
+        this.enabled = newValue;
     }
-    
+
 }
 

@@ -1,5 +1,33 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
+using System.Collections;
+using Mirror;
+using System;
+
+public enum Character : byte
+{
+    Random = 0,
+    Chad,
+    Alice,
+    Jesus,
+    Jamal,
+    Lurker,
+    Phantom,
+    Mary,
+    Fallen,
+    Unknown,
+    Empty
+}
+
+//public enum Option: byte
+//{
+//    Insanity = 0,
+//    AllRandom,
+//    AllowSpectator,
+//    Gamemode,
+//    Stage,
+//}
 
 
 public class LobbyUI : MonoBehaviour
@@ -42,8 +70,8 @@ public class LobbyUI : MonoBehaviour
 
     [SerializeField]
     private JoinGameUI joinGameUI;
-    [SerializeField]
 
+    [SerializeField]
     private HostGameUI hostGameUI;
 
     [SerializeField]
@@ -86,6 +114,45 @@ public class LobbyUI : MonoBehaviour
     private Button randomCharacterButton;
 
     [SerializeField]
+    private Button kickPlayerOneButton;
+
+    [SerializeField]
+    private Button kickPlayerTwoButton;
+
+    [SerializeField]
+    private Button kickPlayerThreeButton;
+
+    [SerializeField]
+    private Button kickPlayerFourButton;
+
+    [SerializeField]
+    private Button kickPlayerFiveButton;
+
+    [SerializeField]
+    private Text playerOneNameText;
+
+    [SerializeField]
+    private Text playerTwoNameText;
+
+    [SerializeField]
+    private Text playerThreeNameText;
+
+    [SerializeField]
+    private Text playerFourNameText;
+
+    [SerializeField]
+    private Text playerFiveNameText;
+
+    [SerializeField]
+    private Toggle insanityToggle;
+
+    [SerializeField]
+    private Toggle allRandomToggle;
+
+    [SerializeField]
+    private Toggle allowSpectatorToggle;
+
+    [SerializeField]
     private RawImage playerOneLobbyIcon;
 
     [SerializeField]
@@ -98,18 +165,20 @@ public class LobbyUI : MonoBehaviour
     private RawImage playerFourLobbyIcon;
 
     [SerializeField]
+    private RawImage playerFiveLobbyIcon;
+
+    [SerializeField]
     private Image selectCharacterPanel;
 
     [SerializeField]
     private Text selectCharacterText;
 
     [SerializeField]
+    [Tooltip("This list must match the the stage listing in the file Stages.cs")]
     private Dropdown stageDropdown;
 
-    private const int ALICE = 0;
-    private const int JAMAL = 1;
-    private const int CHAD = 2;
-    private const int JESUS = 3;
+    [SerializeField]
+    private Dropdown gameModeDropdown;
 
     private const int STAGE_TEMPLATE = 0;
     private const int STAGE_TEMPLATE_MARY = 1;
@@ -117,86 +186,201 @@ public class LobbyUI : MonoBehaviour
     private const int STAGE_TEMPLATE_LURKER = 3;
     private const int STAGE_TEMPLATE_PHANTOM = 4;
 
-    private bool hosting;
+    private const int PLAYER_ONE = 0;
+    private const int PLAYER_TWO = 1;
+    private const int PLAYER_THREE = 2;
+    private const int PLAYER_FOUR = 3;
+    private const int PLAYER_FIVE = 4;
 
     private bool selectingCharacter;
+
+    private const int NORMAL_MODE = 0;
+    private const int LIFE_MODE = 1;
+
+    private bool insanityEnabled;
+    private StageName selectedStage;
+
+    private int playerOneCharacter;
+    private int playerTwoCharacter;
+    private int playerThreeCharacter;
+    private int playerFourCharacter;
+    private int playerFiveCharacter;
+
+    [SerializeField]
+    private NetworkManager networkManager;
+
+    private bool hostingLobby;
+
+    // NOTE: Put connectionId's in here. -1 means no client is using the slot
+    [SerializeField]
+    private LobbyPlayer[] players;
 
     private void Start()
     {
         this.enabled = false;
+        EventManager.lobbyHostPlayerChangedCharacterEvent.AddListener(OnPlayerSlotUpdated);
+        EventManager.lobbyPlayerLeftLobbyEvent.AddListener(OnPlayerLeftLobby);
+        EventManager.lobbyPlayerJoinedLobbyEvent.AddListener(OnPlayerJoinedLobby);
+
+        EventManager.lobbyClientHostChangedAllowSpectatorEvent.AddListener(OnAllowSpectatorOptionUpdated);
+        EventManager.lobbyClientHostChangedStageEvent.AddListener(OnStageSelectionUpdated);
+        EventManager.lobbyClientHostChangedGamemodeEvent.AddListener(OnGameModeSelectionUpdated);
+        EventManager.lobbyClientHostChangedAllRandomEvent.AddListener(OnAllRandomOptionUpdated);
+        EventManager.lobbyClientHostChangedInsanityOptionEvent.AddListener(OnInsanityOptionUpdated);
     }
 
-    private void Update()
+    public void Show(bool hosting)
     {
-        if (Keybinds.GetKey(Action.GuiReturn))
+        this.enabled = true;
+        this.lobbyCanvas.enabled = true;
+        this.hostingLobby = hosting;
+
+        if (hosting)
         {
-            if (selectingCharacter)
-            {
-                DisableSelectCharacterControls();
-                EnableControls();
-                return;
-            }
+            SetUpHostLobbyControls();
+        }
 
-            Hide();
-
-            if (hosting)
-            {
-                hostGameUI.Show();
-            }
-
-            else
-            {
-                joinGameUI.Show();
-            }
-
-
+        else
+        {
+            SetUpClientLobbyControls();
         }
     }
 
-
-    public void Show(bool isHosting)
+    public void OnKickedButtonClicked(int playerNumber)
     {
-        hosting = isHosting;
-        this.enabled = true;
-        lobbyCanvas.enabled = true;
+        //lobbyNetworkHandler.CmdKickPlayer(player);
+    }
 
+    private void SetUpClientLobbyControls()
+    {
+        startGameButton.interactable = false;
+        startGameButton.enabled = false;
+        gameModeDropdown.interactable = false;
+        stageDropdown.interactable = false;
+        insanityToggle.interactable = false;
+        allRandomToggle.interactable = false;
+        allowSpectatorToggle.interactable = false;
+
+        kickPlayerOneButton.interactable = false;
+        kickPlayerOneButton.GetComponentInChildren<Text>().color = Color.clear;
+        kickPlayerTwoButton.interactable = false;
+        kickPlayerTwoButton.GetComponentInChildren<Text>().color = Color.clear;
+        kickPlayerThreeButton.interactable = false;
+        kickPlayerThreeButton.GetComponentInChildren<Text>().color = Color.clear;
+        kickPlayerFourButton.interactable = false;
+        kickPlayerFourButton.GetComponentInChildren<Text>().color = Color.clear;
+        kickPlayerFiveButton.interactable = false;
+        kickPlayerFiveButton.GetComponentInChildren<Text>().color = Color.clear;
+
+        playerOneNameText.text = string.Empty;
+        playerTwoNameText.text = string.Empty;
+        playerThreeNameText.text = string.Empty;
+        playerFourNameText.text = string.Empty;
+        playerFiveNameText.text = string.Empty;
+
+        gameModeDropdown.GetComponent<Image>().enabled = false;
+        gameModeDropdown.GetComponentInChildren<Text>().color = Color.white;
+        stageDropdown.GetComponent<Image>().enabled = false;
+        stageDropdown.GetComponentInChildren<Text>().color = Color.white;
+
+    }
+
+    private void SetUpHostLobbyControls()
+    {
+        startGameButton.interactable = true;
+        startGameButton.enabled = true;
+        gameModeDropdown.interactable = true;
+        stageDropdown.interactable = true;
+        insanityToggle.interactable = true;
+        allRandomToggle.interactable = true;
+        allowSpectatorToggle.interactable = true;
+
+        kickPlayerOneButton.interactable = false;
+        kickPlayerOneButton.GetComponentInChildren<Text>().color = Color.clear;
+        kickPlayerTwoButton.interactable = false;
+        kickPlayerTwoButton.GetComponentInChildren<Text>().color = Color.clear;
+        kickPlayerThreeButton.interactable = false;
+        kickPlayerThreeButton.GetComponentInChildren<Text>().color = Color.clear;
+        kickPlayerFourButton.interactable = false;
+        kickPlayerFourButton.GetComponentInChildren<Text>().color = Color.clear;
+        kickPlayerFiveButton.interactable = false;
+        kickPlayerFiveButton.GetComponentInChildren<Text>().color = Color.clear;
+
+
+        playerOneNameText.text = Settings.PROFILE_NAME;
+        playerTwoNameText.text = string.Empty;
+        playerThreeNameText.text = string.Empty;
+        playerFourNameText.text = string.Empty;
+        playerFiveNameText.text = string.Empty;
+
+        gameModeDropdown.GetComponent<Image>().enabled = true;
+        gameModeDropdown.GetComponentInChildren<Text>().color = Color.gray;
+        stageDropdown.GetComponent<Image>().enabled = true;
+        stageDropdown.GetComponentInChildren<Text>().color = Color.gray;
     }
 
     private void Hide()
     {
+        if (hostingLobby)
+        {
+            networkManager.StopHost();
+            Debug.Log("You are no longer hosting a game!");
+        }
+
         this.enabled = false;
-        lobbyCanvas.enabled = false;
         Reset();
+        lobbyCanvas.enabled = false;
     }
 
-#region HOST_OPTIONS
+    #region HOST_OPTIONS
 
-    public void OnInsanityEnabledCheckboxClicked()
+    public void OnInsanityEnabledCheckboxClicked(bool newValue)
     {
-
+        if (hostingLobby)
+        {
+            EventManager.lobbyHostChangedInsanityOptionEvent.Invoke(newValue);
+        }
     }
 
-
-    public void OnAllowSpectatorCheckboxClicked()
+    public void OnAllowSpectatorCheckboxClicked(bool newValue)
     {
-
+        if (hostingLobby)
+        {
+            EventManager.lobbyHostChangedAllowSpectatorEvent.Invoke(newValue);
+        }
     }
 
 
-    public void OnAllRandomCheckboxClicked()
+    public void OnAllRandomCheckboxClicked(bool newValue)
     {
-
+        if (hostingLobby)
+        {
+            EventManager.lobbyHostChangedAllRandomOptionEvent.Invoke(newValue);
+        }
     }
 
-
-    public void OnGameModeDropdownChanged()
+    public void OnStageDropdownChanged(int newValue)
     {
-
+        if (hostingLobby)
+        {
+            EventManager.lobbyHostChangedStageEvent.Invoke(newValue);
+        }
     }
 
+    public void OnGameModeDropdownChanged(int newValue)
+    {
+        if (hostingLobby)
+        {
+            EventManager.lobbyHostChangedGamemodeEvent.Invoke(newValue);
+        }
+    }
 
     public void OnVoiceChatDropdownChanged()
     {
+        if (hostingLobby)
+        {
+
+        }
 
     }
 
@@ -208,106 +392,127 @@ public class LobbyUI : MonoBehaviour
         Stages.Load(name);
     }
 
+    #endregion
 
-#endregion
-
+    #region CLIENT
     public void OnChooseCharacterButtonClicked()
     {
-        DisableControls();
+        //DisableControls();
         EnableSelectCharacterControls();
 
     }
 
-    private void DisableControls()
+    //[Client]
+    private void Update()
     {
-        leaveLobbyButton.enabled = false;
-        startGameButton.enabled = false;
-        chooseCharacterButton.enabled = false;
-        leaveLobbyButton.GetComponentInChildren<Text>().color = Color.grey;
-        startGameButton.GetComponentInChildren<Text>().color = Color.grey;
-        chooseCharacterButton.GetComponentInChildren<Text>().color = Color.grey;
+        if (Keybinds.GetKey(Action.GuiReturn))
+        {
+            if (selectingCharacter)
+            {
+                DisableSelectCharacterControls();
+                //EnableControls();
+                return;
+            }
+
+            Hide();
+
+            if (hostingLobby)
+            {
+                networkManager.StopHost();
+                hostGameUI.Show();
+                Debug.Log("You are no longer hosting the game!");
+            }
+
+            else
+            {
+                joinGameUI.Show();
+            }
+        }
     }
 
-    private void EnableControls()
-    {
-        leaveLobbyButton.enabled = true;
-        startGameButton.enabled = true;
-        chooseCharacterButton.enabled = true;
-        leaveLobbyButton.GetComponentInChildren<Text>().color = Color.white;
-        startGameButton.GetComponentInChildren<Text>().color = Color.white;
-        chooseCharacterButton.GetComponentInChildren<Text>().color = Color.white;
-    }
 
+
+    //[Client]
     public void OnJamalButtonClicked()
     {
-        playerOneLobbyIcon.texture = jamalIcon;
+        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Jamal);
         DisableSelectCharacterControls();
-        EnableControls();
+        //EnableControls();
     }
 
+
+    //[Client]
     public void OnAliceButtonClicked()
     {
-        playerOneLobbyIcon.texture = aliceIcon;
+        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Alice);
         DisableSelectCharacterControls();
-        EnableControls();
+        //EnableControls();
     }
 
+    //[Client]
     public void OnChadButtonClicked()
     {
-        playerOneLobbyIcon.texture = chadIcon;
+        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Chad);
         DisableSelectCharacterControls();
-        EnableControls();
+        //EnableControls();
     }
 
+    //[Client]
     public void OnJesusButtonClicked()
     {
-        playerOneLobbyIcon.texture = jesusIcon;
+        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Jesus);
         DisableSelectCharacterControls();
-        EnableControls();
+        //EnableControls();
     }
 
+    //[Client]
     public void OnLurkerButtonClicked()
     {
-        playerOneLobbyIcon.texture = lurkerIcon;
+        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Lurker);
         DisableSelectCharacterControls();
-        EnableControls();
+        //EnableControls();
     }
 
 
+    //[Client]
     public void OnPhantomButtonClicked()
     {
-        playerOneLobbyIcon.texture = phantomIcon;
+        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Phantom);
         DisableSelectCharacterControls();
-        EnableControls();
+        //EnableControls();
     }
 
 
+    ////[Client]
     public void OnMaryButtonClicked()
     {
-        playerOneLobbyIcon.texture = maryIcon;
+        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Mary);
         DisableSelectCharacterControls();
-        EnableControls();
+        //EnableControls();
     }
 
 
+    //[Client]
     public void OnFallenButtonClicked()
     {
-        playerOneLobbyIcon.texture = fallenIcon;
+        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Fallen);
         DisableSelectCharacterControls();
-        EnableControls();
+        //EnableControls();
     }
 
+    //[Client]
     public void OnRandomCharacterButtonClicked()
     {
-        playerOneLobbyIcon.texture = randomCharacterIcon;
+        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Random);
         DisableSelectCharacterControls();
-        EnableControls();
+        //EnableControls();
     }
 
 
+    //[Client]
     public void OnLeaveLobbyButtonClicked()
     {
-        if (hosting)
+        if (hostingLobby)
         {
             hostGameUI.Show();
         }
@@ -315,7 +520,6 @@ public class LobbyUI : MonoBehaviour
         else
         {
             joinGameUI.Show();
-
         }
 
         Hide();
@@ -329,38 +533,7 @@ public class LobbyUI : MonoBehaviour
         playerFourLobbyIcon.texture = emptyLobbySlotIcon;
     }
 
-    /*
-    private void OnMouseOverSelectCharacterButton(Button button)
-    {
-        button.GetComponent<Image>().texture = hoveredOverCharacterTexture;
-
-    }
-
-    private void OnMouseLeftCharacterSelectChadButton(Button button)
-    {
-        button.GetComponent<Image>().texture = chadIcon;
-
-    }
-
-    private void OnMouseLeftCharacterSelectAliceButton(Button button)
-    {
-        button.GetComponent<Image>().texture = aliceIcon;
-
-    }
-
-    private void OnMouseLeftCharacterSelectJamalutton(Button button)
-    {
-        button.GetComponent<Image>().texture = jamalIcon;
-
-    }
-
-    private void OnMouseLeftCharacterSelectJesusButton(Button button)
-    {
-        button.GetComponent<Image>().texture = jesusIcon;
-
-    }
-    */
-
+    //[Client]
     private void EnableSelectCharacterControls()
     {
         selectingCharacter = true;
@@ -387,6 +560,7 @@ public class LobbyUI : MonoBehaviour
 
     }
 
+    //[Client]
     private void DisableSelectCharacterControls()
     {
         selectingCharacter = false;
@@ -413,11 +587,178 @@ public class LobbyUI : MonoBehaviour
 
     }
 
-    private void OnPersonDisconnected()
+    private Texture GetCharacterTexture(Character character)
     {
-        // TODO: Get the id of the player and then change it to the X icon.
-        return;
-
+        switch (character)
+        {
+            case Character.Jamal:
+                return jamalIcon;
+            case Character.Alice:
+                return aliceIcon;
+            case Character.Chad:
+                return chadIcon;
+            case Character.Jesus:
+                return jesusIcon;
+            case Character.Lurker:
+                return lurkerIcon;
+            case Character.Phantom:
+                return phantomIcon;
+            case Character.Mary:
+                return maryIcon;
+            case Character.Fallen:
+                return fallenIcon;
+            case Character.Random:
+                return randomCharacterIcon;
+            case Character.Empty:
+                return emptyLobbySlotIcon;
+            default:
+                return emptyLobbySlotIcon;
+        }
     }
 
+
+    private void OnPlayerSlotUpdated(Character character, string playerName, int index)
+    {
+        Texture characterTexture = GetCharacterTexture(character);
+        Debug.Log($"Player changed character! Index = {index}: New character is {character}");
+
+        switch (index)
+        {
+            case PLAYER_ONE:
+                playerOneLobbyIcon.texture = characterTexture;
+                playerOneNameText.text = playerName;
+                break;
+            case PLAYER_TWO:
+                playerTwoLobbyIcon.texture = characterTexture;
+                playerTwoNameText.text = playerName;
+                break;
+            case PLAYER_THREE:
+                playerThreeLobbyIcon.texture = characterTexture;
+                playerThreeNameText.text = playerName;
+                break;
+            case PLAYER_FOUR:
+                playerFourLobbyIcon.texture = characterTexture;
+                playerFourNameText.text = playerName;
+                break;
+            case PLAYER_FIVE:
+                playerFiveLobbyIcon.texture = characterTexture;
+                playerFiveNameText.text = playerName;
+                break;
+        }
+    }
+
+    private void OnPlayerLeftLobby(int index, string playerName)
+    {
+        switch (index)
+        {
+            case PLAYER_ONE:
+                playerOneLobbyIcon.texture = emptyLobbySlotIcon;
+                playerOneNameText.text = string.Empty;
+                kickPlayerOneButton.interactable = false;
+                kickPlayerOneButton.GetComponentInChildren<Text>().color = Color.clear;
+                break;
+            case PLAYER_TWO:
+                playerTwoLobbyIcon.texture = emptyLobbySlotIcon;
+                playerTwoNameText.text = string.Empty;
+                kickPlayerTwoButton.interactable = false;
+                kickPlayerTwoButton.GetComponentInChildren<Text>().color = Color.clear;
+                break;
+            case PLAYER_THREE:
+                playerThreeLobbyIcon.texture = emptyLobbySlotIcon;
+                playerThreeNameText.text = string.Empty;
+                kickPlayerThreeButton.interactable = false;
+                kickPlayerThreeButton.GetComponentInChildren<Text>().color = Color.clear;
+                break;
+            case PLAYER_FOUR:
+                playerFourLobbyIcon.texture = emptyLobbySlotIcon;
+                playerFourNameText.text = string.Empty;
+                kickPlayerFourButton.interactable = false;
+                kickPlayerFourButton.GetComponentInChildren<Text>().color = Color.clear;
+                break;
+            case PLAYER_FIVE:
+                playerFiveLobbyIcon.texture = emptyLobbySlotIcon;
+                playerFiveNameText.text = string.Empty;
+                kickPlayerFiveButton.interactable = false;
+                kickPlayerFiveButton.GetComponentInChildren<Text>().color = Color.clear;
+                break;
+        }
+    }
+
+    private void OnPlayerJoinedLobby(int index, string playerName)
+    {
+        switch (index)
+        {
+            case PLAYER_ONE:
+                playerOneLobbyIcon.texture = randomCharacterIcon;
+                playerOneNameText.text = playerName;
+                kickPlayerOneButton.interactable = true;
+                kickPlayerOneButton.GetComponentInChildren<Text>().color = Color.white;
+                break;
+            case PLAYER_TWO:
+                playerTwoLobbyIcon.texture = emptyLobbySlotIcon;
+                playerTwoNameText.text = playerName;
+                kickPlayerTwoButton.interactable = true;
+                kickPlayerTwoButton.GetComponentInChildren<Text>().color = Color.white;
+                break;
+            case PLAYER_THREE:
+                playerThreeLobbyIcon.texture = emptyLobbySlotIcon;
+                playerThreeNameText.text = playerName;
+                kickPlayerThreeButton.interactable = true;
+                kickPlayerThreeButton.GetComponentInChildren<Text>().color = Color.white;
+                break;
+            case PLAYER_FOUR:
+                playerFourLobbyIcon.texture = emptyLobbySlotIcon;
+                playerFourNameText.text = playerName;
+                kickPlayerFourButton.interactable = true;
+                kickPlayerFourButton.GetComponentInChildren<Text>().color = Color.white;
+                break;
+            case PLAYER_FIVE:
+                playerFiveLobbyIcon.texture = emptyLobbySlotIcon;
+                playerFiveNameText.text = playerName;
+                kickPlayerFiveButton.interactable = true;
+                kickPlayerFiveButton.GetComponentInChildren<Text>().color = Color.white;
+                break;
+        }
+    }
+
+    private void OnStageSelectionUpdated(int newValue)
+    {
+        Debug.Log("Stage selection changed!");
+        stageDropdown.value = (int)newValue;
+    }
+
+    private void OnGameModeSelectionUpdated(int newValue)
+    {
+        Debug.Log("Gamemode selection changed!");
+        gameModeDropdown.value = newValue;
+    }
+
+    private void OnInsanityOptionUpdated(bool newValue)
+    {
+        Debug.Log("Insanity option changed!");
+
+        if (!hostingLobby)
+        {
+            insanityToggle.isOn = newValue;
+        }
+    }
+
+    private void OnAllRandomOptionUpdated(bool newValue)
+    {
+        Debug.Log("All random option changed!");
+        allRandomToggle.isOn = newValue;
+    }
+
+    private void OnAllowSpectatorOptionUpdated(bool newValue)
+    {
+        Debug.Log("Allow spectator changed!");
+        allowSpectatorToggle.isOn = newValue;
+    }
+
+    public bool Hosting()
+    {
+        return hostingLobby;
+    }
 }
+
+#endregion
