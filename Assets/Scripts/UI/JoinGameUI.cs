@@ -29,7 +29,6 @@ public class JoinGameUI : MonoBehaviour
     [SerializeField]
     private Button directConnectButton;
 
-
     [SerializeField]
     private MainMenuUI mainMenuUI;
 
@@ -40,8 +39,6 @@ public class JoinGameUI : MonoBehaviour
     private LobbyUI lobbyUI;
 
     private List<Lobby> lobbies;
-
-
 
     private void Update()
     {

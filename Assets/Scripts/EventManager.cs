@@ -20,31 +20,39 @@ public static class EventManager
 
     public static PlayerPickedUpKeyEvent playerPickedUpKeyEvent = new PlayerPickedUpKeyEvent();
 
-    public static LobbyHostBeginHostingEvent lobbyHostBeginHostingEvent = new LobbyHostBeginHostingEvent();
 
-    public static LobbyHostKickedPlayerEvent lobbyHostKickedPlayerEvent = new LobbyHostKickedPlayerEvent();
+    public static LobbyServerChangedInsanityOptionEvent lobbyServerChangedInsanityOptionEvent = new LobbyServerChangedInsanityOptionEvent();
 
-    public static LobbyHostKickdYouEvent lobbyHostKickdYouEvent = new LobbyHostKickdYouEvent();
+#region LOBBY_SERVER
 
-    public static LobbyHostPlayerChangedCharacterEvent lobbyHostPlayerChangedCharacterEvent = new LobbyHostPlayerChangedCharacterEvent() ;
+    public static LobbyServerKickedEvent lobbyServerKickedEvent = new LobbyServerKickedEvent();
 
-    public static LobbyPlayerLeftLobbyEvent lobbyPlayerLeftLobbyEvent = new LobbyPlayerLeftLobbyEvent();
+    public static LobbyServerChangedAllRandomEvent lobbyServerChangedAllRandomEvent = new LobbyServerChangedAllRandomEvent();
+    
+    public static LobbyServerChangedAllowSpecatorEvent lobbyServerChangedAllowSpectatorEvent = new LobbyServerChangedAllowSpecatorEvent(); 
 
-    public static LobbyPlayerJoinedLobbyEvent lobbyPlayerJoinedLobbyEvent = new LobbyPlayerJoinedLobbyEvent();
+    public static LobbyServerChangedStageEvent lobbyServerChangedStageEvent = new LobbyServerChangedStageEvent();
+
+    public static LobbyServerChangedGamemodeEvent lobbyServerChangedGamemodeEvent = new LobbyServerChangedGamemodeEvent();
+
+
+#endregion
+
+#region LOBBY_CLIENT
+
+    //NOTE: Lobby client.
+
+    public static LobbyClientKickedEvent lobbyClientKickedEvent = new LobbyClientKickedEvent();
+
+    public static LobbyClientHostChangedGamemodeEvent lobbyClientHostChangedGamemodeEvent = new LobbyClientHostChangedGamemodeEvent();
 
     public static LobbyYouChangedCharacterEvent lobbyYouChangedCharacterEvent = new LobbyYouChangedCharacterEvent();
 
-    public static LobbyHostChangedInsanityOptionEvent lobbyHostChangedInsanityOptionEvent = new LobbyHostChangedInsanityOptionEvent();
+    public static LobbyClientPlayerJoinedEvent lobbyClientPlayerJoinedEvent = new LobbyClientPlayerJoinedEvent();
 
-    public static LobbyHostChangedAllRandomOptionEvent lobbyHostChangedAllRandomOptionEvent = new LobbyHostChangedAllRandomOptionEvent();
-    
-    public static LobbyHostChangedAllowSpectatorEvent lobbyHostChangedAllowSpectatorEvent = new LobbyHostChangedAllowSpectatorEvent(); 
+    public static LobbyClientPlayerLeftEvent lobbyClientPlayerLeftEvent = new LobbyClientPlayerLeftEvent();
 
-    public static LobbyHostChangedStageEvent lobbyHostChangedStageEvent = new LobbyHostChangedStageEvent();
-
-    public static LobbyHostChangedGamemodeEvent lobbyHostChangedGamemodeEvent = new LobbyHostChangedGamemodeEvent();
-
-    public static LobbyClientHostChangedGamemodeEvent lobbyClientHostChangedGamemodeEvent = new LobbyClientHostChangedGamemodeEvent();
+    public static LobbyClientPlayerChangedCharacterEvent lobbyClientPlayerChangedCharacterEvent = new LobbyClientPlayerChangedCharacterEvent();
 
     public static LobbyClientHostChangedStageEvent lobbyClientHostChangedStageEvent = new LobbyClientHostChangedStageEvent();
 
@@ -52,7 +60,12 @@ public static class EventManager
 
     public static LobbyClientHostChangedAllRandomEvent lobbyClientHostChangedAllRandomEvent = new LobbyClientHostChangedAllRandomEvent();
 
+
     public static LobbyClientHostChangedInsanityOptionEvent lobbyClientHostChangedInsanityOptionEvent = new LobbyClientHostChangedInsanityOptionEvent();
+
+    public static LobbyYouHaveBeenKickedEvent lobbyYouHaveBeenKickedEvent = new LobbyYouHaveBeenKickedEvent();
+
+#endregion
 
     public static PlayerSentChatMessageEvent playerSentChatMessageEvent = new PlayerSentChatMessageEvent();
 
@@ -234,34 +247,32 @@ public class PlayerClientChangedNameEvent: UnityEvent<string, string>{}
 public class PlayerPickedUpKeyEvent : UnityEvent<string, string> { }
 
 
-#region LOBBY
+#endregion
+
+
+#region LOBBY_SERVER_EVENTS
 
 //NOTE: Host events.
 
 public class LobbyHostBeginHostingEvent: UnityEvent{}
 
-public class LobbyHostKickedPlayerEvent: UnityEvent<string>{}
+public class LobbyClientKickedEvent: UnityEvent<string, int>{}
 
-public class LobbyHostKickdYouEvent: UnityEvent{}
+public class LobbyServerKickedEvent: UnityEvent<int>{}
 
-public class LobbyHostPlayerChangedCharacterEvent: UnityEvent<Character, string, int>{}
-
-public class LobbyPlayerLeftLobbyEvent: UnityEvent<int, string>{}
-
-public class LobbyPlayerJoinedLobbyEvent: UnityEvent<int, string>{}
+public class LobbyYouHaveBeenKickedEvent: UnityEvent{}
 
 public class LobbyYouChangedCharacterEvent: UnityEvent<Character>{}
 
-public class LobbyHostChangedInsanityOptionEvent: UnityEvent<bool>{}
+public class LobbyServerChangedInsanityOptionEvent: UnityEvent<bool>{}
 
-public class LobbyHostChangedAllRandomOptionEvent: UnityEvent<bool>{}
+public class LobbyServerChangedAllRandomEvent: UnityEvent<bool>{}
 
-public class LobbyHostChangedAllowSpectatorEvent: UnityEvent<bool>{}
+public class LobbyServerChangedAllowSpecatorEvent: UnityEvent<bool>{}
 
-public class LobbyHostChangedStageEvent: UnityEvent<int>{}
+public class LobbyServerChangedStageEvent: UnityEvent<int>{}
 
-public class LobbyHostChangedGamemodeEvent: UnityEvent<int>{}
-
+public class LobbyServerChangedGamemodeEvent: UnityEvent<int>{}
 
 public class LobbyClientHostChangedInsanityOptionEvent: UnityEvent<bool>{}
 
@@ -273,9 +284,11 @@ public class LobbyClientHostChangedStageEvent: UnityEvent<int>{}
 
 public class LobbyClientHostChangedGamemodeEvent: UnityEvent<int>{}
 
+public class LobbyClientPlayerJoinedEvent: UnityEvent<string, int>{}
 
+public class LobbyClientPlayerLeftEvent: UnityEvent<string, int>{}
 
-#endregion
+public class LobbyClientPlayerChangedCharacterEvent: UnityEvent<Character, int>{}
 
 #endregion
 

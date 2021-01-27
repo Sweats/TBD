@@ -121,18 +121,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!114 &928500056 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6826062298934968184, guid: a8391e9f8dcca780db940d205aeb499e,
-    type: 3}
-  m_PrefabInstance: {fileID: 1234692155}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1234692155
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -195,16 +183,6 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 5107241063471726715, guid: a8391e9f8dcca780db940d205aeb499e,
-        type: 3}
-      propertyPath: directConnectButton
-      value: 
-      objectReference: {fileID: 928500056}
-    - target: {fileID: 5107241063471726715, guid: a8391e9f8dcca780db940d205aeb499e,
-        type: 3}
-      propertyPath: directConnectUI
-      value: 
-      objectReference: {fileID: 1373978006}
     - target: {fileID: 5107241063503662302, guid: a8391e9f8dcca780db940d205aeb499e,
         type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -534,65 +512,6 @@ PrefabInstance:
     - {fileID: 4965231446830307581, guid: a8391e9f8dcca780db940d205aeb499e, type: 3}
     - {fileID: 1313898844979218975, guid: a8391e9f8dcca780db940d205aeb499e, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: a8391e9f8dcca780db940d205aeb499e, type: 3}
---- !u!114 &1373978006 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2563320678634886961, guid: a8391e9f8dcca780db940d205aeb499e,
-    type: 3}
-  m_PrefabInstance: {fileID: 1234692155}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e1ae4376e098962ebd5b498151b733d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!1 &2073648886 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 395585805059357690, guid: a8391e9f8dcca780db940d205aeb499e,
-    type: 3}
-  m_PrefabInstance: {fileID: 1234692155}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &2073648888
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2073648886}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9a559d7f14d36799e971531dab3e8596, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 0
-  runInBackground: 1
-  autoStartServerBuild: 0
-  showDebugMessages: 0
-  serverTickRate: 30
-  offlineScene: 
-  onlineScene: 
-  transport: {fileID: 2073648890}
-  networkAddress: localhost
-  maxConnections: 5
-  disconnectInactiveConnections: 0
-  disconnectInactiveTimeout: 60
-  authenticator: {fileID: 0}
-  playerPrefab: {fileID: 0}
-  autoCreatePlayer: 0
-  playerSpawnMethod: 0
-  spawnPrefabs: []
---- !u!114 &2073648890 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2958772349620144221, guid: a8391e9f8dcca780db940d205aeb499e,
-    type: 3}
-  m_PrefabInstance: {fileID: 1234692155}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2073648886}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2088369697
 GameObject:
   m_ObjectHideFlags: 0

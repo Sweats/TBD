@@ -206,27 +206,20 @@ public class LobbyUI : MonoBehaviour
     private int playerFourCharacter;
     private int playerFiveCharacter;
 
-    [SerializeField]
-    private NetworkManager networkManager;
-
     private bool hostingLobby;
-
-    // NOTE: Put connectionId's in here. -1 means no client is using the slot
-    [SerializeField]
-    private LobbyPlayer[] players;
 
     private void Start()
     {
         this.enabled = false;
-        EventManager.lobbyHostPlayerChangedCharacterEvent.AddListener(OnPlayerSlotUpdated);
-        EventManager.lobbyPlayerLeftLobbyEvent.AddListener(OnPlayerLeftLobby);
-        EventManager.lobbyPlayerJoinedLobbyEvent.AddListener(OnPlayerJoinedLobby);
-
         EventManager.lobbyClientHostChangedAllowSpectatorEvent.AddListener(OnAllowSpectatorOptionUpdated);
         EventManager.lobbyClientHostChangedStageEvent.AddListener(OnStageSelectionUpdated);
         EventManager.lobbyClientHostChangedGamemodeEvent.AddListener(OnGameModeSelectionUpdated);
         EventManager.lobbyClientHostChangedAllRandomEvent.AddListener(OnAllRandomOptionUpdated);
         EventManager.lobbyClientHostChangedInsanityOptionEvent.AddListener(OnInsanityOptionUpdated);
+        EventManager.lobbyClientPlayerJoinedEvent.AddListener(OnPlayerJoinedLobby);
+        EventManager.lobbyClientPlayerLeftEvent.AddListener(OnPlayerLeftLobby);
+        EventManager.lobbyClientPlayerChangedCharacterEvent.AddListener(OnPlayerSlotUpdated);
+        EventManager.lobbyYouHaveBeenKickedEvent.AddListener(OnKickedFromLobby);
     }
 
     public void Show(bool hosting)
@@ -248,7 +241,7 @@ public class LobbyUI : MonoBehaviour
 
     public void OnKickedButtonClicked(int playerNumber)
     {
-        //lobbyNetworkHandler.CmdKickPlayer(player);
+        EventManager.lobbyServerKickedEvent.Invoke(playerNumber);
     }
 
     private void SetUpClientLobbyControls()
@@ -321,15 +314,21 @@ public class LobbyUI : MonoBehaviour
 
     private void Hide()
     {
-        if (hostingLobby)
-        {
-            networkManager.StopHost();
-            Debug.Log("You are no longer hosting a game!");
-        }
-
         this.enabled = false;
         Reset();
         lobbyCanvas.enabled = false;
+
+        if (hostingLobby)
+        {
+            NetworkServer.DisconnectAll();
+            Debug.Log("You are no longer hosting a game!");
+        }
+
+        else
+        {
+            NetworkClient.Disconnect();
+        }
+
     }
 
     #region HOST_OPTIONS
@@ -338,7 +337,7 @@ public class LobbyUI : MonoBehaviour
     {
         if (hostingLobby)
         {
-            EventManager.lobbyHostChangedInsanityOptionEvent.Invoke(newValue);
+            EventManager.lobbyServerChangedInsanityOptionEvent.Invoke(newValue);
         }
     }
 
@@ -346,7 +345,7 @@ public class LobbyUI : MonoBehaviour
     {
         if (hostingLobby)
         {
-            EventManager.lobbyHostChangedAllowSpectatorEvent.Invoke(newValue);
+            EventManager.lobbyServerChangedAllowSpectatorEvent.Invoke(newValue);
         }
     }
 
@@ -355,7 +354,7 @@ public class LobbyUI : MonoBehaviour
     {
         if (hostingLobby)
         {
-            EventManager.lobbyHostChangedAllRandomOptionEvent.Invoke(newValue);
+            EventManager.lobbyServerChangedAllRandomEvent.Invoke(newValue);
         }
     }
 
@@ -363,7 +362,7 @@ public class LobbyUI : MonoBehaviour
     {
         if (hostingLobby)
         {
-            EventManager.lobbyHostChangedStageEvent.Invoke(newValue);
+            EventManager.lobbyServerChangedStageEvent.Invoke(newValue);
         }
     }
 
@@ -371,7 +370,7 @@ public class LobbyUI : MonoBehaviour
     {
         if (hostingLobby)
         {
-            EventManager.lobbyHostChangedGamemodeEvent.Invoke(newValue);
+            EventManager.lobbyServerChangedGamemodeEvent.Invoke(newValue);
         }
     }
 
@@ -383,6 +382,7 @@ public class LobbyUI : MonoBehaviour
         }
 
     }
+
 
     public void OnStartGameButtonClicked()
     {
@@ -418,7 +418,7 @@ public class LobbyUI : MonoBehaviour
 
             if (hostingLobby)
             {
-                networkManager.StopHost();
+                NetworkServer.DisconnectAll();
                 hostGameUI.Show();
                 Debug.Log("You are no longer hosting the game!");
             }
@@ -435,7 +435,7 @@ public class LobbyUI : MonoBehaviour
     //[Client]
     public void OnJamalButtonClicked()
     {
-        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Jamal);
+        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Jamal });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -444,7 +444,7 @@ public class LobbyUI : MonoBehaviour
     //[Client]
     public void OnAliceButtonClicked()
     {
-        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Alice);
+        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Alice });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -452,7 +452,7 @@ public class LobbyUI : MonoBehaviour
     //[Client]
     public void OnChadButtonClicked()
     {
-        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Chad);
+        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Chad });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -460,7 +460,7 @@ public class LobbyUI : MonoBehaviour
     //[Client]
     public void OnJesusButtonClicked()
     {
-        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Jesus);
+        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Jesus });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -468,7 +468,7 @@ public class LobbyUI : MonoBehaviour
     //[Client]
     public void OnLurkerButtonClicked()
     {
-        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Lurker);
+        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Lurker });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -477,7 +477,7 @@ public class LobbyUI : MonoBehaviour
     //[Client]
     public void OnPhantomButtonClicked()
     {
-        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Phantom);
+        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Phantom });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -486,7 +486,7 @@ public class LobbyUI : MonoBehaviour
     ////[Client]
     public void OnMaryButtonClicked()
     {
-        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Mary);
+        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Mary });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -495,7 +495,7 @@ public class LobbyUI : MonoBehaviour
     //[Client]
     public void OnFallenButtonClicked()
     {
-        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Fallen);
+        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Fallen });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -503,7 +503,7 @@ public class LobbyUI : MonoBehaviour
     //[Client]
     public void OnRandomCharacterButtonClicked()
     {
-        EventManager.lobbyYouChangedCharacterEvent.Invoke(Character.Random);
+        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Random });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -617,7 +617,7 @@ public class LobbyUI : MonoBehaviour
     }
 
 
-    private void OnPlayerSlotUpdated(Character character, string playerName, int index)
+    private void OnPlayerSlotUpdated(Character character, int index)
     {
         Texture characterTexture = GetCharacterTexture(character);
         Debug.Log($"Player changed character! Index = {index}: New character is {character}");
@@ -625,117 +625,241 @@ public class LobbyUI : MonoBehaviour
         switch (index)
         {
             case PLAYER_ONE:
+
                 playerOneLobbyIcon.texture = characterTexture;
-                playerOneNameText.text = playerName;
+
+                if (character == Character.Empty)
+                {
+                    playerOneNameText.text = string.Empty;
+
+                    if (hostingLobby)
+                    {
+                        kickPlayerOneButton.interactable = false;
+                        kickPlayerOneButton.GetComponentInChildren<Text>().color = Color.clear;
+                    }
+                }
+
                 break;
+
             case PLAYER_TWO:
                 playerTwoLobbyIcon.texture = characterTexture;
-                playerTwoNameText.text = playerName;
+
+                if (character == Character.Empty)
+                {
+                    playerTwoNameText.text = string.Empty;
+
+                    if (hostingLobby)
+                    {
+                        kickPlayerTwoButton.interactable = false;
+                        kickPlayerTwoButton.GetComponentInChildren<Text>().color = Color.clear;
+                    }
+                }
+
+
                 break;
+
             case PLAYER_THREE:
                 playerThreeLobbyIcon.texture = characterTexture;
-                playerThreeNameText.text = playerName;
+
+                if (character == Character.Empty)
+                {
+                    playerThreeNameText.text = string.Empty;
+
+                    if (hostingLobby)
+                    {
+                        kickPlayerThreeButton.interactable = false;
+                        kickPlayerThreeButton.GetComponentInChildren<Text>().color = Color.clear;
+                    }
+                }
+
+
                 break;
+
             case PLAYER_FOUR:
                 playerFourLobbyIcon.texture = characterTexture;
-                playerFourNameText.text = playerName;
+
+                if (character == Character.Empty)
+                {
+                    playerFourNameText.text = string.Empty;
+
+                    if (hostingLobby)
+                    {
+                        kickPlayerFourButton.interactable = false;
+                        kickPlayerFourButton.GetComponentInChildren<Text>().color = Color.clear;
+                    }
+                }
+
+
                 break;
+
             case PLAYER_FIVE:
                 playerFiveLobbyIcon.texture = characterTexture;
-                playerFiveNameText.text = playerName;
+
+                if (character == Character.Empty)
+                {
+                    playerFiveNameText.text = string.Empty;
+
+                    if (hostingLobby)
+                    {
+                        kickPlayerFiveButton.interactable = false;
+                        kickPlayerFiveButton.GetComponentInChildren<Text>().color = Color.clear;
+                    }
+                }
+
                 break;
         }
     }
 
-    private void OnPlayerLeftLobby(int index, string playerName)
+    private void OnPlayerLeftLobby(string playerName, int index)
     {
         switch (index)
         {
             case PLAYER_ONE:
                 playerOneLobbyIcon.texture = emptyLobbySlotIcon;
                 playerOneNameText.text = string.Empty;
-                kickPlayerOneButton.interactable = false;
-                kickPlayerOneButton.GetComponentInChildren<Text>().color = Color.clear;
+
+                if (hostingLobby)
+                {
+                    kickPlayerOneButton.interactable = false;
+                    kickPlayerOneButton.GetComponentInChildren<Text>().color = Color.clear;
+                }
+
                 break;
+
             case PLAYER_TWO:
                 playerTwoLobbyIcon.texture = emptyLobbySlotIcon;
                 playerTwoNameText.text = string.Empty;
-                kickPlayerTwoButton.interactable = false;
-                kickPlayerTwoButton.GetComponentInChildren<Text>().color = Color.clear;
+
+                if (hostingLobby)
+                {
+                    kickPlayerTwoButton.interactable = false;
+                    kickPlayerTwoButton.GetComponentInChildren<Text>().color = Color.clear;
+                }
+
                 break;
+
             case PLAYER_THREE:
                 playerThreeLobbyIcon.texture = emptyLobbySlotIcon;
                 playerThreeNameText.text = string.Empty;
-                kickPlayerThreeButton.interactable = false;
-                kickPlayerThreeButton.GetComponentInChildren<Text>().color = Color.clear;
+
+                if (hostingLobby)
+                {
+                    kickPlayerThreeButton.interactable = false;
+                    kickPlayerThreeButton.GetComponentInChildren<Text>().color = Color.clear;
+                }
+
                 break;
+
             case PLAYER_FOUR:
                 playerFourLobbyIcon.texture = emptyLobbySlotIcon;
                 playerFourNameText.text = string.Empty;
-                kickPlayerFourButton.interactable = false;
-                kickPlayerFourButton.GetComponentInChildren<Text>().color = Color.clear;
+
+                if (hostingLobby)
+                {
+                    kickPlayerFourButton.interactable = false;
+                    kickPlayerFourButton.GetComponentInChildren<Text>().color = Color.clear;
+                }
+
                 break;
+
             case PLAYER_FIVE:
                 playerFiveLobbyIcon.texture = emptyLobbySlotIcon;
                 playerFiveNameText.text = string.Empty;
-                kickPlayerFiveButton.interactable = false;
-                kickPlayerFiveButton.GetComponentInChildren<Text>().color = Color.clear;
+
+                if (hostingLobby)
+                {
+                    kickPlayerFiveButton.interactable = false;
+                    kickPlayerFiveButton.GetComponentInChildren<Text>().color = Color.clear;
+                }
                 break;
         }
     }
 
-    private void OnPlayerJoinedLobby(int index, string playerName)
+    private void OnPlayerJoinedLobby(string playerName, int index)
     {
         switch (index)
         {
             case PLAYER_ONE:
                 playerOneLobbyIcon.texture = randomCharacterIcon;
                 playerOneNameText.text = playerName;
-                kickPlayerOneButton.interactable = true;
-                kickPlayerOneButton.GetComponentInChildren<Text>().color = Color.white;
+
+                if (hostingLobby)
+                {
+                    kickPlayerOneButton.interactable = true;
+                    kickPlayerOneButton.GetComponentInChildren<Text>().color = Color.white;
+                }
+
                 break;
+
             case PLAYER_TWO:
-                playerTwoLobbyIcon.texture = emptyLobbySlotIcon;
+                playerTwoLobbyIcon.texture = randomCharacterIcon;
                 playerTwoNameText.text = playerName;
-                kickPlayerTwoButton.interactable = true;
-                kickPlayerTwoButton.GetComponentInChildren<Text>().color = Color.white;
+
+                if (hostingLobby)
+                {
+                    kickPlayerTwoButton.interactable = true;
+                    kickPlayerTwoButton.GetComponentInChildren<Text>().color = Color.white;
+                }
+
                 break;
+
             case PLAYER_THREE:
-                playerThreeLobbyIcon.texture = emptyLobbySlotIcon;
+                playerThreeLobbyIcon.texture = randomCharacterIcon;
                 playerThreeNameText.text = playerName;
-                kickPlayerThreeButton.interactable = true;
-                kickPlayerThreeButton.GetComponentInChildren<Text>().color = Color.white;
+
+                if (hostingLobby)
+                {
+                    kickPlayerThreeButton.interactable = true;
+                    kickPlayerThreeButton.GetComponentInChildren<Text>().color = Color.white;
+                }
+
+
                 break;
             case PLAYER_FOUR:
-                playerFourLobbyIcon.texture = emptyLobbySlotIcon;
+                playerFourLobbyIcon.texture = randomCharacterIcon;
                 playerFourNameText.text = playerName;
-                kickPlayerFourButton.interactable = true;
-                kickPlayerFourButton.GetComponentInChildren<Text>().color = Color.white;
+
+                if (hostingLobby)
+                {
+                    kickPlayerFourButton.interactable = true;
+                    kickPlayerFourButton.GetComponentInChildren<Text>().color = Color.white;
+                }
+
                 break;
+
             case PLAYER_FIVE:
-                playerFiveLobbyIcon.texture = emptyLobbySlotIcon;
+                playerFiveLobbyIcon.texture = randomCharacterIcon;
                 playerFiveNameText.text = playerName;
-                kickPlayerFiveButton.interactable = true;
-                kickPlayerFiveButton.GetComponentInChildren<Text>().color = Color.white;
+
+                if (hostingLobby)
+                {
+                    kickPlayerFiveButton.interactable = true;
+                    kickPlayerFiveButton.GetComponentInChildren<Text>().color = Color.white;
+                }
+
                 break;
         }
     }
 
     private void OnStageSelectionUpdated(int newValue)
     {
-        Debug.Log("Stage selection changed!");
         stageDropdown.value = (int)newValue;
+    }
+
+    private void OnKickedFromLobby()
+    {
+        NetworkClient.Disconnect();
+        joinGameUI.Show();
+        Hide();
     }
 
     private void OnGameModeSelectionUpdated(int newValue)
     {
-        Debug.Log("Gamemode selection changed!");
         gameModeDropdown.value = newValue;
     }
 
     private void OnInsanityOptionUpdated(bool newValue)
     {
-        Debug.Log("Insanity option changed!");
 
         if (!hostingLobby)
         {
@@ -745,13 +869,11 @@ public class LobbyUI : MonoBehaviour
 
     private void OnAllRandomOptionUpdated(bool newValue)
     {
-        Debug.Log("All random option changed!");
         allRandomToggle.isOn = newValue;
     }
 
     private void OnAllowSpectatorOptionUpdated(bool newValue)
     {
-        Debug.Log("Allow spectator changed!");
         allowSpectatorToggle.isOn = newValue;
     }
 

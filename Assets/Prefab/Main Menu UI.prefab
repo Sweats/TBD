@@ -197,11 +197,12 @@ MonoBehaviour:
   disconnectInactiveConnections: 0
   disconnectInactiveTimeout: 60
   authenticator: {fileID: 0}
-  playerPrefab: {fileID: 1399343144565388955, guid: 4a6e3aac53cad2fbf89a105885cb032b,
+  playerPrefab: {fileID: 1581111813915755671, guid: 5dd2f3ec06a6efb3aa4d880afc3a0cbc,
     type: 3}
   autoCreatePlayer: 1
   playerSpawnMethod: 0
-  spawnPrefabs: []
+  spawnPrefabs:
+  - {fileID: 1581111813915755671, guid: 5dd2f3ec06a6efb3aa4d880afc3a0cbc, type: 3}
 --- !u!1 &717939555444070849
 GameObject:
   m_ObjectHideFlags: 0
@@ -7890,9 +7891,9 @@ MonoBehaviour:
   refreshAllButton: {fileID: 5107241065095641291}
   connectButton: {fileID: 5107241064193794374}
   backButton: {fileID: 5107241063517228107}
-  directConnectButton: {fileID: 0}
+  directConnectButton: {fileID: 6826062298934968184}
   mainMenuUI: {fileID: 5107241063929939950}
-  directConnectUI: {fileID: 0}
+  directConnectUI: {fileID: 2563320678634886961}
   lobbyUI: {fileID: 5107241063521015669}
 --- !u!1 &5107241063475366667
 GameObject:
@@ -9104,7 +9105,7 @@ MonoBehaviour:
   stageDropdown: {fileID: 5107241064522631264}
   gameModeDropdown: {fileID: 1998667757669707983}
   networkManager: {fileID: 5093291635463517769}
-  lobbyNetworkHandler: {fileID: 0}
+  players: []
 --- !u!1 &5107241063533634010
 GameObject:
   m_ObjectHideFlags: 0

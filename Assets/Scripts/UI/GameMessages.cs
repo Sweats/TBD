@@ -36,9 +36,9 @@ public class GameMessages : MonoBehaviour
         EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
         EventManager.maryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
         EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
-        EventManager.lobbyHostKickedPlayerEvent.AddListener(OnLobbyHostKickedPlayer);
-        EventManager.lobbyHostKickdYouEvent.AddListener(OnLobbyHostKickedYou);
-        EventManager.lobbyPlayerJoinedLobbyEvent.AddListener(OnPlayerJoinedLobby);
+        EventManager.lobbyClientKickedEvent.AddListener(OnLobbyHostKickedPlayer);
+        EventManager.lobbyYouHaveBeenKickedEvent.AddListener(OnLobbyHostKickedYou);
+        //EventManager.lobbyServerPlayerJoinedLobbyEvent.AddListener(OnPlayerJoinedLobby);
     }
 
     private void UpdateChatText()
@@ -148,7 +148,7 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnLobbyHostKickedPlayer(string playerName)
+    private void OnLobbyHostKickedPlayer(string playerName, int index)
     {
         string newMessage = $"{playerName} has been kicked from the lobby!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));

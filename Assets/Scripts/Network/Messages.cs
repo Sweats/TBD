@@ -76,35 +76,7 @@ public struct PlayerFiveCharacterChanged : NetworkMessage
     public int character;
 }
 
-public struct HostChangedStageSettingMessage: NetworkMessage
-{
-    public StageName newStageName;
-}
 
-public struct HostDisconnectedMessage: NetworkMessage
-{
-
-}
-
-public struct HostChangedInsanityOptionSettingMessage: NetworkMessage
-{
-    public bool insanityEnabled;
-}
-
-public struct HostChangedGameModeSettingMessage: NetworkMessage
-{
-    public int gameMode;
-}
-
-public struct HostChangedAllRandomOptionMessage: NetworkMessage
-{
-    public bool allRandomEnabled;
-}
-
-public struct HostChangedAllowSpectatorOptionMessage: NetworkMessage
-{
-    public bool allowSpectator;
-}
 
 public struct LobbyOtherPlayerConnectedMessage: NetworkMessage
 {
@@ -134,6 +106,85 @@ public struct HostKickedPlayerMessage: NetworkMessage
 }
 
 
+#region LOBBY_SERVER
+
+public struct LobbyServerClientChangedCharacterMessage: NetworkMessage
+{
+    public Character newValue;
+}
+
+public struct LobbyServerPlayerJoinedMessage: NetworkMessage
+{
+    public string clientName;
+    public NetworkIdentity clientIdentity;
+}
 
 #endregion
 
+#region LOBBY_CLIENT
+
+public struct LobbyClientChangedAllRandomMessage: NetworkMessage
+{
+    public bool newOption;
+
+}
+
+public struct LobbyClientKickedMessage: NetworkMessage
+{
+    public string kickedClientName;
+    public int index;
+}
+
+public struct LobbyServerKickedMessage: NetworkMessage
+{
+    public string kickedClientName;
+    public int index;
+}
+
+public struct LobbyClientYouHaveBeenKickedMessage: NetworkMessage
+{
+
+}
+public struct LobbyClientChangedAllowSpectatorOptionMessage: NetworkMessage
+{
+    public bool newOption;
+}
+
+public struct LobbyClientChangedStageMessage: NetworkMessage
+{
+    public int newOption;
+
+}
+
+public struct LobbyClientChangedInsanityOptionMessage: NetworkMessage
+{
+    public bool newOption;
+}
+
+public struct LobbyClientChangedGamemodeOptionMessage: NetworkMessage
+{
+    public int newOption;
+
+}
+
+public struct LobbyClientPlayerJoinedMessage: NetworkMessage
+{
+    public string clientName;
+    public int index;
+}
+
+public struct LobbyClientPlayerLeftMessage: NetworkMessage
+{
+    public string clientName;
+    public int index;
+}
+
+public struct LobbyClientPlayerChangedCharacterMessage: NetworkMessage
+{
+    public Character newCharacter;
+    public int index;
+}
+
+#endregion
+
+#endregion
