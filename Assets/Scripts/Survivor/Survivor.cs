@@ -27,9 +27,6 @@ public class Survivor : NetworkBehaviour
     [SerializeField]
     private AudioSource deathSound;
 
-    [SerializeField]
-    private Sprint sprint;
-
     private CharacterController controller;
 
     private Animator animator;
@@ -72,9 +69,6 @@ public class Survivor : NetworkBehaviour
     [SerializeField]
     private float gravity;
 
-    [SerializeField]
-    private float doorPushStrength;
-
     private Vector3 velocity;
 
     [Header("Distance Settings")]
@@ -112,11 +106,43 @@ public class Survivor : NetworkBehaviour
     [SerializeField]
     private bool flashlightDead;
 
-    private Light flashlightSource;
-
     private IEnumerator flashlightRoutine;
 
-    private Vector3 moving;
+    [Header("Sprint Settings")]
+    [SerializeField]
+    [SyncVar]
+    private bool sprinting;
+
+    [SerializeField]
+    [SyncVar]
+    private float sprintMaxEnergy;
+
+    [SerializeField]
+    [SyncVar]
+    private float sprintMinEnergy;
+
+    [SerializeField]
+    [SyncVar]
+    private float sprintConsumptionRate;
+
+    [SerializeField]
+    [SyncVar]
+    private float sprintRegenerationRate;
+
+    [SerializeField]
+    private float energyNeededToSprint;
+
+    [SerializeField]
+    [SyncVar]
+    private float sprintEnergy;
+
+    [SerializeField]
+    private AudioSource outOfBreath;
+
+    [Header("Misc Settings")]
+    private bool isDead = false;
+
+    private bool isMatchOver = false;
 
     [SerializeField]
     private bool grabbingAnObject;
@@ -169,11 +195,16 @@ public class Survivor : NetworkBehaviour
         EventManager.playerSentChatMessageEvent.AddListener(CmdOnPlayerSentMessage);
         EventManager.playerClientChangedNameEvent.AddListener(CmdOnPlayerChangedProfileNameEvent);
         Cursor.lockState = CursorLockMode.Locked;
-        StartCoroutine(TrapDetectionRoutine());
-        flashlightRoutine = FlashlightRoutine();
-        StartCoroutine(flashlightRoutine);
         playerName = Settings.PROFILE_NAME;
         CmdSetName(playerName);
+    }
+
+    public override void OnStartServer()
+    {
+        flashlightRoutine = FlashlightRoutine();
+        StartCoroutine(flashlightRoutine);
+        StartCoroutine(TrapDetectionRoutine());
+        StartCoroutine(ServerCalcStamina());
     }
 
     private void LateUpdate()
@@ -211,7 +242,6 @@ public class Survivor : NetworkBehaviour
         transform.Rotate(Vector3.up * mouseX);
         survivorCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
         flashlight.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
-        //hand.transform.RotateAround(survivorCamera.transform.position, Vector3.up, 20 * Time.deltaTime);
     }
 
     private void Update()
@@ -241,14 +271,14 @@ public class Survivor : NetworkBehaviour
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
-        Vector3 secondmove = transform.right * x + transform.forward * z;
-        bool isMoving = moving != secondmove;
+        Vector3 secondMove = transform.right * x + transform.forward * z;
+        bool isMoving = transform.hasChanged;
 
-        if (sprint.GetSprinting())
+        if (sprinting)
         {
-            if (!isMoving)
+            if (!transform.hasChanged)
             {
-                sprint.SetSprinting(false);
+                sprinting = true;
                 currentSpeed = defaultSpeed;
             }
 
@@ -272,25 +302,15 @@ public class Survivor : NetworkBehaviour
         }
 
 
-        else if (Keybinds.GetKey(Action.Sprint))
+        else if (Keybinds.GetKey(Action.Sprint) && isMoving)
         {
-            //To make it more 9heads-like, needs to check if player attemps to sprint while moving diagonally
-            //while sprinting, diagonal movement is impossible
-            //needs to check if player is backpaddling
-            if (isMoving && (sprint.GetEnergy() >= sprint.GetEnergyNeededToSprint()))
-            {
-                sprint.SetSprinting(true);
-                //immediately consume energy
-                sprint.SetEnergy(-3.0f / sprint.GetTickRate());
-            }
+            CmdStartSprinting(isMoving);
         }
-        /* Not needed since Sprint triggers on tapping Shift key and works as long as you are moving
-        else if (Keybinds.GetKey(Action.Sprint, true))
-        {
-            sprint.sprinting = false;
-        }
-        */
 
+        else if (Keybinds.GetKey(Action.Sprint, true) && !isMoving)
+        {
+            CmdStopSprinting();
+        }
 
         else if (Keybinds.GetKey(Action.Crouch, true))
         {
@@ -313,7 +333,7 @@ public class Survivor : NetworkBehaviour
 
         else if (Keybinds.GetKey(Action.Grab))
         {
-            OnActionGrab();
+            CmdActionGrab();
         }
 
         else if (Keybinds.GetKey(Action.Grab, true))
@@ -324,12 +344,28 @@ public class Survivor : NetworkBehaviour
             }
         }
 
-
-        controller.Move(secondmove * currentSpeed * Time.deltaTime);
-
+        controller.Move(secondMove * currentSpeed * Time.deltaTime);
     }
 
-    [Client]
+    [Command]
+    private void CmdStartSprinting(bool isMoving)
+    {
+        if (isMoving && (sprintEnergy >= energyNeededToSprint))
+        {
+            sprinting = true;
+            sprintEnergy -= 3f;
+            //immediately consume energy
+            //sprintEnergy = -3.0f / sprintTickRate;
+        }
+    }
+
+    [Command]
+    private void CmdStopSprinting()
+    {
+        sprinting = false;
+    }
+
+    [Server]
     private IEnumerator TrapDetectionRoutine()
     {
         while (true)
@@ -360,8 +396,8 @@ public class Survivor : NetworkBehaviour
         }
     }
 
-    [Client]
-    private void OnActionGrab()
+    [Command]
+    private void CmdActionGrab()
     {
         RaycastHit hit;
 
@@ -414,7 +450,7 @@ public class Survivor : NetworkBehaviour
     private void RpcDie()
     {
         dead = true;
-        sprint.SetDead(dead);
+        sprinting = false;
         string playerName = this.playerName;
         EventManager.survivorDeathEvent.Invoke(playerName);
 
@@ -515,18 +551,19 @@ public class Survivor : NetworkBehaviour
         return keys;
     }
 
-    [Client]
+    [Server]
     private IEnumerator FlashlightRoutine()
     {
         while (true)
         {
             if (toggled && !flashlightDead)
             {
-                CmdUpdateFlashlight();
+                ServerUpdateFlashlight();
             }
 
             else if (matchOver || dead)
             {
+                Debug.Log("Flashlight routine stopped.");
                 yield break;
             }
 
@@ -534,8 +571,8 @@ public class Survivor : NetworkBehaviour
         }
     }
 
-    [Command]
-    private void CmdUpdateFlashlight()
+    [Server]
+    private void ServerUpdateFlashlight()
     {
         charge -= dischargeRate;
 
@@ -565,16 +602,88 @@ public class Survivor : NetworkBehaviour
         flashlight.intensity = newValue;
     }
 
+    [Server]
+    private IEnumerator ServerCalcStamina()
+    {
+        while (true)
+        {
+            //don't need to do any calcs if Match is over or Char is dead, so check first.
+            if (isMatchOver || isDead)
+            {
+                yield break;
+            }
+
+            if (sprinting)
+            {
+                sprintEnergy -= sprintConsumptionRate;
+
+                if (sprintEnergy > sprintMinEnergy)
+                {
+                    sprintEnergy = sprintMinEnergy;
+                }
+
+                else
+                {
+                    outOfBreath.Play();
+                    sprinting = false;
+                }
+
+                yield return new WaitForSeconds(sprintConsumptionRate);
+            }
+
+            else
+            {
+                if (sprintEnergy < sprintMaxEnergy)
+                {
+                    sprintEnergy += sprintRegenerationRate;
+                }
+
+                else if (sprintEnergy >= sprintMaxEnergy)
+                {
+                    sprintEnergy = sprintMaxEnergy;
+                }
+            }
+
+            yield return new WaitForSeconds(sprintRegenerationRate);
+        }
+    }
+
+    [Server]
+    public float GetEnergy()
+    {
+        return sprintEnergy;
+    }
+
+    public float GetEnergyNeededToSprint()
+    {
+        return energyNeededToSprint;
+    }
+
+    [Server]
+    public void SetDead(bool dead)
+    {
+        isDead = dead;
+    }
+
+    [Server]
+    public void SetMatchOver(bool matchOver)
+    {
+        isMatchOver = matchOver;
+    }
+
+    [Server]
     public float FlashlightCharge()
     {
         return charge;
     }
 
+    [Server]
     public bool FlashlightToggled()
     {
         return toggled;
     }
 
+    [Server]
     public bool FlashlightDead()
     {
         return flashlightDead;
@@ -590,16 +699,11 @@ public class Survivor : NetworkBehaviour
         return grabDistance;
     }
 
-    public float DoorPushStrength()
-    {
-        return doorPushStrength;
-    }
-
     [Server]
     public void ServerRechargeFlashlight()
     {
         charge = maxCharge;
-        flashlightSource.intensity = maxCharge;
+        flashlight.intensity = maxCharge;
         flashlightDead = false;
     }
 
@@ -612,7 +716,7 @@ public class Survivor : NetworkBehaviour
         {
             Door door = gameObject.GetComponent<Door>();
             Vector3 moveDirection = hit.moveDirection;
-            door.CmdPlayerHitDoor(moveDirection, doorPushStrength);
+            door.CmdPlayerHitDoor(moveDirection);
         }
     }
 }

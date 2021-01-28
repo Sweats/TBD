@@ -88,26 +88,13 @@ public class Battery : NetworkBehaviour
     }
 
 
-    void OnMouseEnter()
-    {
-        float distanceFromPlayer = 0f;
-
-        if (distanceFromPlayer <= distanceToPickUp)
-        {
-            batteryRenderer.material.SetColor("_Color", outlineGlowColor);
-        }
-    }
-
     void OnMouseExit()
     {
-        // Set the outline color to Color.clear.
     }
 
     private void Glow()
     {
         batteryRenderer.material.SetColor("_Color", outlineGlowColor);
-        //batteryRenderer.material.SetFloat("_Shininess", 1.0f);
-
     }
 
     private void UnGlow()
@@ -127,6 +114,7 @@ public class Battery : NetworkBehaviour
     }
 
     // For the Monsters.
+    [Command]
     public void Show()
     {
         batteryCollider.enabled = true;
@@ -165,8 +153,5 @@ public class Battery : NetworkBehaviour
     private void RpcPlayerPickedUpBattery()
     {
         Debug.Log("A survivor picked up a battery!");
-
     }
-
-
 }

@@ -26,6 +26,9 @@ public class Door : NetworkBehaviour
     [SerializeField]
     private bool grabbed;
 
+    [SyncVar]
+    private float doorPushStrength;
+
     [SerializeField]
     private AudioSource unlockedSound;
 
@@ -52,6 +55,7 @@ public class Door : NetworkBehaviour
     private HingeJoint doorJoint;
 
     private GameObject playerGrabDoorObject;
+
 
     [ServerCallback]
     private void Start()
@@ -135,12 +139,12 @@ public class Door : NetworkBehaviour
     }
 
     [Command(ignoreAuthority = true)]
-    public void CmdPlayerHitDoor(Vector3 moveDirection, float pushStrength)
+    public void CmdPlayerHitDoor(Vector3 moveDirection)
     {
         if (unlocked)
         {
             Vector3 newMoveDirection = new Vector3(moveDirection.x, 0, moveDirection.z);
-            Vector3 velocity = newMoveDirection * pushStrength;
+            Vector3 velocity = newMoveDirection * doorPushStrength;
             doorRigidBody.AddForce(velocity);
         }
     }
@@ -193,7 +197,6 @@ public class Door : NetworkBehaviour
     {
         return unlocked;
     }
-
 
     public int UnlockMask()
     {

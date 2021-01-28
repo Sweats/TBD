@@ -4,6 +4,7 @@ using Mirror;
 public class DarnedObject : NetworkBehaviour
 {
     [SyncVar(hook = nameof(OnObjectGrabbed))]
+    [SerializeField]
     private bool grabbed;
 
     private GameObject playerGrabbingObject;
@@ -42,15 +43,7 @@ public class DarnedObject : NetworkBehaviour
 
         Survivor survivor = sender.identity.GetComponent<Survivor>();
         GameObject hand = survivor.Hand();
-        float grabDistance = survivor.GrabDistance();
-        this.playerGrabbingObject = sender.identity.GetComponent<Survivor>().Hand();
-
-        float distanceFromObject = Vector3.Distance(survivor.transform.position, this.transform.position);
-
-        if (distanceFromObject > grabDistance)
-        {
-            return;
-        }
+        this.playerGrabbingObject = hand;
 
         //TODO: Test this with multiple people.
         //This should hit if someone else is already grabbing the object.
