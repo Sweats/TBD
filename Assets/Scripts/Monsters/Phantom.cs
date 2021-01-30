@@ -30,7 +30,7 @@ public class Phantom : NetworkBehaviour
     private Camera phantomCamera;
 
     [SerializeField]
-    private Windows playerWindows;
+    private Windows windows;
 
     private Vector3 velocity;
 
@@ -54,10 +54,15 @@ public class Phantom : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
+        this.enabled = true;
+        phantomController = GetComponent<CharacterController>();
+        windows.enabled = true;
+        phantomCamera.enabled = true;
+        phantomCamera.GetComponent<AudioListener>().enabled = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        phantomController.enabled = true;
         HideImportantObjects();
         base.OnStartLocalPlayer();
-        phantomController = GetComponent<CharacterController>();
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public override void OnStartServer()
@@ -68,12 +73,17 @@ public class Phantom : NetworkBehaviour
     [Client]
     private void LateUpdate()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
         if (matchOver)
         {
             return;
         }
 
-        if (playerWindows.IsWindowOpen())
+        if (windows.IsWindowOpen())
         {
             return;
         }
@@ -104,12 +114,19 @@ public class Phantom : NetworkBehaviour
         velocity.y -= gravity * Time.deltaTime;
         phantomController.Move(velocity * Time.deltaTime);
 
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
         if (phantomController.isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
 
-        if (playerWindows.IsWindowOpen())
+        windows.Tick();
+
+        if (windows.IsWindowOpen())
         {
             return;
         }
@@ -219,7 +236,7 @@ public class Phantom : NetworkBehaviour
 
     private void OnGUI()
     {
-        if (playerWindows.IsWindowOpen())
+        if (windows.IsWindowOpen())
         {
             return;
         }

@@ -93,7 +93,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4156782407683492228}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 925fb0be318861db7a8e8622c57d537d, type: 3}
   m_Name: 
@@ -103,10 +103,11 @@ MonoBehaviour:
   speed: 5
   attackDistance: 2
   attackCoolDownInSeconds: 1
+  canAttack: 1
   ambientMusic: {fileID: 0}
   attackSound: {fileID: 4156782408510669935}
   phantomCamera: {fileID: 4156782409228209759}
-  playerWindows: {fileID: 3877126026187746420}
+  windows: {fileID: 3877126026187746420}
   gravity: 10
   minimumX: -90
   maximumX: 90
@@ -120,7 +121,7 @@ CharacterController:
   m_GameObject: {fileID: 4156782407683492228}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Height: 2
   m_Radius: 0.5000001
@@ -361,7 +362,7 @@ Camera:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4156782409228209758}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_ClearFlags: 1
   m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
@@ -404,7 +405,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4156782409228209758}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!1001 &7579015293065848536
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -475,6 +476,11 @@ PrefabInstance:
     - target: {fileID: 6692423627310867677, guid: 9cf101cbd74ef1eacb3bb6d5af87d13b,
         type: 3}
       propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6692423627409115820, guid: 9cf101cbd74ef1eacb3bb6d5af87d13b,
+        type: 3}
+      propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6692423627409115822, guid: 9cf101cbd74ef1eacb3bb6d5af87d13b,
@@ -626,7 +632,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 7579015293065848536}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 630ec8789cde51459a2e3f4ca5b50317, type: 3}
   m_Name: 

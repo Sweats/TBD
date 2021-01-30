@@ -17,9 +17,10 @@ public class PlayerSpectator : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
-        Settings.PROFILE_NAME = PlayerPrefs.GetString(PROFILE_NAME_KEY_STRING, "player");
+        this.enabled = true;
         spectatorCamera.enabled = true;
         spectatorCamera.GetComponent<AudioListener>().enabled = true;
+        Settings.PROFILE_NAME = PlayerPrefs.GetString(PROFILE_NAME_KEY_STRING, "player");
         NetworkClient.Send(new ServerPlayerJoinedPlayerMessage{clientName = Settings.PROFILE_NAME, identity = netIdentity});
     }
 }

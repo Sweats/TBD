@@ -166,21 +166,6 @@ public class Survivor : NetworkBehaviour
 
     private Vector3 mPosDelta = Vector3.zero;
 
-    private void Start()
-    {
-        controller = GetComponent<CharacterController>();
-
-        if (!isLocalPlayer)
-        {
-            survivorCamera.enabled = false;
-            survivorCamera.GetComponent<AudioListener>().enabled = false;
-            controller.enabled = false;
-            windows.enabled = false;
-            this.insanity.enabled = false;
-            return;
-        }
-    }
-
     public override void OnStartClient()
     {
         if (!isLocalPlayer)
@@ -192,6 +177,13 @@ public class Survivor : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
+        this.enabled = true;
+        windows.enabled = true;
+        controller = GetComponent<CharacterController>();
+        survivorCamera.enabled = true;
+        survivorCamera.GetComponent<AudioListener>().enabled = true;
+        controller.enabled = true;
+        this.insanity.enabled = true;
         Cursor.lockState = CursorLockMode.Locked;
         playerName = Settings.PROFILE_NAME;
         CmdSetName(playerName);
@@ -251,6 +243,8 @@ public class Survivor : NetworkBehaviour
 
         velocity.y -= gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        windows.Tick();
 
         if (controller.isGrounded && velocity.y < 0)
         {
@@ -470,7 +464,7 @@ public class Survivor : NetworkBehaviour
         }
     }
 
-#region SERVER
+    #region SERVER
 
     [Server]
     private IEnumerator FlashlightRoutine()

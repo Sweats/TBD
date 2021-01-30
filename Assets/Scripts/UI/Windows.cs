@@ -25,7 +25,8 @@ public class Windows : MonoBehaviour
 
     private bool playerStatsWindowOpened;
 
-    private void Update()
+    // NOTE: We made this instead of using update because if multiple players have this script enabled, then the menu's get messed up. We only want this to tick for the local player.
+    public void Tick()
     {
         if (Keybinds.GetKey(Action.GuiReturn))
         {

@@ -1,66 +1,93 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 
 // NOTE: This class may need a lot more testing. I think I covered all of the bugs though. It's a tricky problem to solve lol.
-public class Mary : MonoBehaviour
+public class Mary : NetworkBehaviour
 {
+    [SyncVar]
     [SerializeField]
     private float energy;
 
     [SerializeField]
+    [SyncVar]
     private float energyRechargeRate;
 
+    [SyncVar]
     [SerializeField]
     private float energyConsumptionRate;
 
+    [SyncVar]
     [SerializeField]
     private float maxEnergy;
 
+    [SyncVar]
     [SerializeField]
     private float minEnergy;
 
+    [SyncVar]
     [SerializeField]
     private float normalSpeed;
 
+    [SyncVar]
     [SerializeField]
     private float frenzySpeed;
 
 
+    [SyncVar]
     [SerializeField]
     private float attackDistance;
 
 
+    [SyncVar]
     [SerializeField]
     private float maryArmTrapDistance;
 
 
+    [SyncVar]
     [SerializeField]
     private int attackCoolDownInSeconds;
 
+    [SyncVar]
     [SerializeField]
     private float speed;
 
+    [SyncVar]
     [SerializeField]
     private float gravity;
 
+    [SyncVar]
     [SerializeField]
     private float minEnergyNeededToTeleport;
 
+    [SyncVar]
     [SerializeField]
     private float minEnergyNeededToFrenzy;
 
+    [SyncVar]
     [SerializeField]
     private float teleportEnergyCost;
 
+    [SyncVar]
     [SerializeField]
     private int minTeleportTimerSeconds;
 
+    [SyncVar]
     [SerializeField]
     private int maxTeleportTimerSeconds;
 
+    [SyncVar]
     [SerializeField]
     private int maryTeleportTimer;
+
+    [SyncVar]
+    [SerializeField]
+    private bool canTeleport = false;
+
+    [SyncVar]
+    [SerializeField]
+    private bool readyToFrenzy = false;
 
     [SerializeField]
     private AudioSource maryScreamSound;
@@ -81,7 +108,7 @@ public class Mary : MonoBehaviour
     private AudioSource attackSound;
 
     [SerializeField]
-    private Windows playerWindows;
+    private Windows windows;
 
     private GameObject[] teleportLocations;
 
@@ -96,7 +123,6 @@ public class Mary : MonoBehaviour
 
     [SerializeField]
     private float maximumX;
-
 
     [SerializeField]
     private Camera maryCamera;
@@ -114,13 +140,6 @@ public class Mary : MonoBehaviour
     [SerializeField]
     private bool canAttack = false;
 
-
-    [SerializeField]
-    private bool canTeleport = false;
-
-    [SerializeField]
-    private bool readyToFrenzy = false;
-
     private Coroutine maryRandomTeleportionRoutine;
 
     private Coroutine maryEnergyGainRoutine;
@@ -132,12 +151,17 @@ public class Mary : MonoBehaviour
 
     void LateUpdate()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
         if (matchOver)
         {
             return;
         }
 
-        if (playerWindows.IsWindowOpen())
+        if (windows.IsWindowOpen())
         {
             return;
         }
@@ -162,30 +186,47 @@ public class Mary : MonoBehaviour
         maryCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
 
-    private void Start()
+    public override void OnStartLocalPlayer()
     {
-        maryController = GetComponent<CharacterController>();
-        teleportLocations = GameObject.FindGameObjectsWithTag(Tags.MARY_TELEPORT_LOCATION);
-        speed = normalSpeed;
-        Cursor.lockState = CursorLockMode.Locked;
+        this.enabled = true;
+        windows.enabled = true;
         maryTransform = GetComponent<Transform>();
-        maryEnergyGainRoutine = StartCoroutine(MaryRechargeTimer());
-        maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
-        oldTraps = new List<Trap>();
+        maryController = GetComponent<CharacterController>();
+        maryController.enabled = true;
+        maryCamera.enabled = true;
+        maryCamera.GetComponent<AudioListener>().enabled = true;
+        Cursor.lockState = CursorLockMode.Locked;
+
     }
 
+    public override void OnStartServer()
+    {
+        oldTraps = new List<Trap>();
+        maryEnergyGainRoutine = StartCoroutine(ServerMaryRechargeTimerRoutine());
+        maryRandomTeleportionRoutine = StartCoroutine(ServerMaryRandomTeleportationTimerRoutine());
+        teleportLocations = GameObject.FindGameObjectsWithTag(Tags.MARY_TELEPORT_LOCATION);
+        speed = normalSpeed;
+    }
 
+    [Client]
     private void Update()
     {
         velocity.y -= gravity * Time.deltaTime;
         maryController.Move(velocity * Time.deltaTime);
+
+        if (!isLocalPlayer)
+        {
+            return;
+        }
 
         if (maryController.isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
 
-        if (playerWindows.IsWindowOpen())
+        windows.Tick();
+
+        if (windows.IsWindowOpen())
         {
             return;
         }
@@ -196,31 +237,37 @@ public class Mary : MonoBehaviour
 
         if (Keybinds.GetKey(Action.Teleport))
         {
-            if (canTeleport)
-            {
-                Teleport(true);
-            }
+            CmdTeleport();
         }
 
         else if (Keybinds.GetKey(Action.Transform))
         {
-            if (readyToFrenzy)
-            {
-                OnFrenzy();
-            }
-
+            CmdOnFrenzy();
         }
 
         else if (Keybinds.GetKey(Action.Attack))
         {
-            OnAttack();
+            CmdAttack();
         }
 
         maryController.Move(secondmove * speed * Time.deltaTime);
     }
 
+    [TargetRpc]
+    private void TargetReadyToTeleport()
+    {
+        EventManager.maryReadyToTeleportEvent.Invoke();
+    }
 
-    private IEnumerator MaryRechargeTimer()
+    [TargetRpc]
+    private void TargetReadyToFrenzy()
+    {
+        EventManager.maryReadyToFrenzyEvent.Invoke();
+    }
+
+
+    [Server]
+    private IEnumerator ServerMaryRechargeTimerRoutine()
     {
         Debug.Log("MaryRechargeTimer coroutine started.");
 
@@ -230,15 +277,15 @@ public class Mary : MonoBehaviour
 
             if (energy == minEnergyNeededToTeleport)
             {
-                EventManager.maryReadyToTeleportEvent.Invoke();
                 canTeleport = true;
+                TargetReadyToTeleport();
             }
 
 
             if (energy == minEnergyNeededToFrenzy)
             {
                 readyToFrenzy = true;
-                EventManager.maryReadyToFrenzyEvent.Invoke();
+                TargetReadyToFrenzy();
             }
 
             yield return new WaitForSeconds(energyRechargeRate);
@@ -248,7 +295,9 @@ public class Mary : MonoBehaviour
     }
 
 
-    private IEnumerator MaryRandomTeleportationTimer()
+
+    [Server]
+    private IEnumerator ServerMaryRandomTeleportationTimerRoutine()
     {
         maryTeleportTimer = Random.Range(minTeleportTimerSeconds, maxTeleportTimerSeconds);
         Debug.Log("MaryRandomTeleportationTimer routine started.");
@@ -265,14 +314,28 @@ public class Mary : MonoBehaviour
             if (maryTeleportTimer <= 0)
             {
                 maryTeleportTimer = Random.Range(minTeleportTimerSeconds, maxTeleportTimerSeconds);
-                Teleport(false);
+                ServerTeleport();
             }
 
             yield return new WaitForSeconds(1);
         }
     }
 
-    private IEnumerator MaryFrenzyTimer()
+    [Server]
+    private void ServerTeleport()
+    {
+        if (teleportLocations != null)
+        {
+            StopCoroutine(maryRandomTeleportionRoutine);
+            maryRandomTeleportionRoutine = StartCoroutine(ServerMaryRandomTeleportationTimerRoutine());
+            int randomNumber = Random.Range(0, teleportLocations.Length);
+            Vector3 position = teleportLocations[randomNumber].transform.position;
+            TargetTeleportPlayer(position);
+        }
+    }
+
+    [Server]
+    private IEnumerator ServerMaryFrenzyTimer()
     {
         Debug.Log("MaryFrenzyTimer coroutine started");
 
@@ -283,24 +346,20 @@ public class Mary : MonoBehaviour
         }
 
         Debug.Log("MaryFrenzyTimer coroutine stopped.");
-        OnFrenzyEnd();
+        ServerOnFrenzyEnd();
     }
 
-    private IEnumerator AttackCoolDown()
+    [Server]
+    private IEnumerator ServerAttackCooldown()
     {
         canAttack = false;
         yield return new WaitForSeconds(attackCoolDownInSeconds);
         canAttack = true;
     }
 
-
-    private void OnFrenzy()
+    [TargetRpc]
+    private void TargetPlayMaryScreamSound()
     {
-        readyToFrenzy = false;
-        canTeleport = false;
-        frenzied = true;
-        canAttack = true;
-        speed = frenzySpeed;
         maryScreamSound.Play();
 
         if (maryCryingSound.isPlaying)
@@ -312,24 +371,17 @@ public class Mary : MonoBehaviour
         {
             maryCalmMusic.Stop();
         }
-
-        maryFrenzyMusic.Play();
-
-        maryEnergyFrenzyRoutine = StartCoroutine(MaryFrenzyTimer());
-        StopCoroutine(maryRandomTeleportionRoutine);
-        // NOTE:
-        // If the player does a teleport and a frenzy at the same time, they can have 2 corutines running that allows them to have infinte frenzy energy. 
-        // We can either have this StopCoroutine function called below or change the value minEnergyNeededToFrenzy so this cannot happen.
-        // We will see. For now I will do this.
-        StopCoroutine(maryEnergyGainRoutine);
     }
 
-    private void OnFrenzyEnd()
+    [TargetRpc]
+    private void TargetPlayMaryFrenzyMusic()
     {
-        frenzied = false;
-        canAttack = false;
-        speed = normalSpeed;
+        maryFrenzyMusic.Play();
+    }
 
+    [TargetRpc]
+    private void TargetPlayCryingSoundAndCalmMusic()
+    {
         if (maryFrenzyMusic.isPlaying)
         {
             maryFrenzyMusic.Stop();
@@ -337,13 +389,54 @@ public class Mary : MonoBehaviour
 
         maryCalmMusic.Play();
         maryCryingSound.Play();
-        maryEnergyGainRoutine = StartCoroutine(MaryRechargeTimer());
-        maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
-        Teleport(false);
+    }
+
+    [TargetRpc]
+    private void TargetPlayAttackSound()
+    {
+        attackSound.Play();
     }
 
 
-    private void OnAttack()
+    [Command]
+    private void CmdOnFrenzy()
+    {
+        if (!readyToFrenzy)
+        {
+            return;
+        }
+
+        readyToFrenzy = false;
+        canTeleport = false;
+        frenzied = true;
+        canAttack = true;
+        speed = frenzySpeed;
+        TargetPlayMaryFrenzyMusic();
+
+        maryEnergyFrenzyRoutine = StartCoroutine(ServerMaryFrenzyTimer());
+        StopCoroutine(maryRandomTeleportionRoutine);
+        // NOTE:
+        // If the player does a teleport and a frenzy at the same time, they can have 2 corutines running that allows them to have infinte frenzy energy. 
+        // We can either have this StopCoroutine function called below or change the value minEnergyNeededToFrenzy so this cannot happen.
+        // We will see. For now I will do this.
+        StopCoroutine(maryEnergyGainRoutine);
+
+    }
+
+    [Server]
+    private void ServerOnFrenzyEnd()
+    {
+        frenzied = false;
+        canAttack = false;
+        speed = normalSpeed;
+        maryEnergyGainRoutine = StartCoroutine(ServerMaryRechargeTimerRoutine());
+        maryRandomTeleportionRoutine = StartCoroutine(ServerMaryRandomTeleportationTimerRoutine());
+        ServerTeleport();
+    }
+
+
+    [Command]
+    private void CmdAttack()
     {
         // TODO: Make it so we do a cone raycast or something instead of simply having to click on the player.
         Ray ray = maryCamera.ScreenPointToRay(Input.mousePosition);
@@ -365,8 +458,8 @@ public class Mary : MonoBehaviour
 
         else if (frenzied && canAttack)
         {
-            attackSound.Play();
-            StartCoroutine(AttackCoolDown());
+            TargetPlayAttackSound();
+            StartCoroutine(ServerAttackCooldown());
 
             if (Physics.Raycast(ray, out hit, attackDistance))
             {
@@ -381,51 +474,61 @@ public class Mary : MonoBehaviour
                 else if (hitGameObject.CompareTag(Tags.DOOR))
                 {
                     Door door = hitGameObject.GetComponent<Door>();
-                    door.CmdPlayerClickedOnLockedDoor();;
+                    door.CmdPlayerClickedOnLockedDoor(); ;
                 }
             }
         }
     }
 
-    private void Teleport(bool manuallyTeleported)
+
+    [Command]
+    private void CmdTeleport()
     {
-        // If there are not teleportLocations on the stage, then we will simply do nothing.
-        // The mapper is responsible for putting in the teleportLocations prefab onto the stage.
-        if (teleportLocations != null)
+        if (canTeleport)
         {
-            if (manuallyTeleported)
+            // NOTE: If there are not teleportLocations on the stage, then we will simply do nothing.
+            // The mapper is responsible for putting in the teleportLocations prefab onto the stage.
+            if (teleportLocations != null)
             {
                 energy -= teleportEnergyCost;
                 StopCoroutine(maryRandomTeleportionRoutine);
-                maryRandomTeleportionRoutine = StartCoroutine(MaryRandomTeleportationTimer());
+                maryRandomTeleportionRoutine = StartCoroutine(ServerMaryRandomTeleportationTimerRoutine());
 
                 if (energy < minEnergyNeededToTeleport)
                 {
                     canTeleport = false;
                 }
 
-                if (readyToFrenzy)
+                if (energy < minEnergyNeededToFrenzy)
                 {
-                    if (energy < minEnergyNeededToFrenzy)
-                    {
-                        readyToFrenzy = false;
-                    }
-
-                    StopCoroutine(maryEnergyGainRoutine);
-                    maryEnergyGainRoutine = StartCoroutine(MaryRechargeTimer());
+                    readyToFrenzy = false;
                 }
+
+                StopCoroutine(maryEnergyGainRoutine);
+                maryEnergyGainRoutine = StartCoroutine(ServerMaryRechargeTimerRoutine());
+
+                int randomNumber = Random.Range(0, teleportLocations.Length);
+                Vector3 position = teleportLocations[randomNumber].transform.position;
+                TargetTeleportPlayer(position);
+                ServerOnTeleport();
             }
-
-            int randomNumber = Random.Range(0, teleportLocations.Length);
-            maryTransform.position = teleportLocations[randomNumber].transform.position;
-            maryTeleportSound.Play();
-            OnTeleport();
         }
-
     }
 
+    // TODO: Do movement on the server side.
+
+    [TargetRpc]
+    private void TargetTeleportPlayer(Vector3 newPosition)
+    {
+        maryTransform.position = newPosition;
+        maryTeleportSound.Play();
+    }
+
+
+
     //TODO: Test this. Should be good though.
-    private void OnTeleport()
+    [Server]
+    private void ServerOnTeleport()
     {
         for (var i = 0; i < oldTraps.Count; i++)
         {
@@ -450,9 +553,10 @@ public class Mary : MonoBehaviour
 
     }
 
+    [Client]
     private void OnGUI()
     {
-        if (playerWindows.IsWindowOpen())
+        if (windows.IsWindowOpen())
         {
             return;
         }

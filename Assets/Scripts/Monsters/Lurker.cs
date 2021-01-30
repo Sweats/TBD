@@ -95,7 +95,7 @@ public class Lurker : NetworkBehaviour
     private Camera lurkerCamera;
 
     [SerializeField]
-    private Windows playerWindows;
+    private Windows windows;
 
 
     // Get the list of objects on the stage and cache them for the match.
@@ -125,26 +125,9 @@ public class Lurker : NetworkBehaviour
     [SerializeField]
     private Texture crosshair;
 
-    [SerializeField]
-    private Windows windows;
-
     private Coroutine ghostFormRoutine;
 
     private Coroutine physicalFormRoutine;
-
-    private void Start()
-    {
-        lurkerController = GetComponent<CharacterController>();
-
-        if (!isLocalPlayer)
-        {
-            lurkerController.enabled = false;
-            lurkerCamera.enabled = false;
-            lurkerCamera.GetComponent<AudioListener>().enabled = false;
-            windows.enabled = false;
-        }
-
-    }
 
     public override void OnStartServer()
     {
@@ -156,6 +139,12 @@ public class Lurker : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
+        this.enabled = true;
+        lurkerController = GetComponent<CharacterController>();
+        lurkerController.enabled = true;
+        lurkerCamera.enabled = true;
+        lurkerCamera.GetComponent<AudioListener>().enabled = true;
+        windows.enabled = true;
         StartCoroutine(GlowRoutine());
         doors = GameObject.FindGameObjectsWithTag(Tags.DOOR);
         keys = GameObject.FindGameObjectsWithTag(Tags.KEY);
@@ -172,12 +161,17 @@ public class Lurker : NetworkBehaviour
     [Client]
     private void LateUpdate()
     {
+        if (!isLocalPlayer)
+        {
+            return;
+        }
+
         if (matchOver)
         {
             return;
         }
 
-        if (playerWindows.IsWindowOpen())
+        if (windows.IsWindowOpen())
         {
             return;
         }
@@ -213,15 +207,17 @@ public class Lurker : NetworkBehaviour
             velocity.y = -2f;
         }
 
-        if (playerWindows.IsWindowOpen())
+        windows.Tick();
+
+        if (windows.IsWindowOpen())
         {
             return;
         }
 
-//        if (!hostStartedGame)
-//        {
-//            return;
-//        }
+        //        if (!hostStartedGame)
+        //        {
+        //            return;
+        //        }
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
@@ -453,7 +449,7 @@ public class Lurker : NetworkBehaviour
     [Client]
     private void OnGUI()
     {
-        if (playerWindows.IsWindowOpen())
+        if (windows.IsWindowOpen())
         {
             return;
         }
