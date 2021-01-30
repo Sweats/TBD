@@ -179,6 +179,7 @@ public class Door : NetworkBehaviour
         doorRigidBody.detectCollisions = newValue;
     }
 
+    [Client]
     public void Hide()
     {
         doorRenderer.enabled = false;
@@ -186,6 +187,7 @@ public class Door : NetworkBehaviour
     }
 
     //NOTE: Lurker
+    [Client]
     public void Show()
     {
         doorRenderer.enabled = true;

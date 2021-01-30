@@ -155,6 +155,7 @@ public class Stage : NetworkManager
     private void ServerSpawnSurvivor(NetworkConnection connection, GameObject survivor)
     {
         GameObject playerSpectatorObject = connection.identity.gameObject;
+
         for (var i = 0; i < survivorSpawnPoints.Length; i++)
         {
             SurvivorSpawnPoint survivorSpawnPoint = survivorSpawnPoints[i];

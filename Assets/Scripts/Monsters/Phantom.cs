@@ -1,14 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
+using Mirror;
 
-public class Phantom : MonoBehaviour
+public class Phantom : NetworkBehaviour
 {
     [SerializeField]
+    [SyncVar]
     private float speed;
 
+    [SerializeField]
+    [SyncVar]
+    private float attackDistance;
 
     [SerializeField]
-    private float attackDistance;
+    [SyncVar]
+    private int attackCoolDownInSeconds;
+
+    [SyncVar]
+    [SerializeField]
+    private bool canAttack = true;
 
     [SerializeField]
     private AudioSource ambientMusic;
@@ -17,11 +27,7 @@ public class Phantom : MonoBehaviour
     private AudioSource attackSound;
 
     [SerializeField]
-    private int attackCoolDownInSeconds;
-
-    [SerializeField]
     private Camera phantomCamera;
-
 
     [SerializeField]
     private Windows playerWindows;
@@ -46,15 +52,20 @@ public class Phantom : MonoBehaviour
 
     private bool matchOver;
 
-    private bool canAttack = true;
-
-    private void Start()
+    public override void OnStartLocalPlayer()
     {
-        phantomController = GetComponent<CharacterController>();
         HideImportantObjects();
+        base.OnStartLocalPlayer();
+        phantomController = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
     }
 
+    public override void OnStartServer()
+    {
+
+    }
+
+    [Client]
     private void LateUpdate()
     {
         if (matchOver)
@@ -87,6 +98,7 @@ public class Phantom : MonoBehaviour
         phantomCamera.transform.localRotation = Quaternion.Euler(xRotation, 0, 0);
     }
 
+    [Client]
     private void Update()
     {
         velocity.y -= gravity * Time.deltaTime;
@@ -97,7 +109,6 @@ public class Phantom : MonoBehaviour
             velocity.y = -2f;
         }
 
-
         if (playerWindows.IsWindowOpen())
         {
             return;
@@ -107,40 +118,15 @@ public class Phantom : MonoBehaviour
         float z = Input.GetAxis("Vertical");
         Vector3 secondmove = transform.right * x + transform.forward * z;
 
-        if (Keybinds.GetKey(Action.Attack) && canAttack)
+        if (Keybinds.GetKey(Action.Attack))
         {
-            OnAttack();
+            CmdAttack();
         }
 
         phantomController.Move(secondmove * speed * Time.deltaTime);
     }
 
-    private void OnAttack()
-    {
-        StartCoroutine(AttackCoolDown());
-        RaycastHit hit;
-        Ray ray = phantomCamera.ScreenPointToRay(Input.mousePosition);
-        attackSound.Play();
-
-        if (Physics.Raycast(ray, out hit, attackDistance))
-        {
-            GameObject hitGameObject = hit.collider.gameObject;
-
-            if (hitGameObject.CompareTag(Tags.SURVIVOR))
-            {
-                Survivor survivor = hitGameObject.GetComponent<Survivor>();
-                survivor.CmdDie();
-            }
-        }
-    }
-
-    private IEnumerator AttackCoolDown()
-    {
-        canAttack = false;
-        yield return new WaitForSeconds(attackCoolDownInSeconds);
-        canAttack = true;
-    }
-
+    [Client]
     private void HideImportantObjects()
     {
         GameObject[] doors = GameObject.FindGameObjectsWithTag(Tags.DOOR);
@@ -177,15 +163,55 @@ public class Phantom : MonoBehaviour
         }
     }
 
+    [TargetRpc]
+    private void TargetAttackSoundPlay()
+    {
+        attackSound.Play();
+    }
+
+    [Command]
+    private void CmdAttack()
+    {
+        if (canAttack)
+        {
+            StartCoroutine(AttackCoolDown());
+            RaycastHit hit;
+            Ray ray = phantomCamera.ScreenPointToRay(Input.mousePosition);
+            TargetAttackSoundPlay();
+
+            if (Physics.Raycast(ray, out hit, attackDistance))
+            {
+                GameObject hitGameObject = hit.collider.gameObject;
+
+                if (hitGameObject.CompareTag(Tags.SURVIVOR))
+                {
+                    Survivor survivor = hitGameObject.GetComponent<Survivor>();
+                    survivor.CmdDie();
+                }
+            }
+
+        }
+    }
+
+
+    [Server]
+    private IEnumerator AttackCoolDown()
+    {
+        canAttack = false;
+        yield return new WaitForSeconds(attackCoolDownInSeconds);
+        canAttack = true;
+    }
 
 
     // TODO: How do we want to handle the traps for the Phantom?
+    [Server]
     private IEnumerator HandleTraps()
     {
         yield return null;
     }
 
     // TODO: How do we want to handle the survivor detection for the Phantom?
+    [Server]
     private IEnumerator HandleSurvivorDetection()
     {
         yield return null;
