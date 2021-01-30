@@ -159,7 +159,7 @@ public class ControlsUI : MonoBehaviour
             new ButtonStruct(){button = transformKeyButton, action = Action.Transform, defaultKey = "E"},
             new ButtonStruct(){button = walkKeyButton, action = Action.Walk, defaultKey = "LeftAlt"},
             new ButtonStruct(){button = crouchKeyButton, action = Action.Crouch, defaultKey = "LeftControl"},
-            new ButtonStruct(){button = startKeyButton, action = Action.Start, defaultKey = "KeypadEnter"},
+            new ButtonStruct(){button = startKeyButton, action = Action.Enter, defaultKey = "KeypadEnter"},
             new ButtonStruct(){button = pauseKeyButton, action = Action.Pause, defaultKey = "Escape"},
             new ButtonStruct(){button = playerStatsKeyButton, action = Action.PlayerStats, defaultKey = "Tab"},
             new ButtonStruct(){button = grabKeyButton, action = Action.Grab, defaultKey = "Mouse0"},
@@ -266,7 +266,7 @@ public class ControlsUI : MonoBehaviour
 
     private void OnStartKeyButton()
     {
-        lastSettingPressed = Action.Start;
+        lastSettingPressed = Action.Enter;
         UpdateButtons();
 
     }

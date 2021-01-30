@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
-using System.Collections;
+using TMPro;
 using Mirror;
 using System;
+using System.Text;
+using System.Collections;
+using System.Collections.Generic;
 
 public enum Character : byte
 {
@@ -180,6 +182,13 @@ public class LobbyUI : MonoBehaviour
     [SerializeField]
     private Dropdown gameModeDropdown;
 
+    [SerializeField]
+    private InputField chatMessageBoxInput;
+
+    [SerializeField]
+    private TMP_InputField chatMessageBox;
+
+
     private const int STAGE_TEMPLATE = 0;
     private const int STAGE_TEMPLATE_MARY = 1;
     private const int STAGE_TEMPLATE_FALLEN = 2;
@@ -206,11 +215,15 @@ public class LobbyUI : MonoBehaviour
     private int playerFourCharacter;
     private int playerFiveCharacter;
 
+
+    private StringBuilder stringBuilder;
+
     private bool hostingLobby;
 
     private void Start()
     {
         this.enabled = false;
+        stringBuilder = new StringBuilder();
         EventManager.lobbyClientHostChangedAllowSpectatorEvent.AddListener(OnAllowSpectatorOptionUpdated);
         EventManager.lobbyClientHostChangedStageEvent.AddListener(OnStageSelectionUpdated);
         EventManager.lobbyClientHostChangedGamemodeEvent.AddListener(OnGameModeSelectionUpdated);
@@ -220,7 +233,10 @@ public class LobbyUI : MonoBehaviour
         EventManager.lobbyClientPlayerLeftEvent.AddListener(OnPlayerLeftLobby);
         EventManager.lobbyClientPlayerChangedCharacterEvent.AddListener(OnPlayerSlotUpdated);
         EventManager.lobbyYouHaveBeenKickedEvent.AddListener(OnKickedFromLobby);
+        EventManager.lobbyClientPlayerSentChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
+
     }
+
 
     public void Show(bool hosting)
     {
@@ -316,6 +332,7 @@ public class LobbyUI : MonoBehaviour
     {
         this.enabled = false;
         Reset();
+        stringBuilder.Clear();
         lobbyCanvas.enabled = false;
 
         if (hostingLobby)
@@ -329,6 +346,13 @@ public class LobbyUI : MonoBehaviour
             NetworkClient.Disconnect();
         }
 
+    }
+
+    private void OnPlayerRecievedChatMessage(string text, string clientName)
+    {
+        string newText = $"{clientName}: {text}";
+        stringBuilder.AppendLine(newText);
+        chatMessageBox.text = stringBuilder.ToString();
     }
 
     #region HOST_OPTIONS
@@ -426,6 +450,19 @@ public class LobbyUI : MonoBehaviour
             else
             {
                 joinGameUI.Show();
+            }
+        }
+
+        else if (Keybinds.GetKey(Action.Enter))
+        {
+            Debug.Log("Hit the enter button!");
+
+            if (chatMessageBoxInput.text != string.Empty)
+            {
+                string chatMessageText = chatMessageBoxInput.text;
+                NetworkClient.Send(new LobbyServerPlayerChatMessage{clientName = Settings.PROFILE_NAME, text = chatMessageText });
+                chatMessageBoxInput.text = string.Empty;
+                chatMessageBoxInput.Select();
             }
         }
     }

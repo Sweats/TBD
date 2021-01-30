@@ -60,6 +60,8 @@ public static class EventManager
 
     public static LobbyClientPlayerChangedCharacterEvent lobbyClientPlayerChangedCharacterEvent = new LobbyClientPlayerChangedCharacterEvent();
 
+    public static LobbyClientPlayerSentChatMessageEvent lobbyClientPlayerSentChatMessageEvent = new LobbyClientPlayerSentChatMessageEvent();
+
     public static LobbyClientHostChangedStageEvent lobbyClientHostChangedStageEvent = new LobbyClientHostChangedStageEvent();
 
     public static LobbyClientHostChangedAllowSpectatorEvent lobbyClientHostChangedAllowSpectatorEvent = new LobbyClientHostChangedAllowSpectatorEvent();
@@ -301,6 +303,8 @@ public class LobbyClientPlayerJoinedEvent: UnityEvent<string, int>{}
 public class LobbyClientPlayerLeftEvent: UnityEvent<string, int>{}
 
 public class LobbyClientPlayerChangedCharacterEvent: UnityEvent<Character, int>{}
+
+public class LobbyClientPlayerSentChatMessageEvent: UnityEvent<string, string>{}
 
 
 #endregion

@@ -235,6 +235,18 @@ public struct ClientPlayerDisconnectedMessage: NetworkMessage
     public string clientName;
 }
 
+public struct LobbyServerPlayerChatMessage: NetworkMessage
+{
+    public string clientName;
+    public string text;
+}
+
+public struct LobbyClientPlayerChatMessage: NetworkMessage
+{
+    public string clientName;
+    public string text;
+}
+
 #endregion
 
 #endregion

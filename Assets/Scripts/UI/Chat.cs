@@ -68,8 +68,7 @@ public class Chat : MonoBehaviour
             DeselectChatInput();
         }
 
-        // TODO: Change this keybinding to something else. This is just for testing.
-        else if (Input.GetKey(KeyCode.Home))
+        else if (Keybinds.GetKey(Action.Enter))
         {
             string text = chatMessageBoxInput.text;
 

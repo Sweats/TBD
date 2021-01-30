@@ -11,7 +11,7 @@ public enum Action
     Transform,
     Walk,
     Crouch,
-    Start,
+    Enter,
     Pause,
     PlayerStats,
     Grab,
@@ -57,7 +57,7 @@ public static class Keybinds
         Keybinds.actions[Action.Transform] = KeyCode.E;
         Keybinds.actions[Action.Walk] = KeyCode.LeftAlt;
         Keybinds.actions[Action.Crouch] = KeyCode.LeftControl;
-        Keybinds.actions[Action.Start] = KeyCode.KeypadEnter;
+        Keybinds.actions[Action.Enter] = KeyCode.Return;
         Keybinds.actions[Action.Pause] = KeyCode.Escape;
         Keybinds.actions[Action.PlayerStats] = KeyCode.Tab;
         Keybinds.actions[Action.Grab] = KeyCode.Mouse0;

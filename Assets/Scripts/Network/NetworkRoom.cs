@@ -41,6 +41,7 @@ public class NetworkRoom : NetworkManager
 
         NetworkServer.RegisterHandler<LobbyServerPlayerJoinedMessage>(ServerOnPlayerJoined);
         NetworkServer.RegisterHandler<LobbyServerClientChangedCharacterMessage>(ServerOnClientChangedCharacter);
+        NetworkServer.RegisterHandler<LobbyServerPlayerChatMessage>(ServerOnPlayerSentChatMessage);
 
         EventManager.lobbyServerKickedEvent.AddListener(ServerOnKickedPlayerEvent);
         EventManager.lobbyServerChangedStageEvent.AddListener(ServerOnChangedStageEvent);
@@ -74,6 +75,13 @@ public class NetworkRoom : NetworkManager
             selectedStage = newValue;
             NetworkServer.SendToAll(new LobbyClientChangedStageMessage { newOption = newValue });
         }
+    }
+
+    private void ServerOnPlayerSentChatMessage(NetworkConnection connection, LobbyServerPlayerChatMessage message)
+    {
+        string chatMessageText = message.text;
+        string playerName = message.clientName;
+        NetworkServer.SendToAll(new LobbyClientPlayerChatMessage{clientName = playerName, text = chatMessageText});
     }
 
     private void ServerOnChangedGamemodeEvent(int newValue)
@@ -209,7 +217,16 @@ public class NetworkRoom : NetworkManager
         NetworkClient.RegisterHandler<LobbyClientPlayerChangedCharacterMessage>(OnClientPlayerChangedCharacter);
         NetworkClient.RegisterHandler<LobbyClientYouHaveBeenKickedMessage>(OnClientYouHaveBeenKickedMessage);
         NetworkClient.RegisterHandler<LobbyClientKickedMessage>(OnClientKickedMessage);
+        NetworkClient.RegisterHandler<LobbyClientPlayerChatMessage>(OnClientPlayerChatMessage);
         base.OnStartClient();
+    }
+
+    private void OnClientPlayerChatMessage(NetworkConnection connection, LobbyClientPlayerChatMessage message)
+    {
+        string text = message.text;
+        string clientName = message.clientName;
+        EventManager.lobbyClientPlayerSentChatMessageEvent.Invoke(text, clientName);
+
     }
 
     private void OnHostChangedStage(NetworkConnection connection, LobbyClientChangedStageMessage message)
