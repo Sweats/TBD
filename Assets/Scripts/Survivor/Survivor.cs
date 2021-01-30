@@ -192,8 +192,6 @@ public class Survivor : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
-        EventManager.playerSentChatMessageEvent.AddListener(CmdOnPlayerSentMessage);
-        EventManager.playerClientChangedNameEvent.AddListener(CmdOnPlayerChangedProfileNameEvent);
         Cursor.lockState = CursorLockMode.Locked;
         playerName = Settings.PROFILE_NAME;
         CmdSetName(playerName);
@@ -347,22 +345,241 @@ public class Survivor : NetworkBehaviour
         controller.Move(secondMove * currentSpeed * Time.deltaTime);
     }
 
-    [Command]
-    private void CmdStartSprinting(bool isMoving)
+
+
+    [ClientRpc]
+    private void RpcDie(string playerName)
     {
-        if (isMoving && (sprintEnergy >= energyNeededToSprint))
+        EventManager.survivorDeathEvent.Invoke(playerName);
+
+        if (!isLocalPlayer)
         {
-            sprinting = true;
-            sprintEnergy -= 3f;
-            //immediately consume energy
-            //sprintEnergy = -3.0f / sprintTickRate;
+            deathSound.Play();
         }
     }
 
-    [Command]
-    private void CmdStopSprinting()
+
+
+
+    [ClientRpc]
+    private void RpcPlayerRecievedChatMessage(string playerName, string message)
     {
-        sprinting = false;
+        EventManager.playerRecievedChatMessageEvent.Invoke(playerName, message);
+    }
+
+    [ClientRpc]
+    private void RpcPlayerChangedProfileName(string oldName, string newName)
+    {
+        EventManager.playerChangedNameEvent.Invoke(oldName, newName);
+    }
+
+
+    // TODO: DO we need the command and targets for these functions?
+    // NOTE: Called if the player is the Lurker.
+
+    [TargetRpc]
+    private void TargetHide()
+    {
+        survivorRenderer.enabled = false;
+    }
+
+    // NOTE: Called if the player is the Lurker.
+
+    [TargetRpc]
+    private void TargetShow()
+    {
+        survivorRenderer.enabled = true;
+    }
+
+    public string Name()
+    {
+        return playerName;
+    }
+
+    public bool Dead()
+    {
+        return dead;
+
+    }
+
+    public bool Disconnected()
+    {
+        return disconnected;
+
+    }
+
+    public bool Escaped()
+    {
+        return isInEscapeRoom;
+    }
+
+    public void SetEscaped(bool escaped)
+    {
+        isInEscapeRoom = escaped;
+    }
+
+    public SyncList<Key> Items()
+    {
+        return keys;
+    }
+
+    [Command]
+    public void CmdToggleFlashlight()
+    {
+        toggled = !toggled;
+    }
+
+    [Client]
+    private void SurvivorToggledFlashlight(bool oldToggle, bool newToggle)
+    {
+        flashlightToggleSound.Play();
+        flashlight.enabled = newToggle;
+    }
+
+    [Client]
+    private void SurvivorFlashlightChargeChanged(float oldValue, float newValue)
+    {
+        flashlight.intensity = newValue;
+    }
+
+    public float GetEnergyNeededToSprint()
+    {
+        return energyNeededToSprint;
+    }
+
+    public GameObject Hand()
+    {
+        return hand;
+    }
+
+    public float GrabDistance()
+    {
+        return grabDistance;
+    }
+
+    [Client]
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        var gameObject = hit.gameObject;
+
+        if (gameObject.CompareTag(Tags.DOOR))
+        {
+            Door door = gameObject.GetComponent<Door>();
+            Vector3 moveDirection = hit.moveDirection;
+            door.CmdPlayerHitDoor(moveDirection);
+        }
+    }
+
+#region SERVER
+
+    [Server]
+    private IEnumerator FlashlightRoutine()
+    {
+        while (true)
+        {
+            if (toggled && !flashlightDead)
+            {
+                ServerUpdateFlashlight();
+            }
+
+            else if (matchOver || dead)
+            {
+                Debug.Log("Flashlight routine stopped.");
+                yield break;
+            }
+
+            yield return new WaitForSeconds(1);
+        }
+    }
+
+    [Server]
+    private void ServerUpdateFlashlight()
+    {
+        charge -= dischargeRate;
+
+        if (charge <= minCharge)
+        {
+            charge = minCharge;
+            flashlightDead = true;
+        }
+    }
+
+    [Server]
+    private IEnumerator ServerCalcStamina()
+    {
+        while (true)
+        {
+            //don't need to do any calcs if Match is over or Char is dead, so check first.
+            if (isMatchOver || isDead)
+            {
+                yield break;
+            }
+
+            if (sprinting)
+            {
+                sprintEnergy -= sprintConsumptionRate;
+
+                if (sprintEnergy > sprintMinEnergy)
+                {
+                    sprintEnergy = sprintMinEnergy;
+                }
+
+                else
+                {
+                    outOfBreath.Play();
+                    sprinting = false;
+                }
+
+                yield return new WaitForSeconds(sprintConsumptionRate);
+            }
+
+            else
+            {
+                if (sprintEnergy < sprintMaxEnergy)
+                {
+                    sprintEnergy += sprintRegenerationRate;
+                }
+
+                else if (sprintEnergy >= sprintMaxEnergy)
+                {
+                    sprintEnergy = sprintMaxEnergy;
+                }
+            }
+
+            yield return new WaitForSeconds(sprintRegenerationRate);
+        }
+    }
+
+    [Server]
+    public float GetEnergy()
+    {
+        return sprintEnergy;
+    }
+
+    [Server]
+    public float FlashlightCharge()
+    {
+        return charge;
+    }
+
+    [Server]
+    public bool FlashlightToggled()
+    {
+        return toggled;
+    }
+
+    [Server]
+    public bool FlashlightDead()
+    {
+        return flashlightDead;
+    }
+
+    [Server]
+    public void ServerRechargeFlashlight()
+    {
+        charge = maxCharge;
+        flashlight.intensity = maxCharge;
+        flashlightDead = false;
     }
 
     [Server]
@@ -439,31 +656,36 @@ public class Survivor : NetworkBehaviour
         }
     }
 
-
     [Command]
-    public void Die()
-    {
-        RpcDie();
-    }
-
-    [ClientRpc]
-    private void RpcDie()
+    public void CmdDie()
     {
         dead = true;
         sprinting = false;
-        string playerName = this.playerName;
-        EventManager.survivorDeathEvent.Invoke(playerName);
-
-        if (!isLocalPlayer)
-        {
-            deathSound.Play();
-        }
+        RpcDie(this.playerName);
     }
 
     [Command]
-    private void CmdOnPlayerSentMessage(string playerName, string message)
+    private void CmdStopSprinting()
     {
-        RpcPlayerRecievedChatMessage(playerName, message);
+        sprinting = false;
+    }
+
+    [Command]
+    public void Hide()
+    {
+        TargetHide();
+    }
+
+    [Command]
+    public void Show()
+    {
+        TargetShow();
+    }
+
+    [Command]
+    private void CmdSetName(string newPlayerName)
+    {
+        playerName = newPlayerName;
     }
 
     [Command]
@@ -474,249 +696,21 @@ public class Survivor : NetworkBehaviour
     }
 
     [Command]
-    private void CmdSetName(string newPlayerName)
+    private void CmdOnPlayerSentMessage(string playerName, string message)
     {
-        playerName = newPlayerName;
-    }
-
-    [ClientRpc]
-    private void RpcPlayerRecievedChatMessage(string playerName, string message)
-    {
-        EventManager.playerRecievedChatMessageEvent.Invoke(playerName, message);
-    }
-
-    [ClientRpc]
-    private void RpcPlayerChangedProfileName(string oldName, string newName)
-    {
-        EventManager.playerChangedNameEvent.Invoke(oldName, newName);
-    }
-
-
-    // TODO: DO we need the command and targets for these functions?
-    // NOTE: Called if the player is the Lurker.
-    [Command]
-    public void Hide()
-    {
-        TargetHide();
-    }
-
-    [TargetRpc]
-    private void TargetHide()
-    {
-        survivorRenderer.enabled = false;
-    }
-
-    // NOTE: Called if the player is the Lurker.
-    [Command]
-    public void Show()
-    {
-        TargetShow();
-    }
-
-    [TargetRpc]
-    private void TargetShow()
-    {
-        survivorRenderer.enabled = true;
-    }
-
-    public string Name()
-    {
-        return playerName;
-    }
-
-    public bool Dead()
-    {
-        return dead;
-
-    }
-
-    public bool Disconnected()
-    {
-        return disconnected;
-
-    }
-
-    public bool Escaped()
-    {
-        return isInEscapeRoom;
-    }
-
-    public void SetEscaped(bool escaped)
-    {
-        isInEscapeRoom = escaped;
-    }
-
-    public SyncList<Key> Items()
-    {
-        return keys;
-    }
-
-    [Server]
-    private IEnumerator FlashlightRoutine()
-    {
-        while (true)
-        {
-            if (toggled && !flashlightDead)
-            {
-                ServerUpdateFlashlight();
-            }
-
-            else if (matchOver || dead)
-            {
-                Debug.Log("Flashlight routine stopped.");
-                yield break;
-            }
-
-            yield return new WaitForSeconds(1);
-        }
-    }
-
-    [Server]
-    private void ServerUpdateFlashlight()
-    {
-        charge -= dischargeRate;
-
-        if (charge <= minCharge)
-        {
-            charge = minCharge;
-            flashlightDead = true;
-        }
+        RpcPlayerRecievedChatMessage(playerName, message);
     }
 
     [Command]
-    public void CmdToggleFlashlight()
+    private void CmdStartSprinting(bool isMoving)
     {
-        toggled = !toggled;
-    }
-
-    [Client]
-    private void SurvivorToggledFlashlight(bool oldToggle, bool newToggle)
-    {
-        flashlightToggleSound.Play();
-        flashlight.enabled = newToggle;
-    }
-
-    [Client]
-    private void SurvivorFlashlightChargeChanged(float oldValue, float newValue)
-    {
-        flashlight.intensity = newValue;
-    }
-
-    [Server]
-    private IEnumerator ServerCalcStamina()
-    {
-        while (true)
+        if (isMoving && (sprintEnergy >= energyNeededToSprint))
         {
-            //don't need to do any calcs if Match is over or Char is dead, so check first.
-            if (isMatchOver || isDead)
-            {
-                yield break;
-            }
-
-            if (sprinting)
-            {
-                sprintEnergy -= sprintConsumptionRate;
-
-                if (sprintEnergy > sprintMinEnergy)
-                {
-                    sprintEnergy = sprintMinEnergy;
-                }
-
-                else
-                {
-                    outOfBreath.Play();
-                    sprinting = false;
-                }
-
-                yield return new WaitForSeconds(sprintConsumptionRate);
-            }
-
-            else
-            {
-                if (sprintEnergy < sprintMaxEnergy)
-                {
-                    sprintEnergy += sprintRegenerationRate;
-                }
-
-                else if (sprintEnergy >= sprintMaxEnergy)
-                {
-                    sprintEnergy = sprintMaxEnergy;
-                }
-            }
-
-            yield return new WaitForSeconds(sprintRegenerationRate);
-        }
-    }
-
-    [Server]
-    public float GetEnergy()
-    {
-        return sprintEnergy;
-    }
-
-    public float GetEnergyNeededToSprint()
-    {
-        return energyNeededToSprint;
-    }
-
-    [Server]
-    public void SetDead(bool dead)
-    {
-        isDead = dead;
-    }
-
-    [Server]
-    public void SetMatchOver(bool matchOver)
-    {
-        isMatchOver = matchOver;
-    }
-
-    [Server]
-    public float FlashlightCharge()
-    {
-        return charge;
-    }
-
-    [Server]
-    public bool FlashlightToggled()
-    {
-        return toggled;
-    }
-
-    [Server]
-    public bool FlashlightDead()
-    {
-        return flashlightDead;
-    }
-
-    public GameObject Hand()
-    {
-        return hand;
-    }
-
-    public float GrabDistance()
-    {
-        return grabDistance;
-    }
-
-    [Server]
-    public void ServerRechargeFlashlight()
-    {
-        charge = maxCharge;
-        flashlight.intensity = maxCharge;
-        flashlightDead = false;
-    }
-
-    [Client]
-    private void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        var gameObject = hit.gameObject;
-
-        if (gameObject.CompareTag(Tags.DOOR))
-        {
-            Door door = gameObject.GetComponent<Door>();
-            Vector3 moveDirection = hit.moveDirection;
-            door.CmdPlayerHitDoor(moveDirection);
+            sprinting = true;
+            sprintEnergy -= 3f;
+            //immediately consume energy
+            //sprintEnergy = -3.0f / sprintTickRate;
         }
     }
 }
+#endregion

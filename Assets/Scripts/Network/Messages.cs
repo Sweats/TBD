@@ -185,6 +185,56 @@ public struct LobbyClientPlayerChangedCharacterMessage: NetworkMessage
     public int index;
 }
 
+public struct ServerPlayerSentChatMessage : NetworkMessage
+{
+    public string playerName;
+    public string text;
+}
+
+public struct ClientPlayerSentChatMessage : NetworkMessage
+{
+    public string playerName;
+    public string text;
+}
+
+public struct ServerPlayerChangedProfileNameMessage: NetworkMessage
+{
+    public string oldName;
+    public string newName;
+}
+
+public struct ClientPlayerChangedProfileNameMessage: NetworkMessage
+{
+    public string oldName;
+    public string newName;
+}
+
+public struct ClientPickCharacterMessage: NetworkMessage
+{
+    public Character [] availableCharacters;
+}
+
+public struct ServerClientPickedCharacterMessage: NetworkMessage
+{
+    public Character pickedCharacter;
+}
+
+public struct ServerPlayerJoinedPlayerMessage: NetworkMessage
+{
+    public string clientName;
+    public NetworkIdentity identity;
+}
+
+public struct ClientPlayerJoinedMessage: NetworkMessage
+{
+    public string clientName;
+}
+
+public struct ClientPlayerDisconnectedMessage: NetworkMessage
+{
+    public string clientName;
+}
+
 #endregion
 
 #endregion

@@ -56,7 +56,6 @@ public class Door : NetworkBehaviour
 
     private GameObject playerGrabDoorObject;
 
-
     [ServerCallback]
     private void Start()
     {

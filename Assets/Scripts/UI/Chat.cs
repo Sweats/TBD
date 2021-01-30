@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
+using Mirror;
 
 public class Chat : MonoBehaviour
 {
@@ -74,11 +75,16 @@ public class Chat : MonoBehaviour
 
             if (text != string.Empty)
             {
-                string playerName = Settings.PROFILE_NAME;
+                string localPlayerName = Settings.PROFILE_NAME;
                 string message = chatMessageBoxInput.text;
                 chatMessageBoxInput.text = string.Empty;
                 chatMessageBoxInput.Select();
-                EventManager.playerSentChatMessageEvent.Invoke(playerName, message);
+
+                if (NetworkClient.active)
+                {
+                    NetworkClient.Send(new ServerPlayerSentChatMessage { playerName = localPlayerName, text = message });
+
+                }
             }
         }
     }

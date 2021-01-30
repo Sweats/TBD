@@ -1,9 +1,7 @@
-﻿using UnityEngine;
+using UnityEngine;
 
-public class SurvivorSpawnPoint : MonoBehaviour
+public class MonsterSpawnPoint: MonoBehaviour
 {
-    private bool spawnPointUsed = false;
-
     [Header("Cube appears only in the editor.")]
 
     [SerializeField]
@@ -16,22 +14,12 @@ public class SurvivorSpawnPoint : MonoBehaviour
     private float z;
 
     [SerializeField]
-    private Color color = Color.green;
-
-    public bool Used()
-    {
-        return spawnPointUsed;
-    }
-
-    public void SetUsed()
-    {
-        spawnPointUsed = true;
-    }
+    private Color color = Color.red;
 
     private void OnDrawGizmos()
     {
         Gizmos.color = color;
         Gizmos.DrawCube(transform.position, new Vector3(x, y, z));
     }
-
 }
+

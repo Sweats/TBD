@@ -19,6 +19,7 @@ TagManager:
   - Survivor Spawn Point
   - Key Spawn Point
   - Darned Object
+  - Monster Spawn Point
   layers:
   - Default
   - TransparentFX

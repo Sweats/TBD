@@ -20,6 +20,12 @@ public static class EventManager
 
     public static PlayerPickedUpKeyEvent playerPickedUpKeyEvent = new PlayerPickedUpKeyEvent();
 
+    public static ServerAskedYouToPickCharacterEvent serverAskedYouToPickCharacterEvent = new ServerAskedYouToPickCharacterEvent();
+
+    public static PlayerJoinedEvent playerJoinedEvent = new PlayerJoinedEvent();
+
+    public static HostStartedGameEvent hostStartedGameEvent = new HostStartedGameEvent();
+
 
     public static LobbyServerChangedInsanityOptionEvent lobbyServerChangedInsanityOptionEvent = new LobbyServerChangedInsanityOptionEvent();
 
@@ -246,6 +252,12 @@ public class PlayerClientChangedNameEvent: UnityEvent<string, string>{}
 
 public class PlayerPickedUpKeyEvent : UnityEvent<string, string> { }
 
+public class ServerAskedYouToPickCharacterEvent: UnityEvent<Character[]>{}
+
+public class PlayerJoinedEvent: UnityEvent<string>{}
+
+public class HostStartedGameEvent: UnityEvent{}
+
 
 #endregion
 
@@ -289,6 +301,7 @@ public class LobbyClientPlayerJoinedEvent: UnityEvent<string, int>{}
 public class LobbyClientPlayerLeftEvent: UnityEvent<string, int>{}
 
 public class LobbyClientPlayerChangedCharacterEvent: UnityEvent<Character, int>{}
+
 
 #endregion
 

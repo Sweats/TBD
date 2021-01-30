@@ -129,7 +129,7 @@ public class Phantom : MonoBehaviour
             if (hitGameObject.CompareTag(Tags.SURVIVOR))
             {
                 Survivor survivor = hitGameObject.GetComponent<Survivor>();
-                survivor.Die();
+                survivor.CmdDie();
             }
         }
     }

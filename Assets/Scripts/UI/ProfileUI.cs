@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using Mirror;
 
 public class ProfileUI : MonoBehaviour
 {
@@ -67,9 +68,14 @@ public class ProfileUI : MonoBehaviour
 
         if (nameChanged)
         {
-            EventManager.playerClientChangedNameEvent.Invoke(oldName, Settings.PROFILE_NAME);
-            nameChanged = false;
+            //EventManager.playerClientChangedNameEvent.Invoke(oldName, Settings.PROFILE_NAME);
+
+            if (NetworkClient.active)
+            {
+                //NetworkClient.Send(new ServerPlayerChangedProfileNameMessage { oldName = this.oldName, newName = Settings.PROFILE_NAME });
+            }
         }
+        nameChanged = false;
     }
 
     public void OnEditProfileName(string newName)
@@ -94,7 +100,7 @@ public class ProfileUI : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    private void LoadProfileConfig() 
+    private void LoadProfileConfig()
     {
         string nameFromConfig = PlayerPrefs.GetString(PROFILE_NAME_KEY_STRING, "player");
         profileNameInputField.text = nameFromConfig;

@@ -51,7 +51,7 @@ MonoBehaviour:
   showDebugMessages: 0
   serverTickRate: 30
   offlineScene: Assets/Scenes/menu.unity
-  onlineScene: Assets/Scenes/stage-template-networking.unity
+  onlineScene: Assets/Scenes/stage-template-lurker.unity
   transport: {fileID: 447196919649657876}
   networkAddress: localhost
   maxConnections: 5
@@ -67,6 +67,8 @@ MonoBehaviour:
   - {fileID: 5170028035910589657, guid: 7f8935340521d426780fc2df4c6f40fe, type: 3}
   - {fileID: 5581115987714718923, guid: 01ca81388ae57934f89053f027448bc9, type: 3}
   - {fileID: 8187922377815101283, guid: 4d6d149a222b096579368783b94ac685, type: 3}
+  - {fileID: 7589796053530327116, guid: df3bdcd613ebe0aba9051d889b3f6973, type: 3}
+  - {fileID: 5589048331452068488, guid: 90dafdbec6aaedd8a857d7c815a41404, type: 3}
   batterySpawnChance: 0
   forcedPathID: 1
   choosenKeyPath: 0

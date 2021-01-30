@@ -375,7 +375,7 @@ public class Mary : MonoBehaviour
                 if (hitGameObject.CompareTag(Tags.SURVIVOR))
                 {
                     Survivor survivor = hitGameObject.GetComponent<Survivor>();
-                    survivor.Die();
+                    survivor.CmdDie();
                 }
 
                 else if (hitGameObject.CompareTag(Tags.DOOR))

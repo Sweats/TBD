@@ -105,7 +105,6 @@ public class Battery : NetworkBehaviour
     }
 
     // For the Monsters.
-    [Command]
     public void Hide()
     {
         batteryCollider.enabled = false;
@@ -114,7 +113,6 @@ public class Battery : NetworkBehaviour
     }
 
     // For the Monsters.
-    [Command]
     public void Show()
     {
         batteryCollider.enabled = true;
