@@ -42,4 +42,9 @@ public class Stages
             //Debug.Log($"Failed to load the stage {stagesDict[stageName]}!");
         }
     }
+
+    public static string Name(StageName name)
+    {
+        return stagesDict[name];
+    }
 }

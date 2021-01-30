@@ -113,11 +113,6 @@ public struct LobbyServerClientChangedCharacterMessage: NetworkMessage
     public Character newValue;
 }
 
-public struct LobbyServerPlayerJoinedMessage: NetworkMessage
-{
-    public string clientName;
-    public NetworkIdentity clientIdentity;
-}
 
 #endregion
 
@@ -219,10 +214,10 @@ public struct ServerClientPickedCharacterMessage: NetworkMessage
     public Character pickedCharacter;
 }
 
-public struct ServerPlayerJoinedPlayerMessage: NetworkMessage
+public struct ServerPlayerJoinedMessage: NetworkMessage
 {
     public string clientName;
-    public NetworkIdentity identity;
+    public NetworkIdentity clientIdentity;
 }
 
 public struct ClientPlayerJoinedMessage: NetworkMessage
@@ -245,6 +240,11 @@ public struct LobbyClientPlayerChatMessage: NetworkMessage
 {
     public string clientName;
     public string text;
+}
+
+public struct ServerClientLoadedSceneMessage: NetworkMessage
+{
+
 }
 
 #endregion

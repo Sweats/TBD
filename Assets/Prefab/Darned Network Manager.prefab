@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &447196919649657874
+--- !u!1 &1541178374153687853
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,10 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 447196919649657877}
-  - component: {fileID: 447196919649657880}
-  - component: {fileID: 447196919649657876}
-  - component: {fileID: 447196919649657875}
+  - component: {fileID: 4348910892848287216}
+  - component: {fileID: 4112227810026021002}
+  - component: {fileID: 6246839443908157086}
   m_Layer: 0
   m_Name: Darned Network Manager
   m_TagString: Untagged
@@ -19,70 +18,29 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &447196919649657877
+--- !u!4 &4348910892848287216
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 447196919649657874}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 8.9, z: 0.47599983}
+  m_GameObject: {fileID: 1541178374153687853}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.2608571, y: 20.332617, z: 8.92129}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 5520483086561056925}
+  - {fileID: 8443290767611895260}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &447196919649657880
+--- !u!114 &4112227810026021002
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 447196919649657874}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a776d3ddf065d541a0cf033b87a6b49, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  dontDestroyOnLoad: 1
-  runInBackground: 1
-  autoStartServerBuild: 1
-  showDebugMessages: 0
-  serverTickRate: 30
-  offlineScene: Assets/Scenes/menu.unity
-  onlineScene: Assets/Scenes/stage-template-lurker.unity
-  transport: {fileID: 447196919649657876}
-  networkAddress: localhost
-  maxConnections: 5
-  disconnectInactiveConnections: 0
-  disconnectInactiveTimeout: 60
-  authenticator: {fileID: 0}
-  playerPrefab: {fileID: 0}
-  autoCreatePlayer: 0
-  playerSpawnMethod: 0
-  spawnPrefabs:
-  - {fileID: 6692235084364240656, guid: 726d905e991b126139e10d59084c41d4, type: 3}
-  - {fileID: 424282626034555676, guid: 924e4ad1b4ae4b4478759c05ab9f7e2c, type: 3}
-  - {fileID: 5581115987714718923, guid: 01ca81388ae57934f89053f027448bc9, type: 3}
-  - {fileID: 8187922377815101283, guid: 4d6d149a222b096579368783b94ac685, type: 3}
-  - {fileID: 5170028035910589657, guid: 7f8935340521d426780fc2df4c6f40fe, type: 3}
-  - {fileID: 7589796053530327116, guid: df3bdcd613ebe0aba9051d889b3f6973, type: 3}
-  - {fileID: 5798959600277743417, guid: b8115bf6d56029b5cb36eed8a1eeb308, type: 3}
-  - {fileID: 4156782407683492228, guid: 847c4c7a0b35b1730a3f60ff7b9a206d, type: 3}
-  - {fileID: 5589048331452068488, guid: 90dafdbec6aaedd8a857d7c815a41404, type: 3}
-  batterySpawnChance: 0
-  forcedPathID: 1
-  choosenKeyPath: 0
-  batteryPrefab: {fileID: 424282626034555676, guid: 924e4ad1b4ae4b4478759c05ab9f7e2c,
-    type: 3}
---- !u!114 &447196919649657876
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 447196919649657874}
+  m_GameObject: {fileID: 1541178374153687853}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6b0fecffa3f624585964b0d0eb21b18e, type: 3}
@@ -119,19 +77,133 @@ MonoBehaviour:
   CongestionWindow: 1
   SendWindowSize: 128
   ReceiveWindowSize: 128
-  debugGUI: 0
---- !u!114 &447196919649657875
+  debugGUI: 1
+--- !u!114 &6246839443908157086
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 447196919649657874}
+  m_GameObject: {fileID: 1541178374153687853}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6442dc8070ceb41f094e44de0bf87274, type: 3}
+  m_Script: {fileID: 11500000, guid: 9a559d7f14d36799e971531dab3e8596, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showGUI: 1
-  offsetX: 0
-  offsetY: 0
+  dontDestroyOnLoad: 1
+  runInBackground: 1
+  autoStartServerBuild: 0
+  showDebugMessages: 0
+  serverTickRate: 30
+  offlineScene: 
+  onlineScene: 
+  transport: {fileID: 4112227810026021002}
+  networkAddress: localhost
+  maxConnections: 5
+  disconnectInactiveConnections: 0
+  disconnectInactiveTimeout: 60
+  authenticator: {fileID: 0}
+  playerPrefab: {fileID: 0}
+  autoCreatePlayer: 0
+  playerSpawnMethod: 0
+  spawnPrefabs:
+  - {fileID: 1581111813915755671, guid: 5dd2f3ec06a6efb3aa4d880afc3a0cbc, type: 3}
+  - {fileID: 424282626034555676, guid: 924e4ad1b4ae4b4478759c05ab9f7e2c, type: 3}
+  - {fileID: 5170028035910589657, guid: 7f8935340521d426780fc2df4c6f40fe, type: 3}
+  - {fileID: 1255532794101285128, guid: bcea7775366e78d4e9da77cbab7f8a42, type: 3}
+  - {fileID: 6692235084364240656, guid: 726d905e991b126139e10d59084c41d4, type: 3}
+  - {fileID: 7589796053530327116, guid: df3bdcd613ebe0aba9051d889b3f6973, type: 3}
+  - {fileID: 5798959600277743417, guid: b8115bf6d56029b5cb36eed8a1eeb308, type: 3}
+  - {fileID: 4156782407683492228, guid: 847c4c7a0b35b1730a3f60ff7b9a206d, type: 3}
+  - {fileID: 5589048331452068488, guid: 90dafdbec6aaedd8a857d7c815a41404, type: 3}
+  lobbyNetworkManager: {fileID: 4313549667291013886}
+  stageNetworkManager: {fileID: 6803422932226635356}
+--- !u!1 &3053200361053305781
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5520483086561056925}
+  - component: {fileID: 4313549667291013886}
+  m_Layer: 0
+  m_Name: Lobby Network Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5520483086561056925
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3053200361053305781}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4348910892848287216}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4313549667291013886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3053200361053305781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61e3446aed70e7463a2682e0746a97d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &4518304030204497712
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8443290767611895260}
+  - component: {fileID: 6803422932226635356}
+  m_Layer: 0
+  m_Name: Stage Network Manager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8443290767611895260
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4518304030204497712}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4348910892848287216}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6803422932226635356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4518304030204497712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6ddb86e13dba79d68ef62a8bfdc7569, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  batterySpawnChance: 0
+  forcedPathID: 1
+  choosenKeyPath: 0

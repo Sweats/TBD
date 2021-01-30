@@ -407,13 +407,14 @@ public class LobbyUI : MonoBehaviour
 
     }
 
-
     public void OnStartGameButtonClicked()
     {
         // NOTE: When updating the stage dropdown in the Unity Editor, make sure it matches the enum
         // and the dictionary in the file Stages.cs.
         StageName name = (StageName)stageDropdown.value;
-        Stages.Load(name);
+        string sceneName = Stages.Name(name);
+        Debug.Log($"Scene name to be loaded is {sceneName}");
+        EventManager.lobbyServerStartedGameEvent.Invoke(sceneName);
     }
 
     #endregion

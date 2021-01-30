@@ -24,7 +24,6 @@ public static class EventManager
 
     public static PlayerJoinedEvent playerJoinedEvent = new PlayerJoinedEvent();
 
-    public static HostStartedGameEvent hostStartedGameEvent = new HostStartedGameEvent();
 
 
     public static LobbyServerChangedInsanityOptionEvent lobbyServerChangedInsanityOptionEvent = new LobbyServerChangedInsanityOptionEvent();
@@ -40,6 +39,8 @@ public static class EventManager
     public static LobbyServerChangedStageEvent lobbyServerChangedStageEvent = new LobbyServerChangedStageEvent();
 
     public static LobbyServerChangedGamemodeEvent lobbyServerChangedGamemodeEvent = new LobbyServerChangedGamemodeEvent();
+
+    public static LobbyServerStartedGameEvent lobbyServerStartedGameEvent = new LobbyServerStartedGameEvent();
 
 
 #endregion
@@ -258,9 +259,6 @@ public class ServerAskedYouToPickCharacterEvent: UnityEvent<Character[]>{}
 
 public class PlayerJoinedEvent: UnityEvent<string>{}
 
-public class HostStartedGameEvent: UnityEvent{}
-
-
 #endregion
 
 
@@ -288,6 +286,8 @@ public class LobbyServerChangedStageEvent: UnityEvent<int>{}
 
 public class LobbyServerChangedGamemodeEvent: UnityEvent<int>{}
 
+public class LobbyServerStartedGameEvent: UnityEvent<string>{}
+
 public class LobbyClientHostChangedInsanityOptionEvent: UnityEvent<bool>{}
 
 public class LobbyClientHostChangedAllRandomEvent: UnityEvent<bool>{}
@@ -305,6 +305,7 @@ public class LobbyClientPlayerLeftEvent: UnityEvent<string, int>{}
 public class LobbyClientPlayerChangedCharacterEvent: UnityEvent<Character, int>{}
 
 public class LobbyClientPlayerSentChatMessageEvent: UnityEvent<string, string>{}
+
 
 
 #endregion

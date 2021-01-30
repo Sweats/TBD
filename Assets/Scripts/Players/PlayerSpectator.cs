@@ -21,6 +21,6 @@ public class PlayerSpectator : NetworkBehaviour
         spectatorCamera.enabled = true;
         spectatorCamera.GetComponent<AudioListener>().enabled = true;
         Settings.PROFILE_NAME = PlayerPrefs.GetString(PROFILE_NAME_KEY_STRING, "player");
-        NetworkClient.Send(new ServerPlayerJoinedPlayerMessage{clientName = Settings.PROFILE_NAME, identity = netIdentity});
+        NetworkClient.Send(new ServerPlayerJoinedMessage{clientName = Settings.PROFILE_NAME, clientIdentity = netIdentity});
     }
 }

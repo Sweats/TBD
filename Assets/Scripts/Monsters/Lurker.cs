@@ -131,7 +131,7 @@ public class Lurker : NetworkBehaviour
 
     public override void OnStartServer()
     {
-        EventManager.hostStartedGameEvent.AddListener(OnHostStartedTheGame);
+        //EventManager.hostStartedGameEvent.AddListener(OnHostStartedTheGame);
         speed = ghostFormSpeed;
         ghostFormRoutine = StartCoroutine(ServerGhostFormEnergyRoutine());
         base.OnStartServer();
@@ -153,7 +153,7 @@ public class Lurker : NetworkBehaviour
         Cursor.lockState = CursorLockMode.Locked;
 
         EventManager.survivorsEscapedStageEvent.AddListener(ServerOnMatchOver);
-        EventManager.hostStartedGameEvent.AddListener(OnHostStartedTheGame);
+        //EventManager.hostStartedGameEvent.AddListener(OnHostStartedTheGame);
 
         base.OnStartLocalPlayer();
     }

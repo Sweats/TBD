@@ -8,7 +8,7 @@ public class LobbyPlayer : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
-            NetworkClient.Send(new LobbyServerPlayerJoinedMessage { clientName = Settings.PROFILE_NAME, clientIdentity = netIdentity });
+            NetworkClient.Send(new ServerPlayerJoinedMessage { clientName = Settings.PROFILE_NAME, clientIdentity = netIdentity });
             base.OnStartClient();
         }
     }
