@@ -22,7 +22,7 @@ public class StageNetworkManager : MonoBehaviour
     private Character playerFourCharacter;
     private Character playerFiveCharacter;
 
-    private Character monsterCharacter = Character.Unknown;
+    private Character monsterCharacter = Character.Empty;
 
     private bool monsterCharacterAvailable;
 
@@ -83,10 +83,10 @@ public class StageNetworkManager : MonoBehaviour
         NetworkIdentity identity = message.clientIdentity;
         string playerName = message.clientName;
         Debug.Log($"Player name of the joined player is {playerName}");
-        NetworkRoom.players.Add(new Player(playerName, Character.Unknown, identity));
+        NetworkRoom.players.Add(new Player(playerName, Character.Spectator, identity));
         NetworkServer.SendToAll(new ClientPlayerJoinedMessage { clientName = playerName });
-        Character[] availableCharactersArray = ServerAvailableCharacters();
-        NetworkServer.SendToClientOfPlayer(identity, new ClientPickCharacterMessage { availableCharacters = availableCharactersArray });
+        Character[] unavailableCharactersArray = ServerUnavailableCharacters();
+        NetworkServer.SendToClientOfPlayer(identity, new ClientPickCharacterMessage { availableCharacters = unavailableCharactersArray });
     }
 
     public void OnServerDisconnect(NetworkConnection connection)
@@ -346,7 +346,7 @@ public class StageNetworkManager : MonoBehaviour
     {
         if (character == Character.Random)
         {
-            Character[] availableCharacters = ServerAvailableCharacters();
+            Character[] availableCharacters = ServerUnavailableCharacters();
             int randomIndex = UnityEngine.Random.Range(0, availableCharacters.Length);
             Character pickedCharacter = availableCharacters[randomIndex];
             Debug.Log($"Randomly picked character is {pickedCharacter}!");
@@ -380,95 +380,36 @@ public class StageNetworkManager : MonoBehaviour
         }
     }
 
-    private Character[] ServerAvailableCharacters()
+    private Character[] ServerUnavailableCharacters()
     {
-
-        //public enum Character : byte
-        //{
-        //    Random = 0,
-        //    Chad,
-        //    Alice,
-        //    Jesus,
-        //    Jamal,
-        //    Lurker,
-        //    Phantom,
-        //    Mary,
-        //    Fallen,
-        //    Unknown,
-        //    Empty
-        //}
-
         List<Player> players = NetworkRoom.players;
 
-        List<Character> characters = new List<Character>()
-        {
-                Character.Random,
-                Character.Chad,
-                Character.Alice,
-                Character.Jesus,
-                Character.Jamal,
-                Character.Lurker,
-                Character.Phantom,
-                Character.Mary,
-                Character.Fallen,
-                // NOTE: Need this here or else mary does not get detected in the list...?
-                Character.Unknown
-        };
+        List<Character> characters = new List<Character>();
 
         for (var i = 0; i < players.Count; i++)
         {
             Character playerCharacter = players[i].character;
 
-            for (var j = 0; j < characters.Count; j++)
+            if (playerCharacter == Character.Spectator)
             {
-                Character filterCharacter = characters[j];
-
-                if (filterCharacter == playerCharacter)
-                {
-                    characters.RemoveAt(j);
-
-                    if ((byte)filterCharacter >= 5)
-                    {
-                        ServerRemoveMonstersFromList(characters);
-                    }
-
-                    break;
-                }
+                continue;
             }
-        }
 
-        // NOTE: If all the other characters have been removed and only the Character.Random index is left...
+            Debug.Log($"{playerCharacter} is the same as {monsterCharacter}?");
 
-        if (characters.Count <= 1)
-        {
-            characters.Clear();
+            if (playerCharacter == monsterCharacter)
+            {
+                characters.Add(Character.Mary);
+                characters.Add(Character.Fallen);
+                characters.Add(Character.Lurker);
+                characters.Add(Character.Phantom);
+                continue;
+            }
+
+            characters.Add(playerCharacter);
         }
 
         return characters.ToArray();
-    }
-
-    private void ServerRemoveMonstersFromList(List<Character> characters)
-    {
-        for (var i = 0; i < characters.Count; i++)
-        {
-            Character character = characters[i];
-
-            switch (character)
-            {
-                case Character.Mary:
-                    characters.RemoveAt(i);
-                    break;
-                case Character.Lurker:
-                    characters.RemoveAt(i);
-                    break;
-                case Character.Phantom:
-                    characters.RemoveAt(i);
-                    break;
-                case Character.Fallen:
-                    characters.RemoveAt(i);
-                    break;
-            }
-        }
     }
 
     private void ServerSpawnMonster(NetworkConnection connection, Character monster, bool joiningMidGame)

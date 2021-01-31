@@ -18,7 +18,7 @@ public enum Character : byte
     Phantom,
     Mary,
     Fallen,
-    Unknown,
+    Spectator,
     Empty
 }
 

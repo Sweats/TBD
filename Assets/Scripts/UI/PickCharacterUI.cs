@@ -72,25 +72,6 @@ public class PickCharacterUI : MonoBehaviour
     private void Start()
     {
         EventManager.serverAskedYouToPickCharacterEvent.AddListener(OnServerAskedYouToPickCharacter);
-
-        randomCharacterButton.image.sprite = emptyLobbySlotIcon;
-        randomCharacterButton.interactable = false;
-        chadButton.image.sprite = emptyLobbySlotIcon;
-        chadButton.interactable = false;
-        aliceButton.image.sprite = emptyLobbySlotIcon;
-        aliceButton.interactable = false;
-        jesusButton.image.sprite = emptyLobbySlotIcon;
-        jesusButton.interactable = false;
-        jamalButton.image.sprite = emptyLobbySlotIcon;
-        jamalButton.interactable = false;
-        lurkerButton.image.sprite = emptyLobbySlotIcon;
-        lurkerButton.interactable = false;
-        phantomButton.image.sprite = emptyLobbySlotIcon;
-        phantomButton.interactable = false;
-        maryButton.image.sprite = emptyLobbySlotIcon;
-        maryButton.interactable = false;
-        fallenButton.image.sprite = emptyLobbySlotIcon;
-        fallenButton.interactable = false;
     }
 
     public void OnCharacterButtonClicked(int value)
@@ -98,7 +79,6 @@ public class PickCharacterUI : MonoBehaviour
         Debug.Log($"You clicked on a button and the value is {value}");
         Character character = (Character)value;
         NetworkClient.Send(new ServerClientPickedCharacterMessage{pickedCharacter = character });
-
         Hide();
     }
 
@@ -113,62 +93,73 @@ public class PickCharacterUI : MonoBehaviour
 
     }
 
-    private void OnServerAskedYouToPickCharacter(Character[] availableCharacters)
+    private void OnServerAskedYouToPickCharacter(Character[] unavailableCharacters)
     {
         Debug.Log("Server asked you to pick a character!");
+        int count = 0;
 
-        for (var i = 0; i < availableCharacters.Length; i++)
+        for (var i = 0; i < unavailableCharacters.Length; i++)
         {
-            Character character = availableCharacters[i];
+            Character character = unavailableCharacters[i];
 
             switch (character)
             {
                 case Character.Alice:
-                    aliceButton.image.sprite = aliceIcon;
-                    aliceButton.interactable = true;
-                    aliceButton.enabled = true;
+                    aliceButton.image.sprite = emptyLobbySlotIcon;
+                    aliceButton.interactable = false;
+                    aliceButton.enabled = false;
+                    count++;
                     break;
                 case Character.Jesus:
-                    jesusButton.image.sprite = jesusIcon;
-                    jesusButton.interactable = true;
-                    jesusButton.enabled = true;
+                    jesusButton.image.sprite = emptyLobbySlotIcon;
+                    jesusButton.interactable = false;
+                    jesusButton.enabled = false;
+                    count++;
                     break;
                 case Character.Chad:
-                    chadButton.image.sprite = chadIcon;
-                    chadButton.interactable = true;
-                    chadButton.enabled = true;
+                    chadButton.image.sprite = emptyLobbySlotIcon;
+                    chadButton.interactable = false;
+                    chadButton.enabled = false;
+                    count++;
                     break;
                 case Character.Jamal:
-                    jamalButton.image.sprite = jamalIcon;
-                    jamalButton.interactable = true;
-                    jamalButton.enabled = true;
+                    jamalButton.image.sprite = emptyLobbySlotIcon;
+                    jamalButton.interactable = false;
+                    jamalButton.enabled = false;
+                    count++;
                     break;
                 case Character.Lurker:
-                    lurkerButton.image.sprite  = lurkerIcon;
-                    lurkerButton.interactable = true;
-                    lurkerButton.enabled = true;
+                    lurkerButton.image.sprite  = emptyLobbySlotIcon;
+                    lurkerButton.interactable = false;
+                    lurkerButton.enabled = false;
+                    count++;
                     break;
                 case Character.Phantom:
-                    phantomButton.image.sprite = phantomIcon;
-                    phantomButton.interactable = true;
-                    phantomButton.enabled = true;
+                    phantomButton.image.sprite = emptyLobbySlotIcon;
+                    phantomButton.interactable = false;
+                    phantomButton.enabled = false;
+                    count++;
                     break;
                 case Character.Mary:
-                    maryButton.image.sprite = maryIcon;
-                    maryButton.interactable = true;
-                    maryButton.enabled = true;
+                    maryButton.image.sprite = emptyLobbySlotIcon;
+                    maryButton.interactable = false;
+                    maryButton.enabled = false;
+                    count++;
                     break;
                 case Character.Fallen:
-                    fallenButton.image.sprite = fallenIcon;
-                    fallenButton.interactable = true;
-                    fallenButton.enabled = true;
-                    break;
-                case Character.Random:
-                    randomCharacterButton.image.sprite = randomCharacterIcon;
-                    randomCharacterButton.interactable = true;
-                    randomCharacterButton.enabled = true;
+                    fallenButton.image.sprite = emptyLobbySlotIcon;
+                    fallenButton.interactable = false;
+                    fallenButton.enabled = false;
+                    count++;
                     break;
             }
+        }
+
+        if (count == 8)
+        {
+            randomCharacterButton.interactable = false;
+            randomCharacterButton.image.sprite = emptyLobbySlotIcon;
+            randomCharacterButton.enabled = false; 
         }
 
         Show();
