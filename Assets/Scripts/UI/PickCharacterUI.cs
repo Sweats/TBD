@@ -74,14 +74,23 @@ public class PickCharacterUI : MonoBehaviour
         EventManager.serverAskedYouToPickCharacterEvent.AddListener(OnServerAskedYouToPickCharacter);
 
         randomCharacterButton.image.sprite = emptyLobbySlotIcon;
+        randomCharacterButton.interactable = false;
         chadButton.image.sprite = emptyLobbySlotIcon;
+        chadButton.interactable = false;
         aliceButton.image.sprite = emptyLobbySlotIcon;
+        aliceButton.interactable = false;
         jesusButton.image.sprite = emptyLobbySlotIcon;
+        jesusButton.interactable = false;
         jamalButton.image.sprite = emptyLobbySlotIcon;
+        jamalButton.interactable = false;
         lurkerButton.image.sprite = emptyLobbySlotIcon;
+        lurkerButton.interactable = false;
         phantomButton.image.sprite = emptyLobbySlotIcon;
+        phantomButton.interactable = false;
         maryButton.image.sprite = emptyLobbySlotIcon;
+        maryButton.interactable = false;
         fallenButton.image.sprite = emptyLobbySlotIcon;
+        fallenButton.interactable = false;
     }
 
     public void OnCharacterButtonClicked(int value)

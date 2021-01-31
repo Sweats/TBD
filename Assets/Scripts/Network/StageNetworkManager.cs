@@ -24,7 +24,7 @@ public class StageNetworkManager : MonoBehaviour
 
     private Character monsterCharacter = Character.Unknown;
 
-    private bool monsterCharacterAvailable = true;
+    private bool monsterCharacterAvailable;
 
     private const int MONSTER_LURKER = 0;
     private const int MONSTER_PHANTOM = 1;
@@ -39,11 +39,6 @@ public class StageNetworkManager : MonoBehaviour
     private int playerCount;
 
     private const int MAX_PLAYER_COUNT = 5;
-
-    private bool chadUsed = false;
-    private bool aliceUsed = false;
-    private bool jamalUsed = false;
-    private bool jesusUsed = false;
 
     public void OnStartServer()
     {
@@ -115,10 +110,12 @@ public class StageNetworkManager : MonoBehaviour
 
         Character character = players[playerDisconnectedIndex].character;
 
-        if ((byte)character > 4)
+        if ((byte)character >= 5)
         {
             monsterCharacterAvailable = true;
         }
+
+        NetworkRoom.players.RemoveAt(playerDisconnectedIndex);
     }
 
     public void OnServerSceneChanged(string sceneName)
@@ -162,7 +159,6 @@ public class StageNetworkManager : MonoBehaviour
     {
         GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag(Tags.KEY_SPAWN_POINT);
         List<int> maskIgnoreList = new List<int>();
-        //List<KeySpawnPoint> spawnerList = new List<KeySpawnPoint>();
 
         for (var i = 0; i < spawnPoints.Length; i++)
         {
@@ -185,7 +181,6 @@ public class StageNetworkManager : MonoBehaviour
                     continue;
                 }
 
-                //spawnerList.Add(spawnPoints[i]);
                 Vector3 spawnLocation = ServerGetRandomSpawnLocation(spawnPoints, spawnableKeys.mask);
                 maskIgnoreList.Add(spawnableKeys.mask);
                 ServerSpawnKey(spawnableKeys, spawnLocation);
@@ -241,76 +236,6 @@ public class StageNetworkManager : MonoBehaviour
 
     }
 
-
-    public Character[] ServerAvailableCharacters()
-    {
-        List<Character> availableCharacters = new List<Character>();
-        int count = 0;
-
-        if (monsterCharacterAvailable)
-        {
-            availableCharacters.Add(monsterCharacter);
-        }
-
-        if (!jamalUsed)
-        {
-            count++;
-            availableCharacters.Add(Character.Jamal);
-        }
-
-        if (!aliceUsed)
-        {
-            count++;
-            availableCharacters.Add(Character.Alice);
-        }
-
-        if (!chadUsed)
-        {
-            count++;
-            availableCharacters.Add(Character.Chad);
-        }
-
-        if (!jesusUsed)
-        {
-            count++;
-            availableCharacters.Add(Character.Jesus);
-        }
-
-        if (monsterCharacter == Character.Unknown)
-        {
-            availableCharacters.Add(Character.Fallen);
-            availableCharacters.Add(Character.Lurker);
-            availableCharacters.Add(Character.Phantom);
-            availableCharacters.Add(Character.Mary);
-        }
-
-        //TODO: Test this.
-        if (count < 4 || monsterCharacterAvailable)
-        {
-            availableCharacters.Add(Character.Random);
-        }
-
-        return availableCharacters.ToArray();
-    }
-
-    private void ServerMarkCharacterAsUsed(Character character)
-    {
-        switch (character)
-        {
-            case Character.Chad:
-                chadUsed = true;
-                break;
-            case Character.Jamal:
-                jamalUsed = true;
-                break;
-            case Character.Jesus:
-                jesusUsed = true;
-                break;
-            case Character.Alice:
-                aliceUsed = true;
-                break;
-        }
-    }
 
 
     private void ServerSpawnKey(KeysAtSpawnPoint spawner, Vector3 spawnPointPosition)
@@ -391,36 +316,8 @@ public class StageNetworkManager : MonoBehaviour
         Character pickedCharacter = message.pickedCharacter;
         List<Player> players = NetworkRoom.players;
         Debug.Log($"player picked character {pickedCharacter}");
-
         uint netId = connection.identity.netId;
-
-        for (var i = 0; i < players.Count; i++)
-        {
-            uint foundId = players[i].identity.netId;
-
-            if (foundId == netId)
-            {
-                Player player = players[i];
-                player.character = pickedCharacter;
-                players[i] = player;
-                break;
-            }
-        }
-
-        // NOTE: If the value itself is greater than 4 then it must be a monster.
-
-        if ((byte)pickedCharacter > 4)
-        {
-            GameObject monster = Monster(pickedCharacter);
-            ServerSpawnMonster(connection, monster, true);
-        }
-
-        else
-        {
-            GameObject survivor = Survivor(pickedCharacter);
-            ServerSpawnSurvivor(connection, survivor, true);
-        }
-
+        ServerSpawnPlayer(connection, pickedCharacter, true);
     }
 
     // NOTE: Called only when players are joining the scene from the lobby. OnClientSceneChanged() only gets called when the server
@@ -440,31 +337,149 @@ public class StageNetworkManager : MonoBehaviour
             {
                 Character playerCharacter = players[i].character;
                 Debug.Log($"Player character is {playerCharacter}");
-
-                if ((byte)playerCharacter > 4)
-                {
-                    monsterCharacter = playerCharacter;
-                    monsterCharacterAvailable = false;
-                    GameObject monsterObject = Monster(playerCharacter);
-                    ServerSpawnMonster(connection, monsterObject, false);
-                }
-
-                else
-                {
-                    ServerMarkCharacterAsUsed(playerCharacter);
-                    GameObject survivorObject = Survivor(playerCharacter);
-                    ServerSpawnSurvivor(connection, survivorObject, false);
-                }
+                ServerSpawnPlayer(connection, playerCharacter, false);
             }
         }
     }
 
-    private void ServerSpawnMonster(NetworkConnection connection, GameObject monster, bool joiningMidGame)
+    private void ServerSpawnPlayer(NetworkConnection connection, Character character, bool joiningMidGame)
     {
+        if (character == Character.Random)
+        {
+            Character[] availableCharacters = ServerAvailableCharacters();
+            int randomIndex = UnityEngine.Random.Range(0, availableCharacters.Length);
+            Character pickedCharacter = availableCharacters[randomIndex];
+            Debug.Log($"Randomly picked character is {pickedCharacter}!");
+
+            if ((byte)pickedCharacter >= 5)
+            {
+                ServerSpawnMonster(connection, pickedCharacter, joiningMidGame);
+            }
+
+            else
+            {
+                ServerSpawnSurvivor(connection, pickedCharacter, joiningMidGame);
+            }
+
+            ServerUpdatePlayerSlot(connection.identity.netId, pickedCharacter);
+        }
+
+        else
+        {
+            if ((byte)character >= 5)
+            {
+                ServerSpawnMonster(connection, character, joiningMidGame);
+            }
+
+            else
+            {
+                ServerSpawnSurvivor(connection, character, joiningMidGame);
+            }
+
+            ServerUpdatePlayerSlot(connection.identity.netId, character);
+        }
+    }
+
+    private Character[] ServerAvailableCharacters()
+    {
+
+        //public enum Character : byte
+        //{
+        //    Random = 0,
+        //    Chad,
+        //    Alice,
+        //    Jesus,
+        //    Jamal,
+        //    Lurker,
+        //    Phantom,
+        //    Mary,
+        //    Fallen,
+        //    Unknown,
+        //    Empty
+        //}
+
+        List<Player> players = NetworkRoom.players;
+
+        List<Character> characters = new List<Character>()
+        {
+                Character.Random,
+                Character.Chad,
+                Character.Alice,
+                Character.Jesus,
+                Character.Jamal,
+                Character.Lurker,
+                Character.Phantom,
+                Character.Mary,
+                Character.Fallen,
+                // NOTE: Need this here or else mary does not get detected in the list...?
+                Character.Unknown
+        };
+
+        for (var i = 0; i < players.Count; i++)
+        {
+            Character playerCharacter = players[i].character;
+
+            for (var j = 0; j < characters.Count; j++)
+            {
+                Character filterCharacter = characters[j];
+
+                if (filterCharacter == playerCharacter)
+                {
+                    characters.RemoveAt(j);
+
+                    if ((byte)filterCharacter >= 5)
+                    {
+                        ServerRemoveMonstersFromList(characters);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        // NOTE: If all the other characters have been removed and only the Character.Random index is left...
+
+        if (characters.Count <= 1)
+        {
+            characters.Clear();
+        }
+
+        return characters.ToArray();
+    }
+
+    private void ServerRemoveMonstersFromList(List<Character> characters)
+    {
+        for (var i = 0; i < characters.Count; i++)
+        {
+            Character character = characters[i];
+
+            switch (character)
+            {
+                case Character.Mary:
+                    characters.RemoveAt(i);
+                    break;
+                case Character.Lurker:
+                    characters.RemoveAt(i);
+                    break;
+                case Character.Phantom:
+                    characters.RemoveAt(i);
+                    break;
+                case Character.Fallen:
+                    characters.RemoveAt(i);
+                    break;
+            }
+        }
+    }
+
+    private void ServerSpawnMonster(NetworkConnection connection, Character monster, bool joiningMidGame)
+    {
+        this.monsterCharacter = monster;
+        this.monsterCharacterAvailable = false;
         GameObject[] monsterSpawnPoints = GameObject.FindGameObjectsWithTag(Tags.MONSTER_SPAWN_POINT);
         int randomNumber = UnityEngine.Random.Range(0, monsterSpawnPoints.Length);
+        GameObject monsterObject = Monster(monster);
         GameObject pickedSpawnPoint = monsterSpawnPoints[randomNumber];
-        GameObject spawnedMonster = Instantiate(monster, pickedSpawnPoint.transform.position, Quaternion.identity);
+        GameObject spawnedMonster = Instantiate(monsterObject, pickedSpawnPoint.transform.position, Quaternion.identity);
 
         if (joiningMidGame)
         {
@@ -476,11 +491,10 @@ public class StageNetworkManager : MonoBehaviour
         else
         {
             NetworkServer.AddPlayerForConnection(connection, spawnedMonster);
-
         }
     }
 
-    private void ServerSpawnSurvivor(NetworkConnection connection, GameObject survivor, bool joiningMidGame)
+    private void ServerSpawnSurvivor(NetworkConnection connection, Character survivorCharacter, bool joiningMidGame)
     {
         for (var i = 0; i < survivorSpawnPoints.Length; i++)
         {
@@ -494,7 +508,8 @@ public class StageNetworkManager : MonoBehaviour
             }
 
             survivorSpawnPoint.SetUsed();
-            GameObject spawnedSurvivor = Instantiate(survivor, survivorSpawnPoint.gameObject.transform.position, Quaternion.identity);
+            GameObject survivorObject = Survivor(survivorCharacter);
+            GameObject spawnedSurvivor = Instantiate(survivorObject, survivorSpawnPoint.gameObject.transform.position, Quaternion.identity);
             if (joiningMidGame)
             {
                 GameObject playerSpectatorObject = connection.identity.gameObject;
@@ -510,6 +525,24 @@ public class StageNetworkManager : MonoBehaviour
             break;
         }
 
+    }
+
+    private void ServerUpdatePlayerSlot(uint netId, Character pickedCharacter)
+    {
+        List<Player> players = NetworkRoom.players;
+
+        for (var i = 0; i < players.Count; i++)
+        {
+            uint foundId = players[i].identity.netId;
+
+            if (foundId == netId)
+            {
+                Player player = players[i];
+                player.character = pickedCharacter;
+                players[i] = player;
+                break;
+            }
+        }
     }
 
     private GameObject Survivor(Character character)
@@ -531,8 +564,6 @@ public class StageNetworkManager : MonoBehaviour
 
     private GameObject Monster(Character character)
     {
-        monsterCharacterAvailable = false;
-
         switch (character)
         {
             case Character.Lurker:
