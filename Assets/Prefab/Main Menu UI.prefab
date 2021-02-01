@@ -21266,15 +21266,7 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: stage-template
-      m_Image: {fileID: 0}
     - m_Text: stage-template-lurker
-      m_Image: {fileID: 0}
-    - m_Text: stage-template-mary
-      m_Image: {fileID: 0}
-    - m_Text: stage-template-phantom
-      m_Image: {fileID: 0}
-    - m_Text: stage-template-fallen
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:

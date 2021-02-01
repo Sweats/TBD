@@ -29,7 +29,7 @@ public struct Player
 
 public class NetworkRoom : NetworkManager
 {
-    private bool inLobby = true;
+    public static bool inLobby = true;
 
     public static List<Player> players;
 
@@ -43,12 +43,12 @@ public class NetworkRoom : NetworkManager
     {
         players = new List<Player>();
 
+        EventManager.lobbyServerStartedGameEvent.AddListener(OnServerStartedGame);
+        EventManager.serverLeftGameEvent.AddListener(OnServerStopped);
         NetworkServer.RegisterHandler<ServerPlayerJoinedMessage>(ServerPlayerJoined);
 
         lobbyNetworkManager.RegisterServerHandlers();
         stageNetworkManager.RegisterServerHandlers();
-
-        EventManager.lobbyServerStartedGameEvent.AddListener(OnServerStartedGame);
 
         if (inLobby)
         {
@@ -62,8 +62,36 @@ public class NetworkRoom : NetworkManager
 
     }
 
+    // NOTE: Called when the client that is acting as the server hits the exit button or back to title screen buttons.
+
+    private void OnServerStopped()
+    {
+        StopHost();
+    }
+
+    public override void OnStopServer()
+    {
+        if (inLobby)
+        {
+            lobbyNetworkManager.OnStopServer();
+        }
+
+        else
+        {
+            stageNetworkManager.OnStopServer();
+        }
+    }
+
+    private void OnServerStartedGame(string sceneName)
+    {
+        inLobby = false;
+        NetworkServer.SendToAll(new ClientServerChangeSceneMessage { newValue = inLobby });
+        ServerChangeScene(sceneName);
+    }
+
     public override void OnServerAddPlayer(NetworkConnection connection)
     {
+        base.OnServerAddPlayer(connection);
 
     }
 
@@ -81,6 +109,8 @@ public class NetworkRoom : NetworkManager
         {
             stageNetworkManager.OnServerConnect(connection);
         }
+
+        base.OnServerConnect(connection);
     }
 
     public override void OnServerDisconnect(NetworkConnection connection)
@@ -94,6 +124,8 @@ public class NetworkRoom : NetworkManager
         {
             stageNetworkManager.OnServerDisconnect(connection);
         }
+
+        base.OnServerDisconnect(connection);
     }
 
     private void ServerPlayerJoined(NetworkConnection connection, ServerPlayerJoinedMessage message)
@@ -109,16 +141,12 @@ public class NetworkRoom : NetworkManager
         }
     }
 
-    private void OnServerStartedGame(string sceneName)
-    {
-        inLobby = false;
-        ServerChangeScene(sceneName);
-    }
 
     public override void OnStartClient()
     {
         lobbyNetworkManager.RegisterClientHandlers();
         stageNetworkManager.RegisterClientHandlers();
+        NetworkClient.RegisterHandler<ClientServerChangeSceneMessage>(ClientOnServerChangedScene);
 
         if (inLobby)
         {
@@ -134,10 +162,34 @@ public class NetworkRoom : NetworkManager
         base.OnStartClient();
     }
 
+    public override void OnClientError(NetworkConnection connection, int errorCode)
+    {
+        Debug.Log("Something went wrong with the server!");
+        base.OnClientError(connection, errorCode);
+    }
+
+    public override void OnClientDisconnect(NetworkConnection connection)
+    {
+        StopClient();
+
+        if (inLobby)
+        {
+            lobbyNetworkManager.OnClientDisconnect(connection);
+        }
+
+        else
+        {
+            stageNetworkManager.OnClientDisconnect(connection);
+        }
+
+        base.OnClientDisconnect(connection);
+    }
+
     public override void OnClientSceneChanged(NetworkConnection connection)
     {
         if (inLobby)
         {
+            Debug.Log("is client scene changed being called for the lobby?");
             lobbyNetworkManager.OnClientSceneChanged(connection);
         }
 
@@ -145,6 +197,8 @@ public class NetworkRoom : NetworkManager
         {
             stageNetworkManager.OnClientSceneChanged(connection);
         }
+
+        base.OnClientSceneChanged(connection);
     }
 
     public override void OnServerSceneChanged(string sceneName)
@@ -161,6 +215,14 @@ public class NetworkRoom : NetworkManager
             stageNetworkManager.OnServerSceneChanged(sceneName);
 
         }
+
+        base.OnServerSceneChanged(sceneName);
+    }
+
+    private void ClientOnServerChangedScene(NetworkConnection connection, ClientServerChangeSceneMessage message)
+    {
+        Debug.Log("Received ClientServerChangeSceneMessage from the server!");
+        NetworkRoom.inLobby = message.newValue;
     }
 }
 

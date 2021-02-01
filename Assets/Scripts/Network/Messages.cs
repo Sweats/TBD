@@ -247,6 +247,16 @@ public struct ServerClientLoadedSceneMessage: NetworkMessage
 
 }
 
+public struct ClientServerDisconnectedMessage: NetworkMessage
+{
+
+}
+
+public struct ClientServerChangeSceneMessage: NetworkMessage
+{
+    public bool newValue;
+}
+
 #endregion
 
 #endregion

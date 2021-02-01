@@ -22,7 +22,11 @@ public static class EventManager
 
     public static ServerAskedYouToPickCharacterEvent serverAskedYouToPickCharacterEvent = new ServerAskedYouToPickCharacterEvent();
 
+    public static ServerLeftGameEvent serverLeftGameEvent = new ServerLeftGameEvent();
+
     public static PlayerJoinedEvent playerJoinedEvent = new PlayerJoinedEvent();
+
+    public static StageClientServerDisconnectdEvent stageClientServerDisconnectdEvent = new StageClientServerDisconnectdEvent();
 
 
 
@@ -62,6 +66,8 @@ public static class EventManager
     public static LobbyClientPlayerChangedCharacterEvent lobbyClientPlayerChangedCharacterEvent = new LobbyClientPlayerChangedCharacterEvent();
 
     public static LobbyClientPlayerSentChatMessageEvent lobbyClientPlayerSentChatMessageEvent = new LobbyClientPlayerSentChatMessageEvent();
+
+    public static LobbyClientServerDisconnectedEvent lobbyClientServerDisconnectedEvent = new LobbyClientServerDisconnectedEvent();
 
     public static LobbyClientHostChangedStageEvent lobbyClientHostChangedStageEvent = new LobbyClientHostChangedStageEvent();
 
@@ -257,7 +263,11 @@ public class PlayerPickedUpKeyEvent : UnityEvent<string, string> { }
 
 public class ServerAskedYouToPickCharacterEvent: UnityEvent<Character[]>{}
 
+public class ServerLeftGameEvent: UnityEvent{}
+
 public class PlayerJoinedEvent: UnityEvent<string>{}
+
+public class StageClientServerDisconnectdEvent: UnityEvent{}
 
 #endregion
 
@@ -305,6 +315,9 @@ public class LobbyClientPlayerLeftEvent: UnityEvent<string, int>{}
 public class LobbyClientPlayerChangedCharacterEvent: UnityEvent<Character, int>{}
 
 public class LobbyClientPlayerSentChatMessageEvent: UnityEvent<string, string>{}
+
+public class LobbyClientServerDisconnectedEvent: UnityEvent{}
+
 
 
 

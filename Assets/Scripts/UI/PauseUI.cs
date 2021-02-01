@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using Mirror;
 
 public class PauseUI : MonoBehaviour
 {
@@ -48,6 +49,16 @@ public class PauseUI : MonoBehaviour
 
     public void OnExitGameButtonClicked()
     {
+        if (NetworkServer.active)
+        {
+            NetworkServer.DisconnectAll();
+        }
+
+        else
+        {
+            NetworkClient.Disconnect();
+        }
+
         Application.Quit();
 
         if (Application.isEditor)
@@ -59,7 +70,18 @@ public class PauseUI : MonoBehaviour
 
     public void OnBackToTitleScreenButtonClicked()
     {
-        Stages.Load(StageName.Menu);
+        if (NetworkServer.active)
+        {
+            //Debug.Log("Server has left the game!");
+            EventManager.serverLeftGameEvent.Invoke();
+        }
+
+        else
+        {
+            NetworkClient.Disconnect();
+        }
+
+        //Stages.Load(StageName.Menu);
     }
 
     public void OnOptionsButtonClicked()

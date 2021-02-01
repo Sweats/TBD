@@ -48,11 +48,6 @@ public class MainMenuUI : MonoBehaviour
         Application.Quit();
     }
 
-    public void OnPlayButtonClicked()
-    {
-        Stages.Load(StageName.Template);
-    }
-
     public void OnOptionsButtonClicked()
     {
         optionsUI.Show();

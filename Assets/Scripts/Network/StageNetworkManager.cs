@@ -43,12 +43,19 @@ public class StageNetworkManager : MonoBehaviour
     public void OnStartServer()
     {
         Debug.Log("OnStartServer() called!");
-
     }
+
+    // NOTE: Called on any client that disconnects from the server.
 
     public void OnServerDisconnect()
     {
 
+    }
+
+    public void OnStopServer()
+    {
+        Debug.Log("OnStopServer() called!");
+        Stages.Load(StageName.Menu);
     }
 
     public void RegisterServerHandlers()
@@ -383,7 +390,6 @@ public class StageNetworkManager : MonoBehaviour
     private Character[] ServerUnavailableCharacters()
     {
         List<Player> players = NetworkRoom.players;
-
         List<Character> characters = new List<Character>();
 
         for (var i = 0; i < players.Count; i++)
@@ -525,6 +531,12 @@ public class StageNetworkManager : MonoBehaviour
         Debug.Log("OnClientConnect() called!");
     }
 
+    public void OnClientDisconnect(NetworkConnection connection)
+    {
+        //EventManager.stageClientServerDisconnectdEvent.Invoke();
+        Stages.Load(StageName.Menu);
+    }
+
     public void RegisterClientHandlers()
     {
         NetworkClient.RegisterHandler<ClientPlayerSentChatMessage>(ClientOnPlayerSentChatMessage);
@@ -532,10 +544,12 @@ public class StageNetworkManager : MonoBehaviour
         NetworkClient.RegisterHandler<ClientPickCharacterMessage>(ClientPickCharacter);
         NetworkClient.RegisterHandler<ClientPlayerJoinedMessage>(ClientPlayerJoined);
         NetworkClient.RegisterHandler<ClientPlayerDisconnectedMessage>(OnClientPlayerDisconnected);
+        //NetworkClient.RegisterHandler<ClientServerDisconnectedMessage>(OnClientPlayerDisconnected);
     }
 
     public void OnClientSceneChanged(NetworkConnection connection)
     {
+        Debug.Log("CLIENT CONNECTED TO THE NEW SCENE ON THE SERVER!");
         NetworkClient.Send(new ServerClientLoadedSceneMessage());
     }
 

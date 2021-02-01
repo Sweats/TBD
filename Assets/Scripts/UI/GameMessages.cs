@@ -38,6 +38,7 @@ public class GameMessages : MonoBehaviour
         EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
         EventManager.lobbyClientKickedEvent.AddListener(OnLobbyHostKickedPlayer);
         EventManager.lobbyYouHaveBeenKickedEvent.AddListener(OnLobbyHostKickedYou);
+        EventManager.stageClientServerDisconnectdEvent.AddListener(OnStageClientServerDisconnected);
         //EventManager.lobbyServerPlayerJoinedLobbyEvent.AddListener(OnPlayerJoinedLobby);
     }
 
@@ -157,6 +158,12 @@ public class GameMessages : MonoBehaviour
     private void OnLobbyHostKickedYou()
     {
         string newMessage = "You have been kicked!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnStageClientServerDisconnected()
+    {
+        string newMessage = "Server disconnected!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 

@@ -27,6 +27,12 @@ public class LobbyNetworkManager : MonoBehaviour
         EventManager.lobbyServerChangedInsanityOptionEvent.AddListener(ServerOnChangedInsanityOptionEvent);
     }
 
+
+    public void OnStopServer()
+    {
+
+    }
+
     public void RegisterServerHandlers()
     {
         NetworkServer.RegisterHandler<LobbyServerClientChangedCharacterMessage>(ServerOnClientChangedCharacter);
@@ -39,6 +45,7 @@ public class LobbyNetworkManager : MonoBehaviour
         GameObject spawnedlobbyPlayer = Instantiate(lobbyPlayer);
         NetworkServer.AddPlayerForConnection(connection, spawnedlobbyPlayer);
     }
+
 
     public void OnServerSceneChanged(string sceneName)
     {
@@ -177,6 +184,7 @@ public class LobbyNetworkManager : MonoBehaviour
         return index;
     }
 
+
     private void ServerOnClientChangedCharacter(NetworkConnection connection, LobbyServerClientChangedCharacterMessage message)
     {
         Character character = message.newValue;
@@ -207,6 +215,12 @@ public class LobbyNetworkManager : MonoBehaviour
     {
 
     }
+
+    public void OnClientDisconnect(NetworkConnection connection)
+    {
+        //EventManager.lobbyClientServerDisconnectedEvent.Invoke();
+    }
+
 
     public void OnClientSceneChanged(NetworkConnection connection)
     {
