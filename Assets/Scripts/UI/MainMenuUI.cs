@@ -22,9 +22,18 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField]
     private Color buttonTextColor;
 
+    [SerializeField]
+    private NetworkRoom serverNetworkManager;
+
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Confined;
+
+#if UNITY_SERVER
+        Debug.Log("Starting the server...");
+        NetworkRoom.dedicatedServer = true;
+        serverNetworkManager.StartServer();
+#endif
     }
 
 
@@ -40,10 +49,10 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnQuitButtonClicked()
     {
-        if (Application.isEditor)
-        {
-            UnityEditor.EditorApplication.isPlaying = false;
-        }
+        //if (Application.isEditor)
+        //{
+        //    UnityEditor.EditorApplication.isPlaying = false;
+        //}
 
         Application.Quit();
     }

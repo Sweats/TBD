@@ -19,12 +19,7 @@ public class LobbyNetworkManager : MonoBehaviour
 
     public void OnStartServer()
     {
-        EventManager.lobbyServerKickedEvent.AddListener(ServerOnKickedPlayerEvent);
-        EventManager.lobbyServerChangedStageEvent.AddListener(ServerOnChangedStageEvent);
-        EventManager.lobbyServerChangedGamemodeEvent.AddListener(ServerOnChangedGamemodeEvent);
-        EventManager.lobbyServerChangedAllRandomEvent.AddListener(ServerOnChangedAllRandomEvent);
-        EventManager.lobbyServerChangedAllowSpectatorEvent.AddListener(ServerOnChangedAllowSpectatorEvent);
-        EventManager.lobbyServerChangedInsanityOptionEvent.AddListener(ServerOnChangedInsanityOptionEvent);
+
     }
 
 
@@ -37,10 +32,17 @@ public class LobbyNetworkManager : MonoBehaviour
     {
         NetworkServer.RegisterHandler<LobbyServerClientChangedCharacterMessage>(ServerOnClientChangedCharacter);
         NetworkServer.RegisterHandler<LobbyServerPlayerChatMessage>(ServerOnPlayerSentChatMessage);
+        NetworkServer.RegisterHandler<LobbyServerClientRequestedKickMessage>(ServerOnClientRequestedKickMessage);
+        NetworkServer.RegisterHandler<LobbyServerClientRequestedChangeStageMessage>(ServerOnClientRequestedToChangeStage);
+        NetworkServer.RegisterHandler<LobbyServerClientRequestedChangeGamemodeMessage>(ServerOnClientRequestedToChangeGamemode);
+        NetworkServer.RegisterHandler<LobbyServerClientRequestedChangeInsanityMessage>(ServerOnClientRequestedToChangeInsanity);
+        NetworkServer.RegisterHandler<LobbyServerClientRequestedChangeAllRandomMessage>(ServerOnClientRequestedToChangeAllRandom);
+        NetworkServer.RegisterHandler<LobbyServerClientRequestedChangeAllowSpectatorMessage>(ServerOnClientRequestedToChangeAllowSpectator);
     }
 
     public void OnServerConnect(NetworkConnection connection)
     {
+        List<Player> players = NetworkRoom.players;
         GameObject lobbyPlayer = (GameObject)Resources.Load("Lobby Player");
         GameObject spawnedlobbyPlayer = Instantiate(lobbyPlayer);
         NetworkServer.AddPlayerForConnection(connection, spawnedlobbyPlayer);
@@ -62,19 +64,143 @@ public class LobbyNetworkManager : MonoBehaviour
         {
             Player player = players[foundIndex];
             string name = player.playerName;
+            bool hosting = player.Hosting();
             players.RemoveAt(foundIndex);
+            NetworkServer.DestroyPlayerForConnection(connection);
+
+            if (hosting && players.Count > 0)
+            {
+                Debug.Log("Old host has left the server! Picking a new host...");
+                PickNewHost();
+            }
+
             NetworkServer.SendToAll(new LobbyClientPlayerLeftMessage { clientName = name, index = foundIndex });
         }
     }
 
-    private void ServerOnChangedStageEvent(int newValue)
+    private void ServerOnClientRequestedToChangeStage(NetworkConnection connection, LobbyServerClientRequestedChangeStageMessage message)
     {
-        if (NetworkServer.localClientActive)
+        Debug.Log("Client requested to change the stage!");
+        uint id = connection.identity.netId;
+
+        if (!IsHost(id))
         {
-            selectedStage = newValue;
-            NetworkServer.SendToAll(new LobbyClientChangedStageMessage { newOption = newValue });
+            return;
         }
+
+        selectedStage = message.newValue;
+
+        NetworkServer.SendToAll(new LobbyClientChangedStageMessage { newOption = message.newValue });
     }
+
+
+
+
+    private void ServerOnClientRequestedToChangeInsanity(NetworkConnection connection, LobbyServerClientRequestedChangeInsanityMessage message)
+    {
+        uint id = connection.identity.netId;
+        Debug.Log("Client requested to change the insanity!");
+
+        if (!IsHost(id))
+        {
+            return;
+        }
+
+        insanityOption = message.newValue;
+        NetworkServer.SendToAll(new LobbyClientChangedInsanityOptionMessage { newOption = message.newValue });
+
+    }
+
+    private void ServerOnClientRequestedToChangeAllowSpectator(NetworkConnection connection, LobbyServerClientRequestedChangeAllowSpectatorMessage message)
+    {
+        Debug.Log("Client requested to change the spectator!");
+        uint id = connection.identity.netId;
+
+        if (!IsHost(id))
+        {
+            Debug.Log("The player is not the host!");
+            return;
+        }
+
+        Debug.Log("Server has granted the player to change the allow spectator option");
+
+        allowSpectator = message.newValue;
+
+        NetworkServer.SendToAll(new LobbyClientChangedAllowSpectatorOptionMessage { newOption = message.newValue });
+
+
+    }
+
+    private void ServerOnClientRequestedToChangeAllRandom(NetworkConnection connection, LobbyServerClientRequestedChangeAllRandomMessage message)
+    {
+        Debug.Log("Client requested to change the all random!");
+        uint id = connection.identity.netId;
+
+        if (!IsHost(id))
+        {
+            return;
+        }
+
+        allRandom = message.newValue;
+
+        NetworkServer.SendToAll(new LobbyClientChangedAllRandomMessage { newOption = message.newValue });
+
+    }
+
+    private void ServerOnClientRequestedToChangeGamemode(NetworkConnection connection, LobbyServerClientRequestedChangeGamemodeMessage message)
+    {
+        Debug.Log("Client requested to change the game mode! ");
+        uint id = connection.identity.netId;
+
+        if (!IsHost(id))
+        {
+            return;
+        }
+
+        selectedGamemode = message.newValue;
+
+        NetworkServer.SendToAll(new LobbyClientChangedGamemodeOptionMessage { newOption = message.newValue });
+    }
+
+    public bool IsHost(uint id)
+    {
+        int index = GetIndexOfPlayer(id);
+        Player host = NetworkRoom.players[index];
+
+        if (host.Hosting())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    private void PickNewHost()
+    {
+        List<Player> players = NetworkRoom.players;
+        int randomNumber = Random.Range(0, players.Count);
+        NetworkRoom.players[randomNumber].SetHosting(true);
+        NetworkIdentity newHostIdentity = NetworkRoom.players[randomNumber].identity;
+        Debug.Log($"Picking a new host with the net identity of {newHostIdentity.netId}");
+        NetworkServer.SendToClientOfPlayer(newHostIdentity, new LobbyClientServerAssignedYouHostMessage());
+
+        for (var i = 0; i < players.Count; i++)
+        {
+            // NOTE: Skip the new host.
+            if (randomNumber == i)
+            {
+                continue;
+            }
+
+            Player player = players[i];
+            NetworkIdentity playerIdentity = player.identity;
+            string playerName = player.playerName;
+            NetworkServer.SendToClientOfPlayer(playerIdentity, new LobbyClientServerPickedNewHostMessage { clientName = playerName, index = randomNumber });
+        }
+
+    }
+
 
     private void ServerOnPlayerSentChatMessage(NetworkConnection connection, LobbyServerPlayerChatMessage message)
     {
@@ -83,63 +209,26 @@ public class LobbyNetworkManager : MonoBehaviour
         NetworkServer.SendToAll(new LobbyClientPlayerChatMessage { clientName = playerName, text = chatMessageText });
     }
 
-    private void ServerOnChangedGamemodeEvent(int newValue)
-    {
-        if (NetworkServer.localClientActive)
-        {
-            selectedGamemode = newValue;
-            NetworkServer.SendToAll(new LobbyClientChangedGamemodeOptionMessage { newOption = newValue });
-
-        }
-    }
-
-    private void ServerOnChangedAllRandomEvent(bool newValue)
-    {
-        if (NetworkServer.localClientActive)
-        {
-            allRandom = newValue;
-            NetworkServer.SendToAll(new LobbyClientChangedAllRandomMessage { newOption = newValue });
-        }
-    }
-
-    private void ServerOnChangedAllowSpectatorEvent(bool newValue)
-    {
-        if (NetworkServer.localClientActive)
-        {
-            allowSpectator = newValue;
-            NetworkServer.SendToAll(new LobbyClientChangedAllowSpectatorOptionMessage { newOption = newValue });
-        }
-    }
-
-    private void ServerOnChangedInsanityOptionEvent(bool newValue)
-    {
-        if (NetworkServer.localClientActive)
-        {
-            insanityOption = newValue;
-            NetworkServer.SendToAll(new LobbyClientChangedInsanityOptionMessage { newOption = newValue });
-        }
-    }
-
-    // NOTE: Called when the player takes over a LobbyPlayer object.
-
-    public void ServerOnKickedPlayerEvent(int playerNumber)
+    private void ServerOnClientRequestedKickMessage(NetworkConnection connection, LobbyServerClientRequestedKickMessage message)
     {
         List<Player> players = NetworkRoom.players;
+        uint netId = connection.identity.netId;
+        int requestedPlayerIndex = GetIndexOfPlayer(netId);
+        Player requestee = players[requestedPlayerIndex];
 
-        // NOTE: If statement used just in case if someone wants to try to kick as a non host.
-        if (NetworkServer.localClientActive)
+        if (!requestee.Hosting())
         {
-            // NOTE: I don't think this will work properly and I should definitely test this.
-            Player player = players[playerNumber];
-            string name = player.playerName;
-            NetworkIdentity identity = player.identity;
-            Debug.Log($"Kick attempted! playerNumber = {playerNumber}, clientName = {name}, netId = {identity.netId}");
-            NetworkServer.SendToClientOfPlayer(identity, new LobbyClientYouHaveBeenKickedMessage { });
-            players.RemoveAt(playerNumber);
-            NetworkServer.SendToAll(new LobbyClientKickedMessage { kickedClientName = name, index = playerNumber });
-            NetworkServer.SendToAll(new LobbyClientPlayerChangedCharacterMessage { newCharacter = Character.Empty, index = playerNumber });
-
+            return;
         }
+
+        int playerIndexToKick = message.index;
+        Player kickedPlayer = players[playerIndexToKick];
+        NetworkIdentity identity = kickedPlayer.identity;
+        players.RemoveAt(playerIndexToKick);
+        Debug.Log($"Kick attempted! playerNumber = {playerIndexToKick}, clientName = {name}, netId = {identity.netId}");
+        NetworkServer.SendToClientOfPlayer(identity, new LobbyClientYouHaveBeenKickedMessage { });
+        NetworkServer.SendToAll(new LobbyClientKickedMessage { kickedClientName = name, index = playerIndexToKick });
+        NetworkServer.SendToAll(new LobbyClientPlayerChangedCharacterMessage { newCharacter = Character.Empty, index = playerIndexToKick });
     }
 
     private void SyncUpdatesToNewClient(NetworkIdentity newClientIdentity)
@@ -187,10 +276,10 @@ public class LobbyNetworkManager : MonoBehaviour
 
     private void ServerOnClientChangedCharacter(NetworkConnection connection, LobbyServerClientChangedCharacterMessage message)
     {
-        Character character = message.newValue;
         uint id = connection.identity.netId;
         int foundIndex = GetIndexOfPlayer(id);
         Player player = NetworkRoom.players[foundIndex];
+        Character character = message.newValue;
         player.character = character;
         NetworkRoom.players[foundIndex] = player;
         NetworkServer.SendToAll(new LobbyClientPlayerChangedCharacterMessage { newCharacter = character, index = foundIndex });
@@ -198,12 +287,25 @@ public class LobbyNetworkManager : MonoBehaviour
 
     public void OnPlayerJoined(NetworkConnection connection, ServerPlayerJoinedMessage message)
     {
+        List<Player> players = NetworkRoom.players;
+
         Debug.Log($"A client has sent us their name! it is {message.clientName}. Their netId is {message.clientIdentity.netId}!");
         string name = message.clientName;
         NetworkIdentity clientIdentity = message.clientIdentity;
-        NetworkRoom.players.Add(new Player(name, Character.Random, clientIdentity));
-        int foundPlayerIndex = GetIndexOfPlayer(clientIdentity.netId);
-        NetworkServer.SendToAll(new LobbyClientPlayerJoinedMessage { clientName = name, index = foundPlayerIndex });
+        Player player = new Player(name, Character.Random, clientIdentity);
+        int newPlayerIndex = players.Count - 1;
+
+        if (players.Count == 0)
+        {
+            player.SetHosting(true);
+            Debug.Log($"The value of the hosting  player is {player.Hosting()}");
+            NetworkServer.SendToClientOfPlayer(player.identity, new LobbyClientServerAssignedYouHostMessage { index = newPlayerIndex });
+            Debug.Log($"Made {message.clientName} the host of this lobby.");
+        }
+
+        players.Add(player);
+        Debug.Log($"Length of NetworkRoom.players is {NetworkRoom.players.Count}");
+        NetworkServer.SendToAll(new LobbyClientPlayerJoinedMessage { clientName = name, index = newPlayerIndex });
         SyncUpdatesToNewClient(clientIdentity);
     }
 
@@ -240,7 +342,22 @@ public class LobbyNetworkManager : MonoBehaviour
         NetworkClient.RegisterHandler<LobbyClientYouHaveBeenKickedMessage>(OnClientYouHaveBeenKickedMessage);
         NetworkClient.RegisterHandler<LobbyClientKickedMessage>(OnClientKickedMessage);
         NetworkClient.RegisterHandler<LobbyClientPlayerChatMessage>(OnClientPlayerChatMessage);
+        NetworkClient.RegisterHandler<LobbyClientServerPickedNewHostMessage>(OnClientServerSeletedNewHost);
+        NetworkClient.RegisterHandler<LobbyClientServerAssignedYouHostMessage>(OnClientServerAssignedYouHost);
 
+    }
+
+    private void OnClientServerSeletedNewHost(NetworkConnection connection, LobbyClientServerPickedNewHostMessage message)
+    {
+        string newHostName = message.clientName;
+        int index = message.index;
+        EventManager.lobbyClientServerPickedNewHostEvent.Invoke(newHostName, index);
+    }
+
+    private void OnClientServerAssignedYouHost(NetworkConnection connection, LobbyClientServerAssignedYouHostMessage message)
+    {
+        int index = message.index;
+        EventManager.lobbyClientServerAssignedYouHostEvent.Invoke(index);
     }
 
     private void OnClientPlayerChatMessage(NetworkConnection connection, LobbyClientPlayerChatMessage message)

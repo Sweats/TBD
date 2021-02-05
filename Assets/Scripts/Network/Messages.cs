@@ -130,12 +130,6 @@ public struct LobbyClientKickedMessage: NetworkMessage
     public int index;
 }
 
-public struct LobbyServerKickedMessage: NetworkMessage
-{
-    public string kickedClientName;
-    public int index;
-}
-
 public struct LobbyClientYouHaveBeenKickedMessage: NetworkMessage
 {
 
@@ -255,6 +249,52 @@ public struct ClientServerDisconnectedMessage: NetworkMessage
 public struct ClientServerChangeSceneMessage: NetworkMessage
 {
     public bool newValue;
+}
+
+public struct LobbyClientServerPickedNewHostMessage: NetworkMessage
+{
+    public string clientName;
+    public int index;
+}
+
+public struct LobbyClientServerAssignedYouHostMessage: NetworkMessage
+{
+    public int index;
+}
+
+public struct LobbyServerClientRequestedKickMessage: NetworkMessage
+{
+    public int index;
+}
+
+public struct LobbyServerClientRequestedChangeInsanityMessage: NetworkMessage
+{
+    public bool newValue;
+}
+
+public struct LobbyServerClientRequestedChangeStageMessage: NetworkMessage
+{
+    public int newValue;
+}
+
+public struct LobbyServerClientRequestedChangeGamemodeMessage: NetworkMessage
+{
+    public int newValue;
+}
+
+public struct LobbyServerClientRequestedChangeAllRandomMessage: NetworkMessage
+{
+    public bool newValue;
+}
+
+public struct LobbyServerClientRequestedChangeAllowSpectatorMessage: NetworkMessage
+{
+    public bool newValue;
+}
+
+public struct LobbyServerClientRequestedToStartGameMessage: NetworkMessage
+{
+    public string newSceneName;
 }
 
 #endregion

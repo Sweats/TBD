@@ -200,6 +200,11 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5107241063929939950, guid: a8391e9f8dcca780db940d205aeb499e,
+        type: 3}
+      propertyPath: serverNetworkManager
+      value: 
+      objectReference: {fileID: 18139065}
     - target: {fileID: 5107241063973431473, guid: a8391e9f8dcca780db940d205aeb499e,
         type: 3}
       propertyPath: m_AnchorMax.y
@@ -229,6 +234,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5107241064491568870, guid: a8391e9f8dcca780db940d205aeb499e,
+        type: 3}
+      propertyPath: m_Text
+      value: stage-template-lurker
       objectReference: {fileID: 0}
     - target: {fileID: 5107241064500980529, guid: a8391e9f8dcca780db940d205aeb499e,
         type: 3}

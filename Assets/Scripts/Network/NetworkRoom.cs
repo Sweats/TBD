@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Mirror;
 using System.Collections.Generic;
+using System;
 
 
 
@@ -18,12 +19,25 @@ public struct Player
     public string playerName;
     public Character character;
     public NetworkIdentity identity;
+    public bool hosting;
 
     public Player(string name, Character character, NetworkIdentity identity)
     {
         this.playerName = name;
         this.character = character;
         this.identity = identity;
+        this.hosting = false;
+    }
+
+    public void SetHosting(bool value)
+    {
+        this.hosting = value;
+    }
+
+
+    public bool Hosting()
+    {
+        return this.hosting;
     }
 }
 
@@ -32,6 +46,8 @@ public class NetworkRoom : NetworkManager
     public static bool inLobby = true;
 
     public static List<Player> players;
+
+    public static bool dedicatedServer = false;
 
     [SerializeField]
     private LobbyNetworkManager lobbyNetworkManager;
@@ -43,9 +59,14 @@ public class NetworkRoom : NetworkManager
     {
         players = new List<Player>();
 
-        EventManager.lobbyServerStartedGameEvent.AddListener(OnServerStartedGame);
+        if (dedicatedServer)
+        {
+            Debug.Log("Dedicated server started succesfully!");
+        }
+
         EventManager.serverLeftGameEvent.AddListener(OnServerStopped);
         NetworkServer.RegisterHandler<ServerPlayerJoinedMessage>(ServerPlayerJoined);
+        NetworkServer.RegisterHandler<LobbyServerClientRequestedToStartGameMessage>(ServerOnClientRequestedToStartGame);
 
         lobbyNetworkManager.RegisterServerHandlers();
         stageNetworkManager.RegisterServerHandlers();
@@ -80,13 +101,24 @@ public class NetworkRoom : NetworkManager
         {
             stageNetworkManager.OnStopServer();
         }
+
     }
 
-    private void OnServerStartedGame(string sceneName)
+    private void ServerOnClientRequestedToStartGame(NetworkConnection connection, LobbyServerClientRequestedToStartGameMessage message)
     {
+        uint id = connection.identity.netId;
+
+        if (!lobbyNetworkManager.IsHost(id))
+        {
+            return;
+        }
+
         inLobby = false;
-        NetworkServer.SendToAll(new ClientServerChangeSceneMessage { newValue = inLobby });
+        NetworkServer.SendToAll(new ClientServerChangeSceneMessage { newValue = NetworkRoom.inLobby });
+        string sceneName = message.newSceneName;
+        Debug.Log($"Server is switching to the new scene named {sceneName}");
         ServerChangeScene(sceneName);
+
     }
 
     public override void OnServerAddPlayer(NetworkConnection connection)
@@ -124,6 +156,8 @@ public class NetworkRoom : NetworkManager
         {
             stageNetworkManager.OnServerDisconnect(connection);
         }
+
+
 
         base.OnServerDisconnect(connection);
     }
@@ -190,6 +224,7 @@ public class NetworkRoom : NetworkManager
         if (inLobby)
         {
             Debug.Log("is client scene changed being called for the lobby?");
+
             lobbyNetworkManager.OnClientSceneChanged(connection);
         }
 

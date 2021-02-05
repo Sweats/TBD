@@ -51,7 +51,7 @@ public class Battery : NetworkBehaviour
 
     private int batteryID;
 
-    [Client]
+    [ClientCallback]
     private void Start()
     {
         batteryID = Random.Range(0, 10000);
@@ -61,7 +61,7 @@ public class Battery : NetworkBehaviour
 
     }
 
-    [Client]
+    [ClientCallback]
     private void Update()
     {
         noGlowTimer -= Time.deltaTime * timeBetweenGlows;
@@ -90,6 +90,7 @@ public class Battery : NetworkBehaviour
 
     void OnMouseExit()
     {
+
     }
 
     private void Glow()

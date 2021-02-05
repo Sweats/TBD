@@ -69,6 +69,10 @@ public static class EventManager
 
     public static LobbyClientServerDisconnectedEvent lobbyClientServerDisconnectedEvent = new LobbyClientServerDisconnectedEvent();
 
+    public static LobbyClientServerAssignedYouHostEvent lobbyClientServerAssignedYouHostEvent = new LobbyClientServerAssignedYouHostEvent();
+
+    public static LobbyClientServerPickedNewHostEvent lobbyClientServerPickedNewHostEvent = new LobbyClientServerPickedNewHostEvent();
+
     public static LobbyClientHostChangedStageEvent lobbyClientHostChangedStageEvent = new LobbyClientHostChangedStageEvent();
 
     public static LobbyClientHostChangedAllowSpectatorEvent lobbyClientHostChangedAllowSpectatorEvent = new LobbyClientHostChangedAllowSpectatorEvent();
@@ -113,6 +117,7 @@ public static class EventManager
     public static MaryReadyToTeleportEvent maryReadyToTeleportEvent = new MaryReadyToTeleportEvent();
 
     public static InvalidLobbyNameEvent invalidLobbyNameEvent = new InvalidLobbyNameEvent();
+
 }
 
 
@@ -269,6 +274,8 @@ public class PlayerJoinedEvent: UnityEvent<string>{}
 
 public class StageClientServerDisconnectdEvent: UnityEvent{}
 
+
+
 #endregion
 
 
@@ -318,7 +325,9 @@ public class LobbyClientPlayerSentChatMessageEvent: UnityEvent<string, string>{}
 
 public class LobbyClientServerDisconnectedEvent: UnityEvent{}
 
+public class LobbyClientServerPickedNewHostEvent: UnityEvent<string, int>{}
 
+public class LobbyClientServerAssignedYouHostEvent: UnityEvent<int>{}
 
 
 #endregion

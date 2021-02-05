@@ -39,6 +39,8 @@ public class GameMessages : MonoBehaviour
         EventManager.lobbyClientKickedEvent.AddListener(OnLobbyHostKickedPlayer);
         EventManager.lobbyYouHaveBeenKickedEvent.AddListener(OnLobbyHostKickedYou);
         EventManager.stageClientServerDisconnectdEvent.AddListener(OnStageClientServerDisconnected);
+        EventManager.lobbyClientServerPickedNewHostEvent.AddListener(OnLobbyServerAssignedANewHost);
+        EventManager.lobbyClientServerAssignedYouHostEvent.AddListener(OnLobbyServerAssignedYouHost);
         //EventManager.lobbyServerPlayerJoinedLobbyEvent.AddListener(OnPlayerJoinedLobby);
     }
 
@@ -164,6 +166,18 @@ public class GameMessages : MonoBehaviour
     private void OnStageClientServerDisconnected()
     {
         string newMessage = "Server disconnected!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnLobbyServerAssignedANewHost(string newHostName, int index)
+    {
+        string newMessage = $"Server assigned {newHostName} as the new host of the lobby!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnLobbyServerAssignedYouHost(int index)
+    {
+        string newMessage = "Server assigned you as the new host of the lobby!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
