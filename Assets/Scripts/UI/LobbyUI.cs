@@ -422,7 +422,7 @@ public class LobbyUI : MonoBehaviour
 
         if (hostingLobby)
         {
-            NetworkServer.DisconnectAll();
+            NetworkManager.singleton.StopHost();
             hostGameUI.Show();
             Debug.Log("You are no longer hosting the server!");
         }
@@ -430,7 +430,7 @@ public class LobbyUI : MonoBehaviour
         else
         {
             joinGameUI.Show();
-            NetworkClient.Disconnect();
+            NetworkManager.singleton.StopClient();
         }
     }
 
@@ -623,6 +623,13 @@ public class LobbyUI : MonoBehaviour
         playerTwoLobbyIcon.texture = emptyLobbySlotIcon;
         playerThreeLobbyIcon.texture = emptyLobbySlotIcon;
         playerFourLobbyIcon.texture = emptyLobbySlotIcon;
+        startGameButton.interactable = true;
+        stageDropdown.interactable = true;
+        gameModeDropdown.interactable = true;
+        allRandomToggle.interactable = true;
+        allowSpectatorToggle.interactable = true;
+        insanityToggle.interactable = true;
+        DisableSelectCharacterControls();
     }
 
     //[Client]

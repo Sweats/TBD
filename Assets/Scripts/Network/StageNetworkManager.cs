@@ -123,6 +123,7 @@ public class StageNetworkManager : MonoBehaviour
         }
 
         NetworkRoom.players.RemoveAt(playerDisconnectedIndex);
+        NetworkServer.DestroyPlayerForConnection(connection);
     }
 
     public void OnServerSceneChanged(string sceneName)

@@ -3,8 +3,6 @@ using Mirror;
 using System.Collections.Generic;
 using System;
 
-
-
 // NOTE: I know that I could have used SyncVars but I wanted more control on how and when things are synced. So I did it by hand.
 // I also think it's really dumb that we can't use attributes like [Client] or [Server] inside a class that inherits from
 // NetworkManager. Maybe I'm just bad at using Mirror.
@@ -155,9 +153,16 @@ public class NetworkRoom : NetworkManager
         else
         {
             stageNetworkManager.OnServerDisconnect(connection);
+
+            if (!inLobby && players.Count == 0)
+            {
+                Debug.Log("There are no more players left in the server. Going back to the lobby...");
+                string lobbySceneName = Stages.Name(StageName.Menu);
+                inLobby = true;
+                ServerChangeScene(lobbySceneName);
+
+            }
         }
-
-
 
         base.OnServerDisconnect(connection);
     }

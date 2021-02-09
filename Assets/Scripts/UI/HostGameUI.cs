@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System;
 using Mirror;
+using kcp2k;
 
 public class HostGameUI : MonoBehaviour
 {
@@ -13,10 +14,10 @@ public class HostGameUI : MonoBehaviour
     private InputField passwordField;
 
     [SerializeField]
-    private Canvas hostLobbyCanvas;
+    private InputField portField;
 
     [SerializeField]
-    private Text lobbyNameNotification;
+    private Canvas hostLobbyCanvas;
 
     [SerializeField]
     private MainMenuUI mainMenuUI;
@@ -24,8 +25,7 @@ public class HostGameUI : MonoBehaviour
     [SerializeField]
     private LobbyUI lobbyUI;
 
-    [SerializeField]
-    private NetworkManager networkManager;
+    private ushort port;
 
     private void Start()
     {
@@ -56,11 +56,6 @@ public class HostGameUI : MonoBehaviour
         hostLobbyCanvas.enabled = true;
     }
 
-    public void ShowLobbyNotification()
-    {
-        lobbyNameNotification.enabled = true;
-    }
-
     public void OnHostLobbyBackButtonClicked()
     {
         Hide();
@@ -72,19 +67,25 @@ public class HostGameUI : MonoBehaviour
     {
         string lobbyText = lobbyNameField.text;
 
-        if (lobbyText == String.Empty)
+        if (portField.text == string.Empty)
         {
-            lobbyNameNotification.enabled = true;
-            return;
+            port = 7777;
         }
 
+        else
+        {
+            KcpTransport transport = (KcpTransport)Transport.activeTransport;
+            transport.Port = port;
+        }
+
+        NetworkManager.singleton.StartHost();
         Hide();
-        networkManager.StartHost();
         lobbyUI.Show(true);
     }
 
-    public void OnLobbyNameChanged()
+
+    public void OnPortFieldChanged(string text)
     {
-        lobbyNameNotification.enabled = false;
+        port = Convert.ToUInt16(text);
     }
 }

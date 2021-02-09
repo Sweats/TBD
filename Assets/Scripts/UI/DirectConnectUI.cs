@@ -4,12 +4,13 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
+using kcp2k;
 
 public class DirectConnectUI : MonoBehaviour
 {
     private string hostname = "localhost";
 
-    private int port = 7777;
+    private ushort port = 7777;
 
     [SerializeField]
     private Canvas directConnectCanvas;
@@ -34,9 +35,6 @@ public class DirectConnectUI : MonoBehaviour
 
     [SerializeField]
     private InputField portField;
-    
-    [SerializeField]
-    private NetworkManager networkManager;
 
     [SerializeField]
     private LobbyUI lobbyUI;
@@ -81,7 +79,11 @@ public class DirectConnectUI : MonoBehaviour
     {
         string uriString = $"{hostname}:{port}";
         Uri uri = new Uri(uriString);
-        networkManager.StartClient(uri);
+        //NetworkClient.Connect(uri);
+        NetworkManager.singleton.networkAddress = hostname;
+        KcpTransport transport = (KcpTransport)Transport.activeTransport;
+        transport.Port = port;
+        NetworkManager.singleton.StartClient();
         lobbyUI.Show(false);
         Hide();
     }
@@ -101,7 +103,7 @@ public class DirectConnectUI : MonoBehaviour
 
     public void OnPortFieldChanged()
     {
-        port = Int32.Parse(portField.text);
+        port = Convert.ToUInt16(portField.text);
         Debug.Log($"uri string is now {hostname}:{port}");
     }
 

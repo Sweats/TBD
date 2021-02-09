@@ -51,34 +51,30 @@ public class PauseUI : MonoBehaviour
     {
         if (NetworkServer.active)
         {
-            NetworkServer.DisconnectAll();
+            Debug.Log("The host has stopped the server!");
+            NetworkManager.singleton.StopHost();
         }
 
         else
         {
-            NetworkClient.Disconnect();
+            NetworkManager.singleton.StopClient();
         }
 
         Application.Quit();
-
-        //if (Application.isEditor)
-        //{
-        //    UnityEditor.EditorApplication.isPlaying = false;
-        //}
     }
-
 
     public void OnBackToTitleScreenButtonClicked()
     {
         if (NetworkServer.active)
         {
             //Debug.Log("Server has left the game!");
-            EventManager.serverLeftGameEvent.Invoke();
+            Debug.Log("The host has stopped the server!");
+            NetworkManager.singleton.StopHost();
         }
 
         else
         {
-            NetworkClient.Disconnect();
+            NetworkManager.singleton.StopClient();
         }
 
         //Stages.Load(StageName.Menu);

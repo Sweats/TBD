@@ -74,3 +74,11 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 ProjectSettings/Packages/com.unity.settings-manager/Settings.json
 ProjectSettings/Packages/com.unity.probuilder/Settings.json
+
+# Stuff that Sweats added
+server_data/
+*.so
+*.debug
+server:x86_64
+
+
