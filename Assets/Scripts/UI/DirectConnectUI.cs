@@ -80,12 +80,9 @@ public class DirectConnectUI : MonoBehaviour
         string uriString = $"{hostname}:{port}";
         Uri uri = new Uri(uriString);
         //NetworkClient.Connect(uri);
-        NetworkManager.singleton.networkAddress = hostname;
-        KcpTransport transport = (KcpTransport)Transport.activeTransport;
-        transport.Port = port;
-        NetworkManager.singleton.StartClient();
-        lobbyUI.Show(false);
-        Hide();
+        NetworkRoom.PORT = port;
+        NetworkRoom.HOSTNAME = hostname;
+        Stages.Load(StageName.Lobby);
     }
 
     private void OnFailedToConnectToHost(int errorCode)

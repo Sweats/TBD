@@ -5,7 +5,8 @@ using UnityEngine.SceneManagement;
 public enum StageName
 {
     Template_Lurker,
-    Menu
+    Menu,
+    Lobby
 }
 
 public class Stages
@@ -17,7 +18,8 @@ public class Stages
     private static Dictionary<StageName, string> stagesDict = new Dictionary<StageName, string>()
     {
         {StageName.Template_Lurker, "stage-template-lurker"},
-        {StageName.Menu, "menu"}
+        {StageName.Menu, "menu"},
+        {StageName.Lobby, "lobby"}
     };
 
     public static void Load(StageName stageName)

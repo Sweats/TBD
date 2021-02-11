@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/start.unity
     guid: aad22bdfb626a3e619e7e1701bbd99fb
   - enabled: 1
@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/stage-template-lurker.unity
     guid: 6fb59dbddc8634e4cac2d210f4fe1fa0
+  - enabled: 1
+    path: Assets/Scenes/lobby.unity
+    guid: 1df3decd01ec61449b75cb59f18c2578
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 885a3c4407ddbc9478986ea9b9e231c1,
       type: 2}

@@ -90,7 +90,7 @@ public class JoinGameUI : MonoBehaviour
     public void OnConnectButtonClicked()
     {
         Debug.Log("Connect button clicked!");
-        lobbyUI.Show(false);
+        //lobbyUI.Show(false);
         Hide();
 
     }

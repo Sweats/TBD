@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Mirror;
+using kcp2k;
 using System.Collections.Generic;
 using System;
 
@@ -41,11 +42,17 @@ public struct Player
 
 public class NetworkRoom : NetworkManager
 {
-    public static bool inLobby = true;
+    public static bool IN_LOBBY = true;
 
-    public static List<Player> players;
+    public static List<Player> PLAYERS_IN_SERVER;
 
-    public static bool dedicatedServer = false;
+    public static bool CLIENT_HOSTING_LOBBY = false;
+
+    public static string HOSTNAME = "localhost";
+
+    public static ushort PORT;
+
+    public static bool DEDICATED_SERVER_HOSTING_LOBBY = false;
 
     [SerializeField]
     private LobbyNetworkManager lobbyNetworkManager;
@@ -55,11 +62,12 @@ public class NetworkRoom : NetworkManager
 
     public override void OnStartServer()
     {
-        players = new List<Player>();
+        SetPort(PORT);
+        PLAYERS_IN_SERVER = new List<Player>();
 
-        if (dedicatedServer)
+        if (CLIENT_HOSTING_LOBBY)
         {
-            Debug.Log("Dedicated server started succesfully!");
+            Log("Dedicated server started succesfully!");
         }
 
         EventManager.serverLeftGameEvent.AddListener(OnServerStopped);
@@ -69,7 +77,7 @@ public class NetworkRoom : NetworkManager
         lobbyNetworkManager.RegisterServerHandlers();
         stageNetworkManager.RegisterServerHandlers();
 
-        if (inLobby)
+        if (IN_LOBBY)
         {
             lobbyNetworkManager.OnStartServer();
         }
@@ -81,6 +89,18 @@ public class NetworkRoom : NetworkManager
 
     }
 
+    public static void Allocate()
+    {
+        GameObject darnedNetworkManagerObject = (GameObject)Resources.Load("Darned Network Manager");
+        GameObject spawnedObject = Instantiate(darnedNetworkManagerObject);
+    }
+
+    public static void SetPort(ushort port)
+    {
+        KcpTransport transport = (KcpTransport)Transport.activeTransport;
+        transport.Port = port;
+    }
+
     // NOTE: Called when the client that is acting as the server hits the exit button or back to title screen buttons.
 
     private void OnServerStopped()
@@ -90,7 +110,7 @@ public class NetworkRoom : NetworkManager
 
     public override void OnStopServer()
     {
-        if (inLobby)
+        if (IN_LOBBY)
         {
             lobbyNetworkManager.OnStopServer();
         }
@@ -111,10 +131,10 @@ public class NetworkRoom : NetworkManager
             return;
         }
 
-        inLobby = false;
-        NetworkServer.SendToAll(new ClientServerChangeSceneMessage { newValue = NetworkRoom.inLobby });
+        IN_LOBBY = false;
+        NetworkServer.SendToAll(new ClientServerChangeSceneMessage { newValue = NetworkRoom.IN_LOBBY });
         string sceneName = message.newSceneName;
-        Debug.Log($"Server is switching to the new scene named {sceneName}");
+        Log($"[Darned]: Server is switching to the new scene named {sceneName}");
         ServerChangeScene(sceneName);
 
     }
@@ -127,9 +147,9 @@ public class NetworkRoom : NetworkManager
 
     public override void OnServerConnect(NetworkConnection connection)
     {
-        Debug.Log("Server connected player!");
+        Log("Server connected player!");
 
-        if (inLobby)
+        if (IN_LOBBY)
         {
             lobbyNetworkManager.OnServerConnect(connection);
 
@@ -145,7 +165,7 @@ public class NetworkRoom : NetworkManager
 
     public override void OnServerDisconnect(NetworkConnection connection)
     {
-        if (inLobby)
+        if (IN_LOBBY)
         {
             lobbyNetworkManager.OnServerDisconnect(connection);
         }
@@ -154,11 +174,11 @@ public class NetworkRoom : NetworkManager
         {
             stageNetworkManager.OnServerDisconnect(connection);
 
-            if (!inLobby && players.Count == 0)
+            if (!IN_LOBBY && PLAYERS_IN_SERVER.Count == 0)
             {
-                Debug.Log("There are no more players left in the server. Going back to the lobby...");
-                string lobbySceneName = Stages.Name(StageName.Menu);
-                inLobby = true;
+                Log("There are no more players left in the server. Going back to the lobby...");
+                string lobbySceneName = Stages.Name(StageName.Lobby);
+                IN_LOBBY = true;
                 ServerChangeScene(lobbySceneName);
 
             }
@@ -169,7 +189,7 @@ public class NetworkRoom : NetworkManager
 
     private void ServerPlayerJoined(NetworkConnection connection, ServerPlayerJoinedMessage message)
     {
-        if (inLobby)
+        if (IN_LOBBY)
         {
             lobbyNetworkManager.OnPlayerJoined(connection, message);
         }
@@ -187,7 +207,7 @@ public class NetworkRoom : NetworkManager
         stageNetworkManager.RegisterClientHandlers();
         NetworkClient.RegisterHandler<ClientServerChangeSceneMessage>(ClientOnServerChangedScene);
 
-        if (inLobby)
+        if (IN_LOBBY)
         {
             lobbyNetworkManager.OnStartClient();
 
@@ -203,7 +223,7 @@ public class NetworkRoom : NetworkManager
 
     public override void OnClientError(NetworkConnection connection, int errorCode)
     {
-        Debug.Log("Something went wrong with the server!");
+        Log("Something went wrong with the server!");
         base.OnClientError(connection, errorCode);
     }
 
@@ -211,7 +231,7 @@ public class NetworkRoom : NetworkManager
     {
         StopClient();
 
-        if (inLobby)
+        if (IN_LOBBY)
         {
             lobbyNetworkManager.OnClientDisconnect(connection);
         }
@@ -222,13 +242,15 @@ public class NetworkRoom : NetworkManager
         }
 
         base.OnClientDisconnect(connection);
+
+        Destroy(NetworkManager.singleton.gameObject);
     }
 
     public override void OnClientSceneChanged(NetworkConnection connection)
     {
-        if (inLobby)
+        if (IN_LOBBY)
         {
-            Debug.Log("is client scene changed being called for the lobby?");
+            Log("is client scene changed being called for the lobby?");
 
             lobbyNetworkManager.OnClientSceneChanged(connection);
         }
@@ -243,9 +265,9 @@ public class NetworkRoom : NetworkManager
 
     public override void OnServerSceneChanged(string sceneName)
     {
-        Debug.Log("server has changed the scene!");
+        Log("Server has changed the scene!");
 
-        if (inLobby)
+        if (IN_LOBBY)
         {
             lobbyNetworkManager.OnServerSceneChanged(sceneName);
         }
@@ -261,8 +283,14 @@ public class NetworkRoom : NetworkManager
 
     private void ClientOnServerChangedScene(NetworkConnection connection, ClientServerChangeSceneMessage message)
     {
-        Debug.Log("Received ClientServerChangeSceneMessage from the server!");
-        NetworkRoom.inLobby = message.newValue;
+        Log("Received ClientServerChangeSceneMessage from the server!");
+        NetworkRoom.IN_LOBBY = message.newValue;
+    }
+
+    public static void Log(string text)
+    {
+        string newText = $"[Darned]: {text}";
+        Debug.Log(newText);
     }
 }
 

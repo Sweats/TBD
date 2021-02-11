@@ -69,18 +69,19 @@ public class HostGameUI : MonoBehaviour
 
         if (portField.text == string.Empty)
         {
-            port = 7777;
+            NetworkRoom.PORT = 7777;
         }
 
         else
         {
-            KcpTransport transport = (KcpTransport)Transport.activeTransport;
-            transport.Port = port;
+            NetworkRoom.PORT = port;
         }
 
-        NetworkManager.singleton.StartHost();
-        Hide();
-        lobbyUI.Show(true);
+        NetworkRoom.CLIENT_HOSTING_LOBBY = true;
+        string lobbySceneName = Stages.Name(StageName.Lobby);
+        Stages.Load(StageName.Lobby);
+        //Hide();
+        //lobbyUI.Show(true);
     }
 
 

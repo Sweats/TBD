@@ -60,6 +60,7 @@ public class PauseUI : MonoBehaviour
             NetworkManager.singleton.StopClient();
         }
 
+        Destroy(NetworkManager.singleton.gameObject);
         Application.Quit();
     }
 
@@ -77,7 +78,9 @@ public class PauseUI : MonoBehaviour
             NetworkManager.singleton.StopClient();
         }
 
-        //Stages.Load(StageName.Menu);
+        Destroy(NetworkManager.singleton.gameObject);
+
+        Stages.Load(StageName.Menu);
     }
 
     public void OnOptionsButtonClicked()

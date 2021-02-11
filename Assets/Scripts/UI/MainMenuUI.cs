@@ -26,29 +26,12 @@ public class MainMenuUI : MonoBehaviour
     private void Start()
     {
 #if UNITY_SERVER
-        NetworkRoom.dedicatedServer = true;
+        NetworkRoom.DEDICATED_SERVER_HOSTING_LOBBY = true;
+        NetworkRoom.CLIENT_HOSTING_LOBBY = false;
 #endif
-        if (NetworkRoom.dedicatedServer && !NetworkManager.singleton.isNetworkActive)
+        if (NetworkRoom.DEDICATED_SERVER_HOSTING_LOBBY)
         {
-            string configName = "darned_lobby_server_configuration.yaml";
-
-            if (!Configuration.Exists(configName))
-            {
-                Debug.Log("[Darned]: Exiting...");
-                Application.Quit();
-                return;
-            }
-
-            Configuration serverConfiguration = Configuration.Load(configName);
-            string serverName = serverConfiguration.Name();
-            ushort port = serverConfiguration.Port();
-            string password = serverConfiguration.Password();
-            bool isPrivate = password == string.Empty;
-            Debug.Log($"[Darned]: Starting the server. Settings are:\n\nServer Name = {serverName}\nPort = {port}\nPrivate server = {isPrivate}");
-            KcpTransport transport = (KcpTransport)Transport.activeTransport;
-            transport.Port = port;
-            NetworkRoom.dedicatedServer = true;
-            NetworkManager.singleton.StartServer();
+            Stages.Load(StageName.Lobby);
         }
 
         else

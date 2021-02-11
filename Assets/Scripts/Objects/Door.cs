@@ -27,6 +27,7 @@ public class Door : NetworkBehaviour
     private bool grabbed;
 
     [SyncVar]
+    [SerializeField]
     private float doorPushStrength;
 
     [SerializeField]
@@ -48,7 +49,7 @@ public class Door : NetworkBehaviour
     private Renderer doorRenderer;
 
     [SerializeField]
-    private BoxCollider doorCollider;
+    private MeshCollider doorCollider;
 
     private Rigidbody doorRigidBody;
 
@@ -131,6 +132,7 @@ public class Door : NetworkBehaviour
 
             RpcUnlockDoorMessage(unlockDoorMessage);
             unlocked = true;
+            doorRigidBody.isKinematic = false;
             return;
         }
 
