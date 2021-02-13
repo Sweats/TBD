@@ -177,9 +177,9 @@ public class Survivor : NetworkBehaviour
 
     public override void OnStartLocalPlayer()
     {
+        controller = GetComponent<CharacterController>();
         this.enabled = true;
         windows.enabled = true;
-        controller = GetComponent<CharacterController>();
         survivorCamera.enabled = true;
         survivorCamera.GetComponent<AudioListener>().enabled = true;
         controller.enabled = true;

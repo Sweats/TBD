@@ -77,11 +77,14 @@ public class DirectConnectUI : MonoBehaviour
 
     public void OnConnectButtonClicked()
     {
-        string uriString = $"{hostname}:{port}";
-        Uri uri = new Uri(uriString);
-        //NetworkClient.Connect(uri);
-        NetworkRoom.PORT = port;
-        NetworkRoom.HOSTNAME = hostname;
+        if (NetworkManager.singleton != null)
+        {
+            Destroy(NetworkManager.singleton.gameObject);
+        }
+
+        DarnedNetworkManager.PORT = port;
+        DarnedNetworkManager.HOSTNAME = hostname;
+        // NOTE: We load the lobby scene first and then have the client get the updates from the server.
         Stages.Load(StageName.Lobby);
     }
 

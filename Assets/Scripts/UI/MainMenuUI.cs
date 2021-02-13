@@ -25,19 +25,32 @@ public class MainMenuUI : MonoBehaviour
 
     private void Start()
     {
-#if UNITY_SERVER
-        NetworkRoom.DEDICATED_SERVER_HOSTING_LOBBY = true;
-        NetworkRoom.CLIENT_HOSTING_LOBBY = false;
+#if UNITY_SERVER && DEDICATED_SERVER_BUILD
+        DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY = true;
+        DarnedNetworkManager.CLIENT_HOSTING_LOBBY = false;
+#elif UNITY_SERVER && MASTER_SERVER_BUILD
+        DarnedMasterServerManager.ENABLED = true;
+#elif UNITY_SERVER && MASTER_SERVER_BUILD && DEDICATED_SERVER_BUILD
+        DarnedNetworkManager.Log("You have built both the dedicated server and the master server. Please only define one of the two, not both. Exiting...");
+        Application.Quit();
+        return;
 #endif
-        if (NetworkRoom.DEDICATED_SERVER_HOSTING_LOBBY)
+        if (DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY)
         {
+            DarnedNetworkManager.Log("SWITCHING TO THE LOBBY SCENE...");
             Stages.Load(StageName.Lobby);
+            return;
+        }
+
+        else if (DarnedMasterServerManager.ENABLED)
+        {
+            Stages.Load(StageName.MasterServer);
+            return;
         }
 
         else
         {
             Cursor.lockState = CursorLockMode.Confined;
-
         }
     }
 

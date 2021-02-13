@@ -6,7 +6,8 @@ public enum StageName
 {
     Template_Lurker,
     Menu,
-    Lobby
+    Lobby,
+    MasterServer,
 }
 
 public class Stages
@@ -19,7 +20,8 @@ public class Stages
     {
         {StageName.Template_Lurker, "stage-template-lurker"},
         {StageName.Menu, "menu"},
-        {StageName.Lobby, "lobby"}
+        {StageName.Lobby, "lobby"},
+        {StageName.MasterServer, "master-server"}
     };
 
     public static void Load(StageName stageName)

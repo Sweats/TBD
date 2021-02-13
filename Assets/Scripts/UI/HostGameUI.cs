@@ -66,19 +66,22 @@ public class HostGameUI : MonoBehaviour
     public void OnCreateLobbyButtonClicked()
     {
         string lobbyText = lobbyNameField.text;
+        string password = passwordField.text;
 
         if (portField.text == string.Empty)
         {
-            NetworkRoom.PORT = 7777;
+            HostLobby.LOBBY_PORT = 7777;
         }
 
         else
         {
-            NetworkRoom.PORT = port;
+            HostLobby.LOBBY_PORT = port;
         }
 
-        NetworkRoom.CLIENT_HOSTING_LOBBY = true;
+        DarnedNetworkManager.CLIENT_HOSTING_LOBBY = true;
         string lobbySceneName = Stages.Name(StageName.Lobby);
+        HostLobby.LOBBY_NAME = lobbyText;
+        HostLobby.LOBBY_PASSWORD = password;
         Stages.Load(StageName.Lobby);
         //Hide();
         //lobbyUI.Show(true);

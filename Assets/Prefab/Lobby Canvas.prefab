@@ -7156,6 +7156,8 @@ MonoBehaviour:
   gameModeDropdown: {fileID: 715640920255661162}
   chatMessageBoxInput: {fileID: 3020940349714615174}
   chatMessageBox: {fileID: 4540377881286902036}
+  masterServerTransport: {fileID: 5254587610867000991, guid: adeb6dae6cf7a04f0876fee39d567b9d,
+    type: 3}
 --- !u!1 &6103035743858456820
 GameObject:
   m_ObjectHideFlags: 0

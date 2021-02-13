@@ -42,7 +42,7 @@ public class LobbyNetworkManager : MonoBehaviour
 
     public void OnServerConnect(NetworkConnection connection)
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
         GameObject lobbyPlayer = (GameObject)Resources.Load("Lobby Player");
         GameObject spawnedlobbyPlayer = Instantiate(lobbyPlayer);
         NetworkServer.AddPlayerForConnection(connection, spawnedlobbyPlayer);
@@ -56,7 +56,7 @@ public class LobbyNetworkManager : MonoBehaviour
 
     public void OnServerDisconnect(NetworkConnection connection)
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
 
         // NOTE: We need this check here in case when the host disconnects when there are clients connected to this host.
         if (connection.identity != null)
@@ -169,7 +169,7 @@ public class LobbyNetworkManager : MonoBehaviour
     public bool IsHost(uint id)
     {
         int index = GetIndexOfPlayer(id);
-        Player host = NetworkRoom.PLAYERS_IN_SERVER[index];
+        Player host = DarnedNetworkManager.PLAYERS_IN_SERVER[index];
 
         if (host.Hosting())
         {
@@ -182,11 +182,11 @@ public class LobbyNetworkManager : MonoBehaviour
 
     private void PickNewHost()
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
         int randomNumber = Random.Range(0, players.Count);
-        NetworkRoom.PLAYERS_IN_SERVER[randomNumber].SetHosting(true);
-        NetworkIdentity newHostIdentity = NetworkRoom.PLAYERS_IN_SERVER[randomNumber].identity;
-        NetworkRoom.Log($"Picking a new host with the net identity of {newHostIdentity.netId}");
+        DarnedNetworkManager.PLAYERS_IN_SERVER[randomNumber].SetHosting(true);
+        NetworkIdentity newHostIdentity = DarnedNetworkManager.PLAYERS_IN_SERVER[randomNumber].identity;
+        DarnedNetworkManager.Log($"Picking a new host with the net identity of {newHostIdentity.netId}");
         NetworkServer.SendToClientOfPlayer(newHostIdentity, new LobbyClientServerAssignedYouHostMessage());
 
         for (var i = 0; i < players.Count; i++)
@@ -215,7 +215,7 @@ public class LobbyNetworkManager : MonoBehaviour
 
     private void ServerOnClientRequestedKickMessage(NetworkConnection connection, LobbyServerClientRequestedKickMessage message)
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
         uint netId = connection.identity.netId;
         int requestedPlayerIndex = GetIndexOfPlayer(netId);
         Player requestee = players[requestedPlayerIndex];
@@ -237,7 +237,7 @@ public class LobbyNetworkManager : MonoBehaviour
 
     private void SyncUpdatesToNewClient(NetworkIdentity newClientIdentity)
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
 
         for (var i = 0; i < players.Count; i++)
         {
@@ -259,7 +259,7 @@ public class LobbyNetworkManager : MonoBehaviour
 
     private int GetIndexOfPlayer(uint id)
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
 
         int index = -1;
 
@@ -282,16 +282,16 @@ public class LobbyNetworkManager : MonoBehaviour
     {
         uint id = connection.identity.netId;
         int foundIndex = GetIndexOfPlayer(id);
-        Player player = NetworkRoom.PLAYERS_IN_SERVER[foundIndex];
+        Player player = DarnedNetworkManager.PLAYERS_IN_SERVER[foundIndex];
         Character character = message.newValue;
         player.character = character;
-        NetworkRoom.PLAYERS_IN_SERVER[foundIndex] = player;
+        DarnedNetworkManager.PLAYERS_IN_SERVER[foundIndex] = player;
         NetworkServer.SendToAll(new LobbyClientPlayerChangedCharacterMessage { newCharacter = character, index = foundIndex });
     }
 
     public void OnPlayerJoined(NetworkConnection connection, ServerPlayerJoinedMessage message)
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
 
         Debug.Log($"A client has sent us their name! it is {message.clientName}. Their netId is {message.clientIdentity.netId}!");
         string name = message.clientName;
@@ -301,14 +301,14 @@ public class LobbyNetworkManager : MonoBehaviour
         if (players.Count == 0)
         {
             player.SetHosting(true);
-            NetworkRoom.Log($"The value of the hosting  player is {player.Hosting()}");
+            DarnedNetworkManager.Log($"The value of the hosting  player is {player.Hosting()}");
             NetworkServer.SendToClientOfPlayer(player.identity, new LobbyClientServerAssignedYouHostMessage());
-            NetworkRoom.Log($"Made {message.clientName} the host of this lobby.");
+            DarnedNetworkManager.Log($"Made {message.clientName} the host of this lobby.");
         }
 
         players.Add(player);
         int newPlayerIndex = players.Count - 1;
-        Debug.Log($"Length of NetworkRoom.players is {NetworkRoom.PLAYERS_IN_SERVER.Count}");
+        Debug.Log($"Length of NetworkRoom.players is {DarnedNetworkManager.PLAYERS_IN_SERVER.Count}");
         NetworkServer.SendToAll(new LobbyClientPlayerJoinedMessage { clientName = name, index = newPlayerIndex });
         SyncUpdatesToNewClient(clientIdentity);
     }

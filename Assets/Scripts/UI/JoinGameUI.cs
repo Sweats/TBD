@@ -1,16 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.UI;
-
-public struct Lobby
-{
-    public string lobbyName;
-    public int players;
-    public bool inLobby;
-    public bool privateLobby;
-    public int ping;
-}
-
+using Mirror;
 
 public class JoinGameUI : MonoBehaviour
 {
@@ -38,7 +29,8 @@ public class JoinGameUI : MonoBehaviour
     [SerializeField]
     private LobbyUI lobbyUI;
 
-    private List<Lobby> lobbies;
+    [SerializeField]
+    private Lobby[] lobbies;
 
     private void Update()
     {
@@ -49,14 +41,42 @@ public class JoinGameUI : MonoBehaviour
         }
     }
 
-    void Start()
+    private void Start()
     {
         this.enabled = false;
-        lobbies = new List<Lobby>();
+        EventManager.masterServerSentLobbyListEvent.AddListener(OnGetServers);
+
+    }
+
+    private void CreateMasterServerManager()
+    {
+        DarnedNetworkManager.CLIENT_HOSTING_LOBBY = false;
+        GameObject dedicatedServerObject = (GameObject)Resources.Load("Darned Master Server Manager");
+        GameObject spawnedGameobject = Instantiate(dedicatedServerObject);
+        NetworkManager.singleton.StartClient();
+    }
+
+    private void OnGetServers(Lobby[] lobbies)
+    {
+        this.lobbies = lobbies;
+
+        for (var i = 0; i < lobbies.Length; i++)
+        {
+            Lobby lobby = lobbies[i];
+            string lobbyName = lobby.lobbyName;
+            string hostName = lobby.hostname;
+            byte players = lobby.players;
+            bool isPrivate = lobby.privateLobby;
+            int id = lobby.id;
+            Debug.Log($"Lobby ID = {id}\nLobby Name = {lobbyName}\nIP = {hostName}\n Player Count = {players}\n isPrivate = {isPrivate}");
+            Debug.Log("---------------------\n\n");
+        }
+
     }
 
     public void Show()
     {
+        CreateMasterServerManager();
         this.enabled = true;
         joinGameCanvas.enabled = true;
 
@@ -64,6 +84,8 @@ public class JoinGameUI : MonoBehaviour
 
     private void Hide()
     {
+        NetworkManager.singleton.StopClient();
+        Destroy(NetworkManager.singleton.gameObject);
         this.enabled = false;
         joinGameCanvas.enabled = false;
     }
@@ -71,7 +93,6 @@ public class JoinGameUI : MonoBehaviour
     public void OnRefreshButtonClicked()
     {
         Debug.Log("Refresh all button clicked!");
-        lobbies.Clear();
         //lobbies = GetLobbies();
 
     }
@@ -105,7 +126,7 @@ public class JoinGameUI : MonoBehaviour
 
     private void UpdateLobbiesView()
     {
-        for (var i = 0; i < lobbies.Count; i++)
+        for (var i = 0; i < lobbies.Length; i++)
         {
 
         }

@@ -155,7 +155,6 @@ public class KeyObject : NetworkBehaviour
     public void SetMask(int mask)
     {
         this.mask = mask;
-
     }
 
     public void SetType(KeyType type)
@@ -166,7 +165,6 @@ public class KeyObject : NetworkBehaviour
     public Texture Texture()
     {
         return keyIcon;
-
     }
 
     public int Mask()

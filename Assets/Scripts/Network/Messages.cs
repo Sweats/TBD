@@ -297,6 +297,34 @@ public struct LobbyServerClientRequestedToStartGameMessage: NetworkMessage
     public string newSceneName;
 }
 
+public struct MasterServerLobbyRequestedToBeAddedMessage: NetworkMessage
+{
+    public string name;
+    public ushort port;
+    public bool isPrivate;
+}
+
+public struct MasterServerRequestedToBeRemovedMessage: NetworkMessage
+{
+    public int id;
+}
+
+public struct MasterServerClientRequestServerListMessage: NetworkMessage
+{
+
+}
+
+public struct MasterServerLobbyListMessage: NetworkMessage
+{
+    public Lobby[] lobbies;
+}
+
+public struct ServerAddedOurLobbyMessage: NetworkMessage
+{
+    public int id;
+
+}
+
 #endregion
 
 #endregion

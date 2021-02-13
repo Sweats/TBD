@@ -224,37 +224,34 @@ public class LobbyUI : MonoBehaviour
 
     private void Start()
     {
-        if (NetworkManager.singleton == null)
+        if (DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY && NetworkManager.singleton == null)
         {
-            NetworkRoom.Allocate();
-        }
-
-        if (NetworkRoom.DEDICATED_SERVER_HOSTING_LOBBY && !NetworkManager.singleton.isNetworkActive)
-        {
-            DedicatedServerStart();
+            StartDedicatedServer();
             return;
         }
 
-        else if (NetworkRoom.CLIENT_HOSTING_LOBBY && !NetworkManager.singleton.isNetworkActive)
+        else if (DarnedNetworkManager.CLIENT_HOSTING_LOBBY && NetworkManager.singleton == null)
         {
+            StartHost();
             this.hostingLobby = true;
             this.hostingOnDedicatedServer = false;
             SetUpHostLobbyControls();
-            NetworkManager.singleton.StartHost();
         }
 
-        else if (!NetworkRoom.CLIENT_HOSTING_LOBBY && !NetworkRoom.DEDICATED_SERVER_HOSTING_LOBBY && !NetworkManager.singleton.isNetworkActive)
+        else if (!DarnedNetworkManager.CLIENT_HOSTING_LOBBY && !DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY && NetworkManager.singleton == null)
         {
+            CreateNetworkManager();
             this.hostingLobby = false;
             this.hostingOnDedicatedServer = false;
             SetUpClientLobbyControls();
-            NetworkManager.singleton.networkAddress = NetworkRoom.HOSTNAME;
-            NetworkManager.singleton.StartClient();
-        
+            string address = $"{DarnedNetworkManager.HOSTNAME}:{DarnedNetworkManager.PORT}";
+            Uri uri = new Uri(address);
+            NetworkManager.singleton.StartClient(uri);
+
         }
 
         this.enabled = true;
-        hostingLobby = NetworkRoom.CLIENT_HOSTING_LOBBY;
+        hostingLobby = DarnedNetworkManager.CLIENT_HOSTING_LOBBY;
         chatStringBuilder = new StringBuilder();
         EventManager.lobbyClientHostChangedAllowSpectatorEvent.AddListener(OnAllowSpectatorOptionUpdated);
         EventManager.lobbyClientHostChangedStageEvent.AddListener(OnStageSelectionUpdated);
@@ -271,6 +268,84 @@ public class LobbyUI : MonoBehaviour
 
     }
 
+    private void StartDedicatedServer()
+    {
+        this.hostingLobby = false;
+        this.hostingOnDedicatedServer = true;
+        EventManager.dedicatedServerReceivedIdEvent.AddListener(OnDedicatedServerRecievedId);
+        string configName = "darned_lobby_server_configuration.yaml";
+
+        if (!DedicatedServerConfiguration.Exists(configName))
+        {
+            DarnedNetworkManager.Log("Exiting...");
+            Application.Quit();
+            return;
+        }
+
+        DedicatedServerConfiguration serverConfiguration = DedicatedServerConfiguration.Load(configName);
+        string serverName = serverConfiguration.Name();
+        HostLobby.LOBBY_NAME = serverName;
+        ushort port = serverConfiguration.Port();
+        HostLobby.LOBBY_PORT = port;
+        string password = serverConfiguration.Password();
+        HostLobby.LOBBY_PASSWORD = password;
+        bool isPrivate = password != string.Empty;
+        DarnedNetworkManager.PORT = port;
+        DarnedNetworkManager.Log($"Loaded server configuration:\n\nServer Name = {serverName}\nPort = {port}\nPrivate Lobby = {isPrivate}");
+        GameObject loadedObject = (GameObject)Resources.Load("Darned Master Server Manager");
+        GameObject spawnedObject = Instantiate(loadedObject);
+        string address = "localhost:7777";
+        Uri uri = new Uri(address);
+        NetworkManager.singleton.StartClient(uri);
+    }
+
+    private void StartHost()
+    {
+        EventManager.dedicatedServerReceivedIdEvent.AddListener(OnDedicatedServerRecievedId);
+        GameObject loadedObject = (GameObject)Resources.Load("Darned Master Server Manager");
+        GameObject spawnedObject = Instantiate(loadedObject);
+        string address = "localhost:7777";
+        Uri uri = new Uri(address);
+        NetworkManager.singleton.StartClient(uri);
+    }
+
+    //NOTE: Called when the master server sends us back the ID it generated.
+    private void OnDedicatedServerRecievedId(int id)
+    {
+        StartCoroutine(StartServer(id));
+    }
+
+    private IEnumerator StartServer(int id)
+    {
+        DarnedNetworkManager.ID = id;
+        NetworkManager.singleton.StopClient();
+        Destroy(NetworkManager.singleton.gameObject);
+        yield return null;
+        DarnedNetworkManager.Log("The master server has added us to the list! Starting the dedicated server...");
+        CreateNetworkManager();
+        DarnedNetworkManager.PORT = HostLobby.LOBBY_PORT;
+
+        if (DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY)
+        {
+            NetworkManager.singleton.StartServer();
+        }
+
+        else if (DarnedNetworkManager.CLIENT_HOSTING_LOBBY)
+        {
+            NetworkManager.singleton.StartHost();
+        }
+
+        DarnedNetworkManager.Log("Successfully started the server!");
+
+    }
+
+    private void CreateNetworkManager()
+    {
+        GameObject dedicatedServerObject = (GameObject)Resources.Load("Darned Network Manager");
+        GameObject spawnedGameobject = Instantiate(dedicatedServerObject);
+        DontDestroyOnLoad(spawnedGameobject);
+    }
+
     private void DisableHostControls()
     {
         startGameButton.interactable = false;
@@ -285,31 +360,6 @@ public class LobbyUI : MonoBehaviour
         gameModeDropdown.GetComponentInChildren<Text>().color = Color.white;
         stageDropdown.GetComponent<Image>().enabled = false;
         stageDropdown.GetComponentInChildren<Text>().color = Color.white;
-
-    }
-
-    private void DedicatedServerStart()
-    {
-        this.hostingLobby = true;
-        this.hostingOnDedicatedServer = true;
-
-        string configName = "darned_lobby_server_configuration.yaml";
-
-        if (!Configuration.Exists(configName))
-        {
-            NetworkRoom.Log("Exiting...");
-            Application.Quit();
-            return;
-        }
-
-        Configuration serverConfiguration = Configuration.Load(configName);
-        string serverName = serverConfiguration.Name();
-        ushort port = serverConfiguration.Port();
-        string password = serverConfiguration.Password();
-        bool isPrivate = password != string.Empty;
-        NetworkRoom.Log($"Starting the server. Settings are:\n\nServer Name = {serverName}\nPort = {port}\nPrivate server = {isPrivate}");
-        NetworkRoom.PORT = port;
-        NetworkManager.singleton.StartServer();
 
     }
 
@@ -491,7 +541,7 @@ public class LobbyUI : MonoBehaviour
         if (hostingLobby)
         {
             NetworkManager.singleton.StopHost();
-            NetworkRoom.Log("You are no longer hosting the server!");
+            DarnedNetworkManager.Log("You are no longer hosting the server!");
         }
 
         else

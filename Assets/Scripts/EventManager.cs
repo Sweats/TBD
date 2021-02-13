@@ -71,6 +71,10 @@ public static class EventManager
 
     public static LobbyClientServerAssignedYouHostEvent lobbyClientServerAssignedYouHostEvent = new LobbyClientServerAssignedYouHostEvent();
 
+    public static DedicatedServerReceivedIdEvent dedicatedServerReceivedIdEvent = new DedicatedServerReceivedIdEvent();
+
+    public static MasterServerSentLobbyListEvent masterServerSentLobbyListEvent = new MasterServerSentLobbyListEvent();
+
     public static LobbyClientServerPickedNewHostEvent lobbyClientServerPickedNewHostEvent = new LobbyClientServerPickedNewHostEvent();
 
     public static LobbyClientHostChangedStageEvent lobbyClientHostChangedStageEvent = new LobbyClientHostChangedStageEvent();
@@ -329,6 +333,9 @@ public class LobbyClientServerPickedNewHostEvent: UnityEvent<string, int>{}
 
 public class LobbyClientServerAssignedYouHostEvent: UnityEvent<int>{}
 
+public class DedicatedServerReceivedIdEvent: UnityEvent<int>{}
+
+public class MasterServerSentLobbyListEvent: UnityEvent<Lobby[]>{}
 
 #endregion
 

@@ -90,7 +90,7 @@ public class StageNetworkManager : MonoBehaviour
         NetworkIdentity identity = message.clientIdentity;
         string playerName = message.clientName;
         Debug.Log($"Player name of the joined player is {playerName}");
-        NetworkRoom.PLAYERS_IN_SERVER.Add(new Player(playerName, Character.Spectator, identity));
+        DarnedNetworkManager.PLAYERS_IN_SERVER.Add(new Player(playerName, Character.Spectator, identity));
         NetworkServer.SendToAll(new ClientPlayerJoinedMessage { clientName = playerName });
         Character[] unavailableCharactersArray = ServerUnavailableCharacters();
         NetworkServer.SendToClientOfPlayer(identity, new ClientPickCharacterMessage { availableCharacters = unavailableCharactersArray });
@@ -98,7 +98,7 @@ public class StageNetworkManager : MonoBehaviour
 
     public void OnServerDisconnect(NetworkConnection connection)
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
         uint id = connection.identity.netId;
         int playerDisconnectedIndex = 0;
 
@@ -122,7 +122,7 @@ public class StageNetworkManager : MonoBehaviour
             monsterCharacterAvailable = true;
         }
 
-        NetworkRoom.PLAYERS_IN_SERVER.RemoveAt(playerDisconnectedIndex);
+        DarnedNetworkManager.PLAYERS_IN_SERVER.RemoveAt(playerDisconnectedIndex);
         NetworkServer.DestroyPlayerForConnection(connection);
     }
 
@@ -322,7 +322,7 @@ public class StageNetworkManager : MonoBehaviour
     private void ServerClientPickedCharacter(NetworkConnection connection, ServerClientPickedCharacterMessage message)
     {
         Character pickedCharacter = message.pickedCharacter;
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
         Debug.Log($"player picked character {pickedCharacter}");
         uint netId = connection.identity.netId;
         ServerSpawnPlayer(connection, pickedCharacter, true);
@@ -334,7 +334,7 @@ public class StageNetworkManager : MonoBehaviour
 
     private void ServerOnClientLoadedScene(NetworkConnection connection, ServerClientLoadedSceneMessage message)
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
         uint netId = connection.identity.netId;
 
         for (var i = 0; i < players.Count; i++)
@@ -390,7 +390,7 @@ public class StageNetworkManager : MonoBehaviour
 
     private Character[] ServerUnavailableCharacters()
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
         List<Character> characters = new List<Character>();
 
         for (var i = 0; i < players.Count; i++)
@@ -477,7 +477,7 @@ public class StageNetworkManager : MonoBehaviour
 
     private void ServerUpdatePlayerSlot(uint netId, Character pickedCharacter)
     {
-        List<Player> players = NetworkRoom.PLAYERS_IN_SERVER;
+        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
 
         for (var i = 0; i < players.Count; i++)
         {
