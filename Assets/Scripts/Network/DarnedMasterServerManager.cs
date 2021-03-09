@@ -13,6 +13,7 @@ public struct Lobby
     public int id;
     public string hostname;
     public ushort port;
+    public StageName stage;
 
     public Lobby(string name, bool isPrivate, int id)
     {
@@ -24,6 +25,7 @@ public struct Lobby
         this.id = id;
         this.hostname = "localhost";
         this.port = 7777;
+        this.stage = StageName.Lobby;
     }
 }
 
@@ -38,6 +40,7 @@ public struct Lobby
 public class DarnedMasterServerManager : NetworkManager
 {
     public static ushort PORT;
+    public static bool EXITING = false;
     public static bool ENABLED = false;
     public static string HOSTNAME;
     public List<Lobby> lobbies;
@@ -48,8 +51,6 @@ public class DarnedMasterServerManager : NetworkManager
         base.OnStartServer();
         lobbies = new List<Lobby>();
         Log("Master server has started successfully!");
-        //KcpTransport transport = (KcpTransport)Transport.activeTransport;
-        //transport.Port = PORT;
         NetworkServer.RegisterHandler<MasterServerLobbyRequestedToBeAddedMessage>(LobbyServerRequestedToBeAdded);
         NetworkServer.RegisterHandler<MasterServerRequestedToBeRemovedMessage>(LobbyServerRequestedToBeRemoved);
         NetworkServer.RegisterHandler<MasterServerClientRequestServerListMessage>(OnClientRequstedListOfServers);
@@ -59,6 +60,14 @@ public class DarnedMasterServerManager : NetworkManager
     public override void OnStopServer()
     {
 
+    }
+
+    private void PingServers()
+    {
+        for (var i = 0; i < lobbies.Count; i++)
+        {
+
+        }
     }
 
     [Server]
@@ -97,12 +106,15 @@ public class DarnedMasterServerManager : NetworkManager
     [Server]
     private void LobbyServerRequestedToBeRemoved(NetworkConnection connection, MasterServerRequestedToBeRemovedMessage message)
     {
+        Log($"Got request to remove the lobby with an ID of {message.id}");
+
         for (var i = 0; i < lobbies.Count; i++)
         {
             int foundId = lobbies[i].id;
 
             if (foundId == message.id)
             {
+                Log("Found the lobby. Removing...");
                 lobbies.RemoveAt(i);
                 break;
             }
@@ -152,6 +164,18 @@ public class DarnedMasterServerManager : NetworkManager
     public override void OnClientConnect(NetworkConnection connection)
     {
         base.OnClientConnect(connection);
+
+        if (EXITING)
+        {
+            MasterServerRequestedToBeRemovedMessage message = new MasterServerRequestedToBeRemovedMessage
+            {
+                id = DarnedNetworkManager.ID
+            };
+
+            NetworkClient.Send(message);
+            Log("Told the master server that this lobby no longer exits...");
+            return;
+        }
 
         if (DarnedNetworkManager.CLIENT_HOSTING_LOBBY || DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY)
         {

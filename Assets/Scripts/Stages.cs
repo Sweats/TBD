@@ -2,7 +2,7 @@
 using UnityEngine.SceneManagement;
 
 // NOTE: Make sure that this list matches the dictionary down a few lines below.
-public enum StageName
+public enum StageName: byte
 {
     Template_Lurker,
     Menu,
@@ -35,7 +35,6 @@ public class Stages
         {
             string stageNameFailedToLoad = stagesDict[stageName];
             EventManager.failedToLoadStageEvent.Invoke(stageNameFailedToLoad);
-            //Debug.Log($"Failed to load the stage {stagesDict[stageName]}!");
         }
     }
 

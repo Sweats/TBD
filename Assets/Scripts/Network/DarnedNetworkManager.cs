@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using Mirror;
 using kcp2k;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Collections;
 
 // NOTE: I know that I could have used SyncVars but I wanted more control on how and when things are synced. So I did it by hand.
 // I also think it's really dumb that we can't use attributes like [Client] or [Server] inside a class that inherits from
@@ -116,6 +117,34 @@ public class DarnedNetworkManager : NetworkManager
             stageNetworkManager.OnStopServer();
         }
 
+    }
+
+    public override void OnApplicationQuit()
+    {
+        if (CLIENT_HOSTING_LOBBY)
+        {
+            StopHost();
+        }
+
+        else if (DEDICATED_SERVER_HOSTING_LOBBY)
+        {
+            StopServer();
+        }
+
+        base.OnApplicationQuit();
+        // TODO: Make it so when the server terminates, we tell the master server that the server no longer exists.
+    }
+
+    private IEnumerator UpdateMasterServer()
+    {
+        Destroy(NetworkManager.singleton.gameObject);
+        yield return null;
+        GameObject loadedObject = (GameObject)Resources.Load("Darned Master Server Manager");
+        GameObject spawnedObject = Instantiate(loadedObject);
+        string address = "localhost:7777";
+        Uri uri = new Uri(address);
+        DarnedMasterServerManager.EXITING = true;
+        NetworkManager.singleton.StartClient(uri);
     }
 
     private void ServerOnClientRequestedToStartGame(NetworkConnection connection, LobbyServerClientRequestedToStartGameMessage message)
@@ -238,8 +267,6 @@ public class DarnedNetworkManager : NetworkManager
         }
 
         base.OnClientDisconnect(connection);
-
-        Destroy(NetworkManager.singleton.gameObject);
     }
 
     public override void OnClientSceneChanged(NetworkConnection connection)

@@ -76,7 +76,7 @@ ProjectSettings/Packages/com.unity.settings-manager/Settings.json
 ProjectSettings/Packages/com.unity.probuilder/Settings.json
 
 # Stuff that Sweats added
-server_data/
+server_Data/
 master-server-build/
 *.so
 *.debug
