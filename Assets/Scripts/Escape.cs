@@ -48,7 +48,7 @@ public class Escape : NetworkBehaviour
         }
     }
 
-    [Command(requiresAuthority=true)]
+    [Command(requiresAuthority=false)]
     private void CmdSurviorLeftEscapeRoom(NetworkConnectionToClient sender = null)
     {
         Survivor survivor = sender.identity.GetComponent<Survivor>();
