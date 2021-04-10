@@ -125,7 +125,7 @@ public class Battery : NetworkBehaviour
         return batteryID;
     }
 
-    [Command(ignoreAuthority=true)]
+    [Command(requiresAuthority=false)]
     public void CmdPlayerClickedOnBattery(NetworkConnectionToClient sender = null)
     {
         Survivor survivor = sender.identity.GetComponent<Survivor>();

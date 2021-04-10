@@ -187,7 +187,7 @@ public class KeyObject : NetworkBehaviour
         return type;
     }
 
-    [Command(ignoreAuthority=true)]
+    [Command(requiresAuthority=false)]
     public void CmdPlayerClickedOnKey(NetworkConnectionToClient sender = null)
     {
         StartCoroutine(PlayerClickedOnKeyRoutine(sender));

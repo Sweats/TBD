@@ -9,7 +9,7 @@ public class MasterServerConfiguration
     public static MasterServerConfiguration Load(string configPath)
     {
         string yamlData = File.ReadAllText(configPath);
-        var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+        var deserializer = new Deserializer();
         MasterServerConfiguration configuration = deserializer.Deserialize<MasterServerConfiguration>(yamlData);
         return configuration;
     }
@@ -36,7 +36,7 @@ public class MasterServerConfiguration
             port = 7777,
         };
 
-        var serializer = new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+        var serializer = new Serializer();
         string yamlData = serializer.Serialize(config);
         File.WriteAllText(configPath, yamlData);
     }

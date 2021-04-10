@@ -13,7 +13,7 @@ public class DedicatedServerConfiguration
     public static DedicatedServerConfiguration Load(string configPath)
     {
         string yamlData = File.ReadAllText(configPath);
-        var deserializer = new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+        var deserializer = new Deserializer();
         DedicatedServerConfiguration configuration = deserializer.Deserialize<DedicatedServerConfiguration>(yamlData);
         return configuration;
     }
@@ -43,7 +43,7 @@ public class DedicatedServerConfiguration
 
         };
 
-        var serializer = new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+        var serializer = new Serializer();
         string yamlData = serializer.Serialize(config);
         File.WriteAllText(configPath, yamlData);
     }

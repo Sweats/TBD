@@ -40,13 +40,13 @@ public class Trap : NetworkBehaviour
         armed = true;
     }
 
-    [Command(ignoreAuthority=true)]
+    [Command(requiresAuthority=false)]
     public void CmdTrigger()
     {
         armed = false;
     }
 
-    [Command(ignoreAuthority=true)]
+    [Command(requiresAuthority=false)]
     public void CmdArm()
     {
         armed = true;
@@ -83,7 +83,7 @@ public class Trap : NetworkBehaviour
         return trapHitAmount;
     }
 
-    [Command(ignoreAuthority=true)]
+    [Command(requiresAuthority=false)]
     public void CmdTriggerTrap(NetworkConnectionToClient sender = null)
     {
         Survivor survivor = sender.identity.GetComponent<Survivor>();

@@ -33,7 +33,7 @@ public class DarnedObject : NetworkBehaviour
         this.enabled = false;
     }
 
-    [Command(ignoreAuthority = true)]
+    [Command(requiresAuthority = false)]
     public void CmdGrab(NetworkConnectionToClient sender = null)
     {
         if (grabbed)
@@ -53,7 +53,7 @@ public class DarnedObject : NetworkBehaviour
         this.enabled = true;
     }
 
-    [Command(ignoreAuthority = true)]
+    [Command(requiresAuthority = false)]
     public void CmdDrop()
     {
         grabbed = false;

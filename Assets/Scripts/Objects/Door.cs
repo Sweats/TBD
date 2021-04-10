@@ -91,7 +91,7 @@ public class Door : NetworkBehaviour
     }
     */
 
-    [Command(ignoreAuthority=true)]
+    [Command(requiresAuthority=false)]
     public void CmdPlayerClickedOnLockedDoor(NetworkConnectionToClient sender = null)
     {
         Survivor survivor = sender.identity.GetComponent<Survivor>();
@@ -139,7 +139,7 @@ public class Door : NetworkBehaviour
         RpcFailedToUnlockDoor();
     }
 
-    [Command(ignoreAuthority = true)]
+    [Command(requiresAuthority = false)]
     public void CmdPlayerHitDoor(Vector3 moveDirection)
     {
         if (unlocked)
