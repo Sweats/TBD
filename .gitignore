@@ -81,5 +81,7 @@ master-server-build/
 *.so
 *.debug
 server:x86_64
+bin_windows/
+ProjectSettings/SceneTemplateSettings.json
 
 
