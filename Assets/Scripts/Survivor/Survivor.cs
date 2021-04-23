@@ -166,6 +166,9 @@ public class Survivor : NetworkBehaviour
 
     private Vector3 mPosDelta = Vector3.zero;
 
+//NOTE: For drowing the keys in the inventory
+    private Rect currentPosition;
+
     public override void OnStartClient()
     {
         if (!isLocalPlayer)
@@ -187,6 +190,12 @@ public class Survivor : NetworkBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         playerName = Settings.PROFILE_NAME;
         CmdSetName(playerName);
+
+        currentPosition = new Rect
+        {
+            height = 30,
+            width = 30
+        };
     }
 
     public override void OnStartServer()
@@ -293,6 +302,11 @@ public class Survivor : NetworkBehaviour
             crouched = true;
         }
 
+        else if (Keybinds.GetKey(Action.Crouch, true))
+        {
+            currentSpeed = defaultSpeed;
+            crouched = false;
+        }
 
         else if (Keybinds.GetKey(Action.Sprint) && isMoving)
         {
@@ -304,11 +318,6 @@ public class Survivor : NetworkBehaviour
             CmdStopSprinting();
         }
 
-        else if (Keybinds.GetKey(Action.Crouch, true))
-        {
-            currentSpeed = defaultSpeed;
-            crouched = false;
-        }
 
         else if (Keybinds.GetKey(Action.Walk))
         {
@@ -706,5 +715,36 @@ public class Survivor : NetworkBehaviour
             //sprintEnergy = -3.0f / sprintTickRate;
         }
     }
+
+    [Client]
+    public void OnGUI()
+    {
+        if (windows.IsWindowOpen())
+        {
+            return;
+        }
+
+        int currentX = Screen.width - 20;
+        int currentY = 20;
+
+        for (var i = 0; i < keys.Count; i++)
+        {
+            Texture itemIcon = keys[i].Texture();
+
+            if (i % 8 == 0)
+            {
+                // go back to the top where we were when we started and then go left 50 because images will be 50 in pixels
+                currentX -= 50;
+                currentY = 20;
+            }
+
+            currentPosition.x = currentX;
+            currentPosition.y = currentY;
+            GUI.DrawTexture(currentPosition, itemIcon);
+            currentY += 35;
+
+        }
+    }
+
 }
 #endregion

@@ -10,11 +10,6 @@ public class PlayerSpectator : NetworkBehaviour
 
     private const string PROFILE_NAME_KEY_STRING = "profile_name";
 
-    private void Start()
-    {
-
-    }
-
     public override void OnStartLocalPlayer()
     {
         this.enabled = true;
@@ -22,5 +17,11 @@ public class PlayerSpectator : NetworkBehaviour
         spectatorCamera.GetComponent<AudioListener>().enabled = true;
         Settings.PROFILE_NAME = PlayerPrefs.GetString(PROFILE_NAME_KEY_STRING, "player");
         NetworkClient.Send(new ServerPlayerJoinedMessage{clientName = Settings.PROFILE_NAME, clientIdentity = netIdentity});
+    }
+
+    [Command]
+    private void test()
+    {
+
     }
 }

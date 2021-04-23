@@ -11,14 +11,7 @@ public class Inventory : MonoBehaviour
 
     private void Start()
     {
-        // TO DO: Get the size of the Keylist and 
         keys = new List<Key>();
-
-        currentPosition = new Rect
-        {
-            height = 30,
-            width = 30
-        };
 
     }
 

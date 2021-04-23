@@ -65,7 +65,7 @@ public class DarnedNetworkManager : NetworkManager
 
     public override void OnStartServer()
     {
-        SetPort(PORT);
+        //SetPort(PORT);
         PLAYERS_IN_SERVER = new List<Player>();
         EventManager.serverLeftGameEvent.AddListener(OnServerStopped);
         NetworkServer.RegisterHandler<ServerPlayerJoinedMessage>(ServerPlayerJoined);
@@ -244,12 +244,6 @@ public class DarnedNetworkManager : NetworkManager
         }
 
         base.OnStartClient();
-    }
-
-    public override void OnClientError(NetworkConnection connection, int errorCode)
-    {
-        Log("Something went wrong with the server!");
-        base.OnClientError(connection, errorCode);
     }
 
     public override void OnClientDisconnect(NetworkConnection connection)

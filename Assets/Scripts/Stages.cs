@@ -12,7 +12,6 @@ public enum StageName: byte
 
 public class Stages
 {
-
     private Stages() { }
 
     // NOTE: Make sure that the order of this matches the enum at the top of this file.

@@ -217,7 +217,7 @@ public class KeyObject : NetworkBehaviour
             yield break;
         }
         
-        Key key = new Key(keyName, mask, pathID, type);
+        Key key = new Key(keyName, mask, pathID, type, keyIcon);
         keys.Add(key);
 
         PlayerPickedUpKeyMessage playerPickedUpKeyMessage = new PlayerPickedUpKeyMessage

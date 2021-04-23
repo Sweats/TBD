@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5609730272972451061}
   - component: {fileID: 4833223150035666117}
+  - component: {fileID: 8774628456735373566}
   m_Layer: 0
   m_Name: Survivor Spawn Point
   m_TagString: Survivor Spawn Point
@@ -47,3 +48,15 @@ MonoBehaviour:
   y: 1
   z: 1
   color: {r: 0, g: 1, b: 0, a: 1}
+--- !u!114 &8774628456735373566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5609730272972451057}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41f84591ce72545258ea98cb7518d8b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
