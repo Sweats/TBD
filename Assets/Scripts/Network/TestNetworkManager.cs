@@ -59,12 +59,6 @@ public class TestNetworkManager : NetworkManager
         NetworkServer.AddPlayerForConnection(connection, spawnedSpectator);
     }
 
-    public override void OnServerAddPlayer(NetworkConnection connection)
-    {
-        Debug.Log("this is a test string");
-        base.OnServerAddPlayer(connection);
-    }
-
     [Server]
     public void OnPlayerJoined(NetworkConnection connection, ServerPlayerJoinedMessage message)
     {
