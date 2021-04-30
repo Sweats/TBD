@@ -534,7 +534,6 @@ public class LobbyUI : MonoBehaviour
                 break;
         }
     }
-
     private void ExitScene()
     {
         if (hostingLobby)

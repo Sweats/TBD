@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
-using kcp2k;
 
 public class DirectConnectUI : MonoBehaviour
 {
@@ -44,7 +41,6 @@ public class DirectConnectUI : MonoBehaviour
         this.enabled = false;
     }
 
-    // Update is called once per frame
     private void Update()
     {
         if (Keybinds.GetKey(Action.GuiReturn))

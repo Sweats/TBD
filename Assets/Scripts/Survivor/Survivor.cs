@@ -473,6 +473,36 @@ public class Survivor : NetworkBehaviour
         }
     }
 
+    [Client]
+    public void OnGui()
+    {
+        if (windows.IsWindowOpen())
+        {
+            return;
+        }
+
+        int currentX = Screen.width - 20;
+        int currentY = 20;
+
+        for (var i = 0; i < keys.Count; i++)
+        {
+            Texture itemIcon = keys[i].Texture();
+
+            if (i % 8 == 0)
+            {
+                // Go back to the top where we were when we started and then go left 50 because images will be 50 in pixels
+                currentX -= 50;
+                currentY = 20;
+            }
+
+            currentPosition.x = currentX;
+            currentPosition.y = currentY;
+            GUI.DrawTexture(currentPosition, itemIcon);
+            currentY += 35;
+
+        }
+    }
+
     #region SERVER
 
     [Server]
@@ -713,36 +743,6 @@ public class Survivor : NetworkBehaviour
             sprintEnergy -= 3f;
             //immediately consume energy
             //sprintEnergy = -3.0f / sprintTickRate;
-        }
-    }
-
-    [Client]
-    public void OnGUI()
-    {
-        if (windows.IsWindowOpen())
-        {
-            return;
-        }
-
-        int currentX = Screen.width - 20;
-        int currentY = 20;
-
-        for (var i = 0; i < keys.Count; i++)
-        {
-            Texture itemIcon = keys[i].Texture();
-
-            if (i % 8 == 0)
-            {
-                // go back to the top where we were when we started and then go left 50 because images will be 50 in pixels
-                currentX -= 50;
-                currentY = 20;
-            }
-
-            currentPosition.x = currentX;
-            currentPosition.y = currentY;
-            GUI.DrawTexture(currentPosition, itemIcon);
-            currentY += 35;
-
         }
     }
 
