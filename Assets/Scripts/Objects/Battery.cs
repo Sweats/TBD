@@ -27,7 +27,8 @@ public class Battery : NetworkBehaviour
     [SerializeField]
     private Color glowColor = Color.white;
 
-    public float chargeNeededToGrab;
+    [SerializeField]
+    private float chargeNeededToGrab;
 
     [SerializeField]
     private float maxTimerForGlow = 100;
@@ -51,7 +52,7 @@ public class Battery : NetworkBehaviour
 
     private int batteryID;
 
-    [ClientCallback]
+    [Client]
     private void Start()
     {
         batteryID = Random.Range(0, 10000);
@@ -61,7 +62,7 @@ public class Battery : NetworkBehaviour
 
     }
 
-    [ClientCallback]
+    [Client]
     private void Update()
     {
         noGlowTimer -= Time.deltaTime * timeBetweenGlows;
@@ -87,17 +88,13 @@ public class Battery : NetworkBehaviour
         }
     }
 
-
-    void OnMouseExit()
-    {
-
-    }
-
+    [Client]
     private void Glow()
     {
         batteryRenderer.material.SetColor("_Color", outlineGlowColor);
     }
 
+    [Client]
     private void UnGlow()
     {
         batteryRenderer.material.SetColor("_Color", originalMeshColor);
@@ -105,7 +102,13 @@ public class Battery : NetworkBehaviour
 
     }
 
+    public float ChargeNeededToGrab()
+    {
+        return chargeNeededToGrab;
+    }
+
     // For the Monsters.
+    [Client]
     public void Hide()
     {
         batteryCollider.enabled = false;
@@ -114,43 +117,10 @@ public class Battery : NetworkBehaviour
     }
 
     // For the Monsters.
+    [Client]
     public void Show()
     {
         batteryCollider.enabled = true;
         batteryRenderer.enabled = true;
-    }
-
-    public int BatteryID()
-    {
-        return batteryID;
-    }
-
-    [Command(requiresAuthority=false)]
-    public void CmdPlayerClickedOnBattery(NetworkConnectionToClient sender = null)
-    {
-        Survivor survivor = sender.identity.GetComponent<Survivor>();
-
-        if (survivor.FlashlightCharge() <= chargeNeededToGrab)
-        {
-            survivor.ServerRechargeFlashlight();
-            NetworkServer.Destroy(this.gameObject);
-        }
-
-        else
-        {
-            TargetFailedToPickUpBattery();
-        }
-    }
-
-    [TargetRpc]
-    private void TargetFailedToPickUpBattery()
-    {
-        EventManager.survivorFailedToPickUpBatteryEvent.Invoke();
-    }
-
-    [ClientRpc]
-    private void RpcPlayerPickedUpBattery()
-    {
-        Debug.Log("A survivor picked up a battery!");
     }
 }

@@ -1,51 +1,45 @@
 using UnityEngine.Events;
-using Mirror;
 
 public static class EventManager
 {
+    #region STAGE_CLIENT
+    public static ClientServerGameSurvivorDeathEvent clientServerGameSurvivorDeathEvent = new ClientServerGameSurvivorDeathEvent();
 
-    public static SurvivorPickedUpBatteryEvent survivorPickedUpBatteryEvent = new SurvivorPickedUpBatteryEvent();
+    public static ClientServerGameSurvivorsEscapedEvent survivorsEscapedStageEvent = new ClientServerGameSurvivorsEscapedEvent();
 
-    public static SurvivorAlreadyHaveKeyEvent survivorAlreadyHasKeyEvent = new SurvivorAlreadyHaveKeyEvent();
+    public static ClientServerGameSurvivorPickedUpKeyEvent clientServerGameSurvivorPickedUpKeyEvent = new ClientServerGameSurvivorPickedUpKeyEvent();
 
-    public static SurvivorDeathEvent survivorDeathEvent = new SurvivorDeathEvent();
+    public static ClientServerGameAlreadyHaveKeyEvent clientServerGameAlreadyHaveKeyEvent = new ClientServerGameAlreadyHaveKeyEvent();
 
-    public static SurvivorFailedToPickUpBatteryEvent survivorFailedToPickUpBatteryEvent = new SurvivorFailedToPickUpBatteryEvent();
+    public static ClientServerGameAskedYouToPickCharacterEvent clientServerGameAskedYouToPickCharacterEvent = new ClientServerGameAskedYouToPickCharacterEvent();
 
-    public static SurvivorsEscapedStageEvent survivorsEscapedStageEvent = new SurvivorsEscapedStageEvent();
+    public static ClientServerGamePlayerJoinedEvent clientServerGamePlayerJoinedEvent = new ClientServerGamePlayerJoinedEvent();
 
-    public static SurvivorTriggeredTrapEvent survivorTriggeredTrapEvent = new SurvivorTriggeredTrapEvent();
+    public static ClientServerGamePlayerDisconnectEvent ClientServerGamePlayerDisconnectEvent = new ClientServerGamePlayerDisconnectEvent();
 
-    public static SurvivorToggleFlashlightEvent survivorToggledFlashlightEvent;
+    public static ClientServerGameYouPickedUpBatteryEvent clientServerGameYouPickedUpBatteryEvent = new ClientServerGameYouPickedUpBatteryEvent();
 
-    public static PlayerPickedUpKeyEvent playerPickedUpKeyEvent = new PlayerPickedUpKeyEvent();
+    public static ClientServerGameRejectBatteryPickupEvent clientServerGameRejectBatteryPickupEvent = new ClientServerGameRejectBatteryPickupEvent();
 
-    public static ServerAskedYouToPickCharacterEvent serverAskedYouToPickCharacterEvent = new ServerAskedYouToPickCharacterEvent();
+    public static ClientServerGamePlayerSentChatMessageEvent clientServerGamePlayerSentChatMessageEvent = new ClientServerGamePlayerSentChatMessageEvent();
 
-    public static ServerLeftGameEvent serverLeftGameEvent = new ServerLeftGameEvent();
+    public static ClientServerGameSurvivorUnlockedDoorEvent clientServerGameSurvivorUnlockedDoorEvent = new ClientServerGameSurvivorUnlockedDoorEvent();
 
-    public static PlayerJoinedEvent playerJoinedEvent = new PlayerJoinedEvent();
+    public static ClientServerGameFaliedToUnlockDoorEvent clientServerGameFaliedToUnlockDoorEvent = new ClientServerGameFaliedToUnlockDoorEvent();
 
-    public static StageClientServerDisconnectdEvent stageClientServerDisconnectdEvent = new StageClientServerDisconnectdEvent();
+    public static ClientServerGamePlayerConnectedEvent clientServerGamePlayerConnectedEvent = new ClientServerGamePlayerConnectedEvent();
 
+    public static ClientServerGamePlayerDisconnectedEvent clientServerGamePlayerDisconnectedEvent = new ClientServerGamePlayerDisconnectedEvent();
 
+    public static ClientServerGamePlayerChangedNameEvent clientServerGamePlayerChangedNameEvent = new ClientServerGamePlayerChangedNameEvent();
 
-    public static LobbyServerChangedInsanityOptionEvent lobbyServerChangedInsanityOptionEvent = new LobbyServerChangedInsanityOptionEvent();
+    public static ClientServerGameMonsterWonEvent clientServerGameMonsterWonEvent = new ClientServerGameMonsterWonEvent();
 
-#region LOBBY_SERVER
+    public static ClientServerGameLurkerReadyToGoIntoPhysicalFormEvent clientServerGameLurkerReadyToGoIntoPhysicalFormEvent = new ClientServerGameLurkerReadyToGoIntoPhysicalFormEvent();
 
-    public static LobbyServerKickedEvent lobbyServerKickedEvent = new LobbyServerKickedEvent();
+    public static ClientServerGameMaryReadyToFrenzyEvent ClientServerGameMaryReadyToFrenzyEvent = new ClientServerGameMaryReadyToFrenzyEvent();
 
-    public static LobbyServerChangedAllRandomEvent lobbyServerChangedAllRandomEvent = new LobbyServerChangedAllRandomEvent();
-    
-    public static LobbyServerChangedAllowSpecatorEvent lobbyServerChangedAllowSpectatorEvent = new LobbyServerChangedAllowSpecatorEvent(); 
-
-    public static LobbyServerChangedStageEvent lobbyServerChangedStageEvent = new LobbyServerChangedStageEvent();
-
-    public static LobbyServerChangedGamemodeEvent lobbyServerChangedGamemodeEvent = new LobbyServerChangedGamemodeEvent();
-
-    public static LobbyServerStartedGameEvent lobbyServerStartedGameEvent = new LobbyServerStartedGameEvent();
-
+    public static ClientServerGameMaryReadyToTeleportEvent clientServerGameMaryReadyToTeleportEvent = new ClientServerGameMaryReadyToTeleportEvent();
 
 #endregion
 
@@ -53,173 +47,63 @@ public static class EventManager
 
     //NOTE: Lobby client.
 
-    public static LobbyClientKickedEvent lobbyClientKickedEvent = new LobbyClientKickedEvent();
+    public static ClientServerLobbyClientKickedEvent clientServerLobbyClientKickedEvent = new ClientServerLobbyClientKickedEvent();
 
-    public static LobbyClientHostChangedGamemodeEvent lobbyClientHostChangedGamemodeEvent = new LobbyClientHostChangedGamemodeEvent();
+    public static ClientServerLobbyHostChangedGamemodeEvent clientServerLobbyHostChangedGamemodeEvent = new ClientServerLobbyHostChangedGamemodeEvent();
 
-    public static LobbyYouChangedCharacterEvent lobbyYouChangedCharacterEvent = new LobbyYouChangedCharacterEvent();
+    public static ClientServerLobbyPlayerJoinedEvent clientServerLobbyPlayerJoinedEvent = new ClientServerLobbyPlayerJoinedEvent();
 
-    public static LobbyClientPlayerJoinedEvent lobbyClientPlayerJoinedEvent = new LobbyClientPlayerJoinedEvent();
+    public static ClientServerLobbyPlayerDisconnectEvent clientServerLobbyPlayerDisconnectEvent = new ClientServerLobbyPlayerDisconnectEvent();
 
-    public static LobbyClientPlayerLeftEvent lobbyClientPlayerLeftEvent = new LobbyClientPlayerLeftEvent();
+    public static ClientServerLobbyPlayerChangedCharacterEvent clientServerLobbyPlayerChangedCharacterEvent = new ClientServerLobbyPlayerChangedCharacterEvent();
 
-    public static LobbyClientPlayerChangedCharacterEvent lobbyClientPlayerChangedCharacterEvent = new LobbyClientPlayerChangedCharacterEvent();
+    public static ClientServerLobbyPlayerSentChatMessageEvent clientServerLobbyPlayerSentChatMessageEvent = new ClientServerLobbyPlayerSentChatMessageEvent();
 
-    public static LobbyClientPlayerSentChatMessageEvent lobbyClientPlayerSentChatMessageEvent = new LobbyClientPlayerSentChatMessageEvent();
-
-    public static LobbyClientServerDisconnectedEvent lobbyClientServerDisconnectedEvent = new LobbyClientServerDisconnectedEvent();
-
-    public static LobbyClientServerAssignedYouHostEvent lobbyClientServerAssignedYouHostEvent = new LobbyClientServerAssignedYouHostEvent();
-
-    public static DedicatedServerReceivedIdEvent dedicatedServerReceivedIdEvent = new DedicatedServerReceivedIdEvent();
-
-    public static MasterServerSentLobbyListEvent masterServerSentLobbyListEvent = new MasterServerSentLobbyListEvent();
-
-    public static LobbyClientServerPickedNewHostEvent lobbyClientServerPickedNewHostEvent = new LobbyClientServerPickedNewHostEvent();
-
-    public static LobbyClientHostChangedStageEvent lobbyClientHostChangedStageEvent = new LobbyClientHostChangedStageEvent();
-
-    public static LobbyClientHostChangedAllowSpectatorEvent lobbyClientHostChangedAllowSpectatorEvent = new LobbyClientHostChangedAllowSpectatorEvent();
-
-    public static LobbyClientHostChangedAllRandomEvent lobbyClientHostChangedAllRandomEvent = new LobbyClientHostChangedAllRandomEvent();
+    public static ClientServerLobbyServerAssignedYouHostEvent clientServerLobbyServerAssignedYouHostEvent = new ClientServerLobbyServerAssignedYouHostEvent();
 
 
-    public static LobbyClientHostChangedInsanityOptionEvent lobbyClientHostChangedInsanityOptionEvent = new LobbyClientHostChangedInsanityOptionEvent();
+    public static ClientServerLobbyServerPickedNewHostEvent clientServerLobbyServerPickedNewHostEvent = new ClientServerLobbyServerPickedNewHostEvent();
 
-    public static LobbyYouHaveBeenKickedEvent lobbyYouHaveBeenKickedEvent = new LobbyYouHaveBeenKickedEvent();
+    public static ClientServerLobbyHostChangedStageEvent clientServerLobbyHostChangedStageEvent = new ClientServerLobbyHostChangedStageEvent();
+
+    public static ClientServerLobbyHostChangedAllowSpectatorEvent clientServerLobbyHostChangedAllowSpectatorEvent = new ClientServerLobbyHostChangedAllowSpectatorEvent();
+
+    public static ClientServerLobbyHostChangedAllRandomEvent clientServerLobbyHostChangedAllRandomEvent = new ClientServerLobbyHostChangedAllRandomEvent();
+
+
+    public static ClientServerLobbyHostChangedInsanityOptionEvent clientServerLobbyHostChangedInsanityOptionEvent = new ClientServerLobbyHostChangedInsanityOptionEvent();
+
+    public static ClientServerLobbyHostKickedYouEvent clientServerLobbyHostKickedYouEvent = new ClientServerLobbyHostKickedYouEvent();
 
 #endregion
+    public static MasterServerClientSentUsLobbyListEvent masterServerClientSentUsLobbyListEvent = new MasterServerClientSentUsLobbyListEvent();
 
-    public static PlayerSentChatMessageEvent playerSentChatMessageEvent = new PlayerSentChatMessageEvent();
-
-    public static PlayerRecievedChatMessageEvent playerRecievedChatMessageEvent = new PlayerRecievedChatMessageEvent();
-
-    public static SurvivorFailedToUnlockDoorEvent survivorFailedToUnlockDoorEvent = new SurvivorFailedToUnlockDoorEvent();
-
-    public static SurvivorUnlockDoorEvent survivorUnlockDoorEvent = new SurvivorUnlockDoorEvent();
-
-    public static PlayerConnectedEvent playerConnectedEvent = new PlayerConnectedEvent();
-
-    public static PlayerDisconnectedEvent playerDisconnectedEvent = new PlayerDisconnectedEvent();
-
-    public static PlayerChangedNameEvent playerChangedNameEvent = new PlayerChangedNameEvent();
-
-    public static PlayerClientChangedNameEvent playerClientChangedNameEvent = new PlayerClientChangedNameEvent();
-
-    public static MonsterWonEvent monsterWonEvent = new MonsterWonEvent();
-
-    public static FailedToLoadStageEvent failedToLoadStageEvent = new FailedToLoadStageEvent();
-
-    public static LurkerChangedFormEvent lurkerChangedFormEvent = new LurkerChangedFormEvent();
-
-    public static LurkerReadyToGoIntoPhysicalFormEvent lurkerReadyToGoIntoPhysicalFormEvent = new LurkerReadyToGoIntoPhysicalFormEvent();
-
-    public static MonsterSpawnedInStageEvent monsterSpawnedInStageEvent = new MonsterSpawnedInStageEvent();
-
-    public static MaryReadyToFrenzyEvent maryReadyToFrenzyEvent = new MaryReadyToFrenzyEvent();
-
-    public static MaryReadyToTeleportEvent maryReadyToTeleportEvent = new MaryReadyToTeleportEvent();
-
-    public static InvalidLobbyNameEvent invalidLobbyNameEvent = new InvalidLobbyNameEvent();
 
 }
 
 
-#region Survivor_Events
+#region CLIENT_GAME_EVENTS
 
 
-[System.Serializable]
-public class SurvivorDeathEvent : UnityEvent<string> { }
+public class ClientServerGameSurvivorDeathEvent : UnityEvent<string> { }
 
-[System.Serializable]
-public class SurvivorUnlockDoorEvent : UnityEvent<string, string, string> { }
+public class ClientServerGameSurvivorUnlockedDoorEvent : UnityEvent<string, string, string> { }
 
-[System.Serializable]
-public class SurvivorFailedToUnlockDoorEvent : UnityEvent<Door> { }
+public class ClientServerGameFaliedToUnlockDoorEvent: UnityEvent<float, float, float>{}
 
+public class ClientServerGameRejectBatteryPickupEvent: UnityEvent{}
 
-[System.Serializable]
-public class SurvivorPickedUpBatteryEvent : UnityEvent<Survivor, Battery> { }
+public class ClientServerGameYouPickedUpBatteryEvent: UnityEvent{}
 
-[System.Serializable]
-public class SurvivorFailedToPickUpBatteryEvent : UnityEvent { }
-
-[System.Serializable]
-public class SurvivorStartSprintingEvent : UnityEvent<Survivor> { }
-
-[System.Serializable]
-public class SurvivorStopSprintingEvent : UnityEvent<Survivor> { }
-
-[System.Serializable]
-public class SurvivorToggleFlashlightEvent : UnityEvent<Survivor> { }
-
-//TODO. Figure out if we need this or not.
-public class FlashlightEvent : UnityEvent<Flashlight> { }
-
-[System.Serializable]
-public class SurvivorAlreadyHaveKeyEvent : UnityEvent { }
-
-[System.Serializable]
-public class PlayerSentChatMessageEvent : UnityEvent<string, string> { }
-
-public class PlayerRecievedChatMessageEvent : UnityEvent<string, string> { }
-
-
-[System.Serializable]
-public class SurvivorMovingEvent : UnityEvent<bool> { }
-
-[System.Serializable]
-public class SurvivorStopMovingEvent : UnityEvent { }
+public class ClientServerGamePlayerSentChatMessageEvent : UnityEvent<string, string> { }
 
 #endregion
-
-#region INSANITY
-
-[System.Serializable]
-public class InsanityEffectEvent : UnityEvent { }
-
-
-#endregion
-
-#region GAME_MESSAGES
-
-[System.Serializable]
-
-#endregion
-
-
-#region TRAP_EVENTS
-
-public class SurvivorTriggeredTrapEvent : UnityEvent<Trap> { }
-
-[System.Serializable]
-public class MonsterArmedTrapEvent : UnityEvent<Trap> { }
-
-#endregion
-
 
 #region STAGE_EVENTS
 
-[System.Serializable]
-public class SurvivorsEscapedStageEvent : UnityEvent { }
+public class ClientServerGameSurvivorsEscapedEvent : UnityEvent { }
 
-
-[System.Serializable]
-public class FailedToLoadStageEvent : UnityEvent<string> { }
-
-public class MonsterWonEvent : UnityEvent { }
-
-
-public class MonsterSpawnedInStageEvent : UnityEvent<int> { }
-
-public class LurkerSpawnedInStageEvent : UnityEvent { }
-
-public class PhantomSpawnedInStageEvent : UnityEvent { }
-
-public class MarySpawendInStageEvent : UnityEvent { }
-
-public class FallenSpawnedInStageEvent : UnityEvent { }
-
+public class ClientServerGameMonsterWonEvent : UnityEvent { }
 
 #endregion
 
@@ -228,7 +112,7 @@ public class FallenSpawnedInStageEvent : UnityEvent { }
 public class LurkerChangedFormEvent : UnityEvent<bool> { }
 
 
-public class LurkerReadyToGoIntoPhysicalFormEvent : UnityEvent { }
+public class ClientServerGameLurkerReadyToGoIntoPhysicalFormEvent : UnityEvent { }
 
 
 #endregion
@@ -236,9 +120,9 @@ public class LurkerReadyToGoIntoPhysicalFormEvent : UnityEvent { }
 
 #region MARY_EVENTS
 
-public class MaryReadyToFrenzyEvent : UnityEvent { }
+public class ClientServerGameMaryReadyToFrenzyEvent : UnityEvent { }
 
-public class MaryReadyToTeleportEvent : UnityEvent { }
+public class ClientServerGameMaryReadyToTeleportEvent : UnityEvent { }
 
 #endregion
 
@@ -258,25 +142,26 @@ public class InvalidLobbyNameEvent : UnityEvent { }
 #region NETWORK_EVENTS
 
 
-[System.Serializable]
-public class PlayerConnectedEvent : UnityEvent<string> { }
+public class ClientServerGamePlayerConnectedEvent : UnityEvent<string> { }
 
-[System.Serializable]
-public class PlayerDisconnectedEvent : UnityEvent<string> { }
+public class ClientServerGamePlayerDisconnectedEvent : UnityEvent<string> { }
 
-public class PlayerChangedNameEvent: UnityEvent<string, string>{}
+public class ClientServerGamePlayerChangedNameEvent: UnityEvent<string, string>{}
 
 public class PlayerClientChangedNameEvent: UnityEvent<string, string>{}
 
-public class PlayerPickedUpKeyEvent : UnityEvent<string, string> { }
+public class ClientServerGameSurvivorPickedUpKeyEvent : UnityEvent<string, string> { }
 
-public class ServerAskedYouToPickCharacterEvent: UnityEvent<Character[]>{}
+public class ClientServerGameAlreadyHaveKeyEvent: UnityEvent{}
+
+public class ClientServerGameAskedYouToPickCharacterEvent: UnityEvent<Character[]>{}
 
 public class ServerLeftGameEvent: UnityEvent{}
 
-public class PlayerJoinedEvent: UnityEvent<string>{}
 
-public class StageClientServerDisconnectdEvent: UnityEvent{}
+public class ClientServerGamePlayerJoinedEvent: UnityEvent<string>{}
+
+public class ClientServerGamePlayerDisconnectEvent: UnityEvent{}
 
 
 
@@ -289,11 +174,11 @@ public class StageClientServerDisconnectdEvent: UnityEvent{}
 
 public class LobbyHostBeginHostingEvent: UnityEvent{}
 
-public class LobbyClientKickedEvent: UnityEvent<string, int>{}
+public class ClientServerLobbyClientKickedEvent: UnityEvent<string, int>{}
 
 public class LobbyServerKickedEvent: UnityEvent<int>{}
 
-public class LobbyYouHaveBeenKickedEvent: UnityEvent{}
+public class ClientServerLobbyHostKickedYouEvent: UnityEvent{}
 
 public class LobbyYouChangedCharacterEvent: UnityEvent<Character>{}
 
@@ -309,33 +194,35 @@ public class LobbyServerChangedGamemodeEvent: UnityEvent<int>{}
 
 public class LobbyServerStartedGameEvent: UnityEvent<string>{}
 
-public class LobbyClientHostChangedInsanityOptionEvent: UnityEvent<bool>{}
+public class ClientServerLobbyHostChangedInsanityOptionEvent: UnityEvent<bool>{}
 
-public class LobbyClientHostChangedAllRandomEvent: UnityEvent<bool>{}
+public class ClientServerLobbyHostChangedAllRandomEvent: UnityEvent<bool>{}
 
-public class LobbyClientHostChangedAllowSpectatorEvent: UnityEvent<bool>{}
+public class ClientServerLobbyHostChangedAllowSpectatorEvent: UnityEvent<bool>{}
 
-public class LobbyClientHostChangedStageEvent: UnityEvent<int>{}
+public class ClientServerLobbyHostChangedStageEvent: UnityEvent<int>{}
 
-public class LobbyClientHostChangedGamemodeEvent: UnityEvent<int>{}
+public class ClientServerLobbyHostChangedGamemodeEvent: UnityEvent<int>{}
 
-public class LobbyClientPlayerJoinedEvent: UnityEvent<string, int>{}
+public class ClientServerLobbyPlayerJoinedEvent: UnityEvent<string, int>{}
 
-public class LobbyClientPlayerLeftEvent: UnityEvent<string, int>{}
+public class ClientServerLobbyPlayerDisconnectEvent: UnityEvent<string, int>{}
 
-public class LobbyClientPlayerChangedCharacterEvent: UnityEvent<Character, int>{}
+public class ClientServerLobbyPlayerChangedCharacterEvent: UnityEvent<Character, int>{}
 
-public class LobbyClientPlayerSentChatMessageEvent: UnityEvent<string, string>{}
+public class ClientServerLobbyPlayerSentChatMessageEvent: UnityEvent<string, string>{}
 
 public class LobbyClientServerDisconnectedEvent: UnityEvent{}
 
-public class LobbyClientServerPickedNewHostEvent: UnityEvent<string, int>{}
+public class ClientServerLobbyServerPickedNewHostEvent: UnityEvent<string, int>{}
 
-public class LobbyClientServerAssignedYouHostEvent: UnityEvent<int>{}
+public class ClientServerLobbyServerAssignedYouHostEvent: UnityEvent<int>{}
 
 public class DedicatedServerReceivedIdEvent: UnityEvent<int>{}
 
-public class MasterServerSentLobbyListEvent: UnityEvent<Lobby[]>{}
+public class MasterServerClientSentUsLobbyListEvent: UnityEvent<Lobby[]>{}
+
+public class ClientServerPickedNewHostEvent: UnityEvent<string>{}
 
 #endregion
 

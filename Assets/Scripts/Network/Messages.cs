@@ -1,330 +1,360 @@
 ﻿using Mirror;
+using UnityEngine;
 
-public struct PlayerChatMessage
+// NOTE: These are the messages that the server/host will get from the clients. The implementation for all of this will all happen in DarnedNetworkManager.cs
+#region SERVER_MESSAGES
+
+// If a client sends us this, then that means they toggled their flashlight. 
+public struct ServerClientGameToggledFlashlightMessage: NetworkMessage
 {
-    public string survivorName;
-    public string text;
+    public bool toggled;
 }
 
-public struct PlayerUnlockedDoorMessage
+// If a client sends us this, then that means that they clicked on a battery and we need to make sure that they are allowed to do that. Checks must be done on the server side.
+public struct ServerClientGameClickedOnBatteryMessage: NetworkMessage
 {
-    public string playerName;
-    public string doorName;
-    public string keyName;
+    public uint requestedBatteryId;
 }
 
-public struct PlayerPickedUpKeyMessage
+// If a client sends us this, then that means that they clicked on a door and we need to tell them whether or not they can unlock it. Checks must be done on the server side.
+public struct ServerClientGameClickedOnDoorMessage: NetworkMessage
 {
-    public string playerName;
-    public string keyName;
+    public uint requestedDoorID;
 }
 
-public struct PlayerConnectMessage
+// If a client sends us this, then that means they requested to change the stage for the server. Only a host should be able to do this.
+public struct ServerClientLobbyRequestedToChangeStageMessage: NetworkMessage
 {
-    public string playerName;
+    public StageName requestedStageValue;
 }
 
-public struct PlayerJoinMessage
+// If a client sends us this, then that means they requested to change the insanity option in the lobby. Only a host should be able to do this.
+public struct ServerClientLobbyRequestedToChangeInsanityMessage: NetworkMessage
 {
-    public string playerName;
+    public bool requestedInsanityValue;
 }
 
-public struct PlayerDisconnectMessage
+public struct ServerClientLobbyRequestedToChangeAllowSpectatorMessage: NetworkMessage
 {
-    public string playerName;
+    public bool requestedAllowSpectatorValue;
+    
 }
 
-public struct PlayerAddKeyToInventoryMessage
+// If a client sends us this, then that means a client requested to change the All Random option in the lobby. Only a host should be able to do this.
+public struct ServerClientLobbyRequestedToChangeAllRandomMessage: NetworkMessage
 {
-    public KeyObject key;
+    public bool requestedAllRandomValue;
 }
 
-#region LOBBY
-
-// NOTE: This is kind of dumb but whatever. It's a work around for now. I may change this.
-//
-public struct LobbyClientCharacterChangedMessage: NetworkMessage
-{
-    public int character;
-}
-
-public struct LobbyHostClientCharacterChangedMessage: NetworkMessage
-{
-    public int character;
-    public int playerNumber;
-    public string playerName;
-}
-
-public struct PlayerOneCharacterChanged : NetworkMessage
-{
-    public int character;
-}
-public struct PlayerTwoCharacterChanged : NetworkMessage
-{
-    public int character;
-}
-public struct PlayerThreeCharacterChanged : NetworkMessage
-{
-    public int character;
-}
-public struct PlayerFourCharacterChanged : NetworkMessage
-{
-    public int character;
-}
-public struct PlayerFiveCharacterChanged : NetworkMessage
-{
-    public int character;
-}
-
-
-
-public struct LobbyOtherPlayerConnectedMessage: NetworkMessage
-{
-    public string playerName;
-}
-
-public struct LobbyOtherPlayerDisconnectedMessage: NetworkMessage
-{
-    public string playerName;
-}
-
-public struct LobbyHostClientDisconnectedMessage: NetworkMessage
-{
-    public string playerName;
-}
-
-public struct LobbyHostClientConnected: NetworkMessage
-{
-    public string playerName;
-}
-
-public struct HostKickedPlayerMessage: NetworkMessage
-{
-    public int lobbyPlayerNumber;
-    public string lobbyPlayerName;
-
-}
-
-
-#region LOBBY_SERVER
-
-public struct LobbyServerClientChangedCharacterMessage: NetworkMessage
-{
-    public Character newValue;
-}
-
-
-#endregion
-
-#region LOBBY_CLIENT
-
-public struct LobbyClientChangedAllRandomMessage: NetworkMessage
-{
-    public bool newOption;
-
-}
-
-public struct LobbyClientKickedMessage: NetworkMessage
-{
-    public string kickedClientName;
-    public int index;
-}
-
-public struct LobbyClientYouHaveBeenKickedMessage: NetworkMessage
+public struct ServerClientLobbyRequestedUnavailableCharactersMessage: NetworkMessage
 {
 
 }
-public struct LobbyClientChangedAllowSpectatorOptionMessage: NetworkMessage
+
+// If a client sends us this, then that means a client requested to change their character. Checks will be done on the server side.
+public struct ServerClientLobbyRequestedCharacterChangeMessage: NetworkMessage
 {
-    public bool newOption;
+    public Character requestedCharacter;
 }
 
-public struct LobbyClientChangedStageMessage: NetworkMessage
+// If a client sends us this, then that means that a client requested to start the game. Only a host should be able do to this.
+public struct ServerClientLobbyRequestedToStartGameMessage: NetworkMessage
 {
-    public int newOption;
-
-}
-
-public struct LobbyClientChangedInsanityOptionMessage: NetworkMessage
-{
-    public bool newOption;
-}
-
-public struct LobbyClientChangedGamemodeOptionMessage: NetworkMessage
-{
-    public int newOption;
 
 }
 
-public struct LobbyClientPlayerJoinedMessage: NetworkMessage
+public struct ServerClientLobbyHostRequestToKickPlayerMessage: NetworkMessage
 {
-    public string clientName;
-    public int index;
+    public NetworkIdentity playerIdentity;
 }
 
-public struct LobbyClientPlayerLeftMessage: NetworkMessage
+public struct ServerClientLobbyRequestedToChangeGamemodeMessage: NetworkMessage
 {
-    public string clientName;
-    public int index;
+    public int requestedGamemodeValue;
 }
 
-public struct LobbyClientPlayerChangedCharacterMessage: NetworkMessage
+// If a client sends us this, then that means that a client rquested to pick up a key. Checks should be done on the server side.
+public struct ServerClientGameClickedOnKeyMessage: NetworkMessage
 {
-    public Character newCharacter;
-    public int index;
+    public uint requestedKeyId;
 }
 
-public struct ServerPlayerSentChatMessage : NetworkMessage
+public struct ServerClientLobbyRequestedToChangeVoiceChatMessage: NetworkMessage
 {
-    public string playerName;
-    public string text;
+    public bool requestedVoiceChatValue;
+
 }
 
-public struct ClientPlayerSentChatMessage : NetworkMessage
-{
-    public string playerName;
-    public string text;
-}
-
-public struct ServerPlayerChangedProfileNameMessage: NetworkMessage
-{
-    public string oldName;
-    public string newName;
-}
-
-public struct ClientPlayerChangedProfileNameMessage: NetworkMessage
-{
-    public string oldName;
-    public string newName;
-}
-
-public struct ClientPickCharacterMessage: NetworkMessage
-{
-    public Character [] availableCharacters;
-}
-
-public struct ServerClientPickedCharacterMessage: NetworkMessage
+public struct ServerClientGamePlayerPickedCharacterMessage: NetworkMessage
 {
     public Character pickedCharacter;
 }
 
-public struct ServerPlayerJoinedMessage: NetworkMessage
+public struct ServerClientPlayerSentChatMessage: NetworkMessage
 {
-    public string clientName;
-    public NetworkIdentity clientIdentity;
-}
-
-public struct ClientPlayerJoinedMessage: NetworkMessage
-{
-    public string clientName;
-}
-
-public struct ClientPlayerDisconnectedMessage: NetworkMessage
-{
-    public string clientName;
-}
-
-public struct LobbyServerPlayerChatMessage: NetworkMessage
-{
-    public string clientName;
+    public string playerName;
     public string text;
 }
 
-public struct LobbyClientPlayerChatMessage: NetworkMessage
-{
-    public string clientName;
-    public string text;
-}
-
-public struct ServerClientLoadedSceneMessage: NetworkMessage
+public struct ServerClientGameSurvivorEscapedMessage: NetworkMessage
 {
 
 }
 
-public struct ClientServerDisconnectedMessage: NetworkMessage
+public struct ServerClientGameSurvivorNoLongerEscapedMessage: NetworkMessage
 {
 
 }
 
-public struct ClientServerChangeSceneMessage: NetworkMessage
+#endregion
+
+//NOTE: These messages are what clients will get from the host/server when the server sends it. The logic for all of these are implemented in DarnedNetworkManager.cs.
+#region CLIENT_MESSAGES
+
+
+public struct ClientServerLobbyHostChangedInsanityOption: NetworkMessage
 {
-    public bool newValue;
+    public bool newInsanityValue;
 }
 
-public struct LobbyClientServerPickedNewHostMessage: NetworkMessage
+public struct ClientServerLobbyHostChangedVoiceChatMessage: NetworkMessage
 {
-    public string clientName;
+    public bool newVoiceChatValue;
+}
+
+// If the server sends us this, then that means that the server rejected our character change request because another client has already chosen that character.
+public struct ClientServerLobbyCharacterAlreadyTakenMessage: NetworkMessage
+{
+
+}
+
+// If the server sends us this, then that means the server told us that we already have the key (same mask) we clicked on.
+public struct ClientServerGameAlreadyHaveKeyMessage: NetworkMessage
+{
+
+}
+
+public struct ClientServerLobbyPlayerChangedCharacterMessage: NetworkMessage
+{
+    // Who is the new character that the player picked?
+    public Character newCharacter;
+    // Index of the person who picked the new character
+    public byte playerIndexInLobby;
+
+}
+
+public struct ClientServerLobbyHostChangedStageMessage: NetworkMessage
+{
+    public StageName newStage;
+}
+
+public struct ClientServerLobbyHostChangedAllRandomOption: NetworkMessage
+{
+    public bool newAllRandomValue;
+}
+
+public struct ClientServerLobbyHostChangedAllowSpectatorOptinon: NetworkMessage
+{
+    public bool newAllowSpectatorValue;
+}
+
+public struct ClientServerLobbyHostChangedGamemodeOption: NetworkMessage
+{
+    public int newGamemodeValue;
+}
+
+public struct ClientServerLobbyPlayerDisconnectedMessage: NetworkMessage
+{
+    public string disconnectedClientName;
+    public int disconnectedClientIndex;
+}
+
+public struct ClientServerLobbyHostKickedYouMessage: NetworkMessage
+{
+
+}
+
+public struct ClientServerLobbyHostKickedPlayerMessage: NetworkMessage
+{
+    public string kickedClientName;
+    public int index;
+
+}
+
+// If the server sends this, then that means that the server said that we cannot unlock that door because it failed its required checks.
+public struct ClientServerGameDoorFailedToUnlockMessage: NetworkMessage
+{
+    // Where should we play the sound?
+    public Vector3 position;
+
+}
+
+// If the server sends us is, then that means the server said that the door is now unlocked.
+public struct ClientServerGameDoorUnlockedMessage: NetworkMessage
+{
+    // Who unlocked the door?
+    public string playerName;
+    // What kind of door is it?
+    public string doorName;
+}
+
+// If the server sends us this, then that means the server  has allowed a fellow survivor to pick up a key.
+public struct ClientServerGameSurvivorPickedUpKeyMessage: NetworkMessage
+{
+    // Who picked up a key?
+    public string playerName;
+    // What kind of key is it?
+    public string keyName;
+}
+
+// If the server sends us this, then that means the server has allowed us to pick up the key we clicked on.
+public struct ClientServerGameYouPickedUpKeyMessage: NetworkMessage
+{
+    // What kind of key is it?
+    public string keyName;
+
+}
+
+// If the server sends us this, then that means the server has allowed us to pick up the battery we clicked on.
+public struct ClientServerGameYouPickedUpBatteryMessage: NetworkMessage
+{
+
+}
+
+// If the server sends us this, then that means the server made us host because the old host of the lobby has left.
+public struct ClientServerLobbyMadeYouHostMessage: NetworkMessage
+{
+    public int index;
+
+}
+
+// If the server sends us this, then that means the server made someone else an new host because the old host has left.
+public struct ClientServerLobbyMadeSomeoneHostMessage: NetworkMessage
+{
+    // Who is the new host?
+    public string newHostName;
     public int index;
 }
 
-public struct LobbyClientServerAssignedYouHostMessage: NetworkMessage
+// If the server sends us this, then that means it has rejected our request to pick up a battery to recharge our flashlight.
+public struct ClientServerGameRejectedBatteryPickupMessage: NetworkMessage
 {
-    public int index;
+
 }
 
-public struct LobbyServerClientRequestedKickMessage: NetworkMessage
+// If the server sends us this, then that means someone picked up a battery to recharge their flashlight.
+public struct ClientServerGameBatteryPickedUp: NetworkMessage
 {
-    public int index;
+    public int batteryID;
 }
 
-public struct LobbyServerClientRequestedChangeInsanityMessage: NetworkMessage
+// If the server sends us this, then that means that a fellow survivor has toggled their flashlight.
+public struct ClientServerGamePlayerToggledFlashlight: NetworkMessage
 {
-    public bool newValue;
+
 }
 
-public struct LobbyServerClientRequestedChangeStageMessage: NetworkMessage
+// If the server sends us this, then that means that the server decided to let us know the latest value of a survivors flashlight. This will only happen a little bit to avoid network spam.
+public struct ClientServerGamePlayerUpdatedFlashlightValue: NetworkMessage
 {
-    public int newValue;
+    public float newValue;
 }
 
-public struct LobbyServerClientRequestedChangeGamemodeMessage: NetworkMessage
+public struct ClientServerGameSurvivorHitTrapMessage: NetworkMessage
 {
-    public int newValue;
+
 }
 
-public struct LobbyServerClientRequestedChangeAllRandomMessage: NetworkMessage
-{
-    public bool newValue;
-}
-
-public struct LobbyServerClientRequestedChangeAllowSpectatorMessage: NetworkMessage
-{
-    public bool newValue;
-}
-
-public struct LobbyServerClientRequestedToStartGameMessage: NetworkMessage
-{
-    public string newSceneName;
-}
-
-public struct MasterServerLobbyRequestedToBeAddedMessage: NetworkMessage
+public struct ClientServerPlayerConnectedMessage: NetworkMessage
 {
     public string name;
-    public ushort port;
-    public bool isPrivate;
+
 }
 
-public struct MasterServerRequestedToBeRemovedMessage: NetworkMessage
+public struct ClientServerLobbyPlayerJoinedMessage: NetworkMessage
 {
-    public int id;
+    public string clientName;
+    public int index;
+
 }
+public struct ClientServerLobbyPlayerSentChatMessage: NetworkMessage
+{
+    public string clientName;
+    public string text;
+}
+
+public struct ClientServerGameSurvivorsEscapedMessage: NetworkMessage
+{
+
+}
+
+public struct ClientServerLobbyUnavailableCharactersMessage: NetworkMessage
+{
+    public Character[] unavailableCharacters;
+}
+public struct ClientServerGamePickCharacterMessage: NetworkMessage
+{
+    public Character[] unavailableCharacters;
+}
+
+#endregion
+
+#region MASTER_SERVER
 
 public struct MasterServerClientRequestServerListMessage: NetworkMessage
 {
 
 }
 
-public struct MasterServerLobbyListMessage: NetworkMessage
+public struct MasterServerDedicatedServerRequestToBeAddedMessage: NetworkMessage
 {
-    public Lobby[] lobbies;
+    public string lobbyName;
+    public string password;
+    public bool isPrivate;
+
 }
 
-public struct ServerAddedOurLobbyMessage: NetworkMessage
+public struct MasterServerClientHostRequestToBeAddedMessage: NetworkMessage
 {
-    public int id;
+    public string lobbyName;
+    public string password;
+    public bool isPrivate;
+
+}
+
+public struct MasterServerClientHostRequestToBeRemovedMessage: NetworkMessage
+{
+    public int clientHostServerId;
+
+}
+
+public struct MasterServerDedicatedServerRequestToBeRemovedMessage: NetworkMessage
+{
+    public int dedicatedServerId;
 
 }
 
 #endregion
+
+#region MASTER_CLIENT
+
+public struct MasterClientServerAddedClientHostServerMessage: NetworkMessage
+{
+
+}
+
+// IF the master server sends us this, then that means it added our dedicated server do the master server list
+public struct MasterClientServerAddedDedicatedServerMessage: NetworkMessage
+{
+    // The id that the master server gave us. Store this for when the dedicated server disconnects and requests to be removed from the server listing.
+    public int id;
+
+}
+
+public struct MasterClientServerSentServerListingMessage: NetworkMessage
+{
+    public Lobby[] lobbiesOnServer;
+
+}
 
 #endregion

@@ -2,10 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using Mirror;
-using kcp2k;
-using System;
 using System.Text;
-using System.Collections;
 
 public enum Character : byte
 {
@@ -70,12 +67,6 @@ public class LobbyUI : MonoBehaviour
     [SerializeField]
     private Canvas lobbyCanvas;
 
-    //    [SerializeField]
-    //    private JoinGameUI joinGameUI;
-    //
-    //    [SerializeField]
-    //    private HostGameUI hostGameUI;
-    //
     [SerializeField]
     private Color buttonTextColor;
 
@@ -223,126 +214,21 @@ public class LobbyUI : MonoBehaviour
 
     private void Start()
     {
-        if (DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY && NetworkManager.singleton == null)
-        {
-            StartDedicatedServer();
-            return;
-        }
-
-        else if (DarnedNetworkManager.CLIENT_HOSTING_LOBBY && NetworkManager.singleton == null)
-        {
-            StartHost();
-            this.hostingLobby = true;
-            this.hostingOnDedicatedServer = false;
-            SetUpHostLobbyControls();
-        }
-
-        else if (!DarnedNetworkManager.CLIENT_HOSTING_LOBBY && !DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY && NetworkManager.singleton == null)
-        {
-            CreateNetworkManager();
-            this.hostingLobby = false;
-            this.hostingOnDedicatedServer = false;
-            SetUpClientLobbyControls();
-            string address = $"{DarnedNetworkManager.HOSTNAME}:{DarnedNetworkManager.PORT}";
-            Uri uri = new Uri(address);
-            NetworkManager.singleton.StartClient(uri);
-
-        }
-
         this.enabled = true;
-        hostingLobby = DarnedNetworkManager.CLIENT_HOSTING_LOBBY;
         chatStringBuilder = new StringBuilder();
-        EventManager.lobbyClientHostChangedAllowSpectatorEvent.AddListener(OnAllowSpectatorOptionUpdated);
-        EventManager.lobbyClientHostChangedStageEvent.AddListener(OnStageSelectionUpdated);
-        EventManager.lobbyClientHostChangedGamemodeEvent.AddListener(OnGameModeSelectionUpdated);
-        EventManager.lobbyClientHostChangedAllRandomEvent.AddListener(OnAllRandomOptionUpdated);
-        EventManager.lobbyClientHostChangedInsanityOptionEvent.AddListener(OnInsanityOptionUpdated);
-        EventManager.lobbyClientPlayerJoinedEvent.AddListener(OnPlayerJoinedLobby);
-        EventManager.lobbyClientPlayerLeftEvent.AddListener(OnPlayerLeftLobby);
-        EventManager.lobbyClientPlayerChangedCharacterEvent.AddListener(OnPlayerSlotUpdated);
-        EventManager.lobbyYouHaveBeenKickedEvent.AddListener(OnKickedFromLobby);
-        EventManager.lobbyClientPlayerSentChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
-        EventManager.lobbyClientServerAssignedYouHostEvent.AddListener(OnServerAssignedYouHost);
-        EventManager.lobbyClientServerPickedNewHostEvent.AddListener(OnServerAssignedPlayerHost);
+        EventManager.clientServerLobbyHostChangedInsanityOptionEvent.AddListener(OnAllowSpectatorOptionUpdated);
+        EventManager.clientServerLobbyHostChangedStageEvent.AddListener(OnStageSelectionUpdated);
+        EventManager.clientServerLobbyHostChangedGamemodeEvent.AddListener(OnGameModeSelectionUpdated);
+        EventManager.clientServerLobbyHostChangedAllRandomEvent.AddListener(OnAllRandomOptionUpdated);
+        EventManager.clientServerLobbyHostChangedInsanityOptionEvent.AddListener(OnInsanityOptionUpdated);
+        EventManager.clientServerLobbyPlayerJoinedEvent.AddListener(OnPlayerJoinedLobby);
+        EventManager.clientServerLobbyPlayerDisconnectEvent.AddListener(OnPlayerLeftLobby);
+        EventManager.clientServerLobbyPlayerChangedCharacterEvent.AddListener(OnPlayerSlotUpdated);
+        EventManager.clientServerLobbyHostKickedYouEvent.AddListener(OnKickedFromLobby);
+        EventManager.clientServerLobbyPlayerSentChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
+        EventManager.clientServerLobbyServerAssignedYouHostEvent.AddListener(OnServerAssignedYouHost);
+        EventManager.clientServerLobbyServerPickedNewHostEvent.AddListener(OnServerAssignedPlayerHost);
 
-    }
-
-    private void StartDedicatedServer()
-    {
-        this.hostingLobby = false;
-        this.hostingOnDedicatedServer = true;
-        EventManager.dedicatedServerReceivedIdEvent.AddListener(OnDedicatedServerRecievedId);
-        string configName = "darned_lobby_server_configuration.yaml";
-
-        if (!DedicatedServerConfiguration.Exists(configName))
-        {
-            DarnedNetworkManager.Log("Exiting...");
-            Application.Quit();
-            return;
-        }
-
-        DedicatedServerConfiguration serverConfiguration = DedicatedServerConfiguration.Load(configName);
-        string serverName = serverConfiguration.Name();
-        HostLobby.LOBBY_NAME = serverName;
-        ushort port = serverConfiguration.Port();
-        HostLobby.LOBBY_PORT = port;
-        string password = serverConfiguration.Password();
-        HostLobby.LOBBY_PASSWORD = password;
-        bool isPrivate = password != string.Empty;
-        DarnedNetworkManager.PORT = port;
-        DarnedNetworkManager.Log($"Loaded server configuration:\n\nServer Name = {serverName}\nPort = {port}\nPrivate Lobby = {isPrivate}");
-        GameObject loadedObject = (GameObject)Resources.Load("Darned Master Server Manager");
-        GameObject spawnedObject = Instantiate(loadedObject);
-        string address = "localhost:7777";
-        Uri uri = new Uri(address);
-        NetworkManager.singleton.StartClient(uri);
-    }
-
-    private void StartHost()
-    {
-        EventManager.dedicatedServerReceivedIdEvent.AddListener(OnDedicatedServerRecievedId);
-        GameObject loadedObject = (GameObject)Resources.Load("Darned Master Server Manager");
-        GameObject spawnedObject = Instantiate(loadedObject);
-        string address = "localhost:7777";
-        Uri uri = new Uri(address);
-        NetworkManager.singleton.StartClient(uri);
-    }
-
-    //NOTE: Called when the master server sends us back the ID it generated.
-    private void OnDedicatedServerRecievedId(int id)
-    {
-        StartCoroutine(StartServer(id));
-    }
-
-    private IEnumerator StartServer(int id)
-    {
-        DarnedNetworkManager.ID = id;
-        NetworkManager.singleton.StopClient();
-        Destroy(NetworkManager.singleton.gameObject);
-        yield return null;
-        DarnedNetworkManager.Log("The master server has added us to the list! Starting the dedicated server...");
-        CreateNetworkManager();
-        DarnedNetworkManager.PORT = HostLobby.LOBBY_PORT;
-
-        if (DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY)
-        {
-            NetworkManager.singleton.StartServer();
-        }
-
-        else if (DarnedNetworkManager.CLIENT_HOSTING_LOBBY)
-        {
-            NetworkManager.singleton.StartHost();
-        }
-
-        DarnedNetworkManager.Log("Successfully started the server!");
-
-    }
-
-    private void CreateNetworkManager()
-    {
-        GameObject dedicatedServerObject = (GameObject)Resources.Load("Darned Network Manager");
-        GameObject spawnedGameobject = Instantiate(dedicatedServerObject);
-        DontDestroyOnLoad(spawnedGameobject);
     }
 
     private void DisableHostControls()
@@ -385,7 +271,7 @@ public class LobbyUI : MonoBehaviour
     // NOTE: If the user gets here then they must be a client and the server.
     public void OnKickedButtonClicked(int playerNumber)
     {
-        EventManager.lobbyServerKickedEvent.Invoke(playerNumber);
+        //NetworkClient.Send(new ServerClientLobbyHostRequestToKickPlayerMessage{playerIdentity })
     }
 
     private void SetUpClientLobbyControls()
@@ -563,28 +449,28 @@ public class LobbyUI : MonoBehaviour
 
     public void OnInsanityEnabledCheckboxClicked(bool newOption)
     {
-        NetworkClient.Send(new LobbyServerClientRequestedChangeInsanityMessage { newValue = newOption });
+        NetworkClient.Send(new ServerClientLobbyRequestedToChangeInsanityMessage { requestedInsanityValue = newOption });
     }
 
     public void OnAllowSpectatorCheckboxClicked(bool newOption)
     {
-        NetworkClient.Send(new LobbyServerClientRequestedChangeAllowSpectatorMessage { newValue = newOption });
+        NetworkClient.Send(new ServerClientLobbyRequestedToChangeAllowSpectatorMessage{requestedAllowSpectatorValue = newOption});
     }
 
 
     public void OnAllRandomCheckboxClicked(bool newOption)
     {
-        NetworkClient.Send(new LobbyServerClientRequestedChangeAllRandomMessage { newValue = newOption });
+        NetworkClient.Send(new ServerClientLobbyRequestedToChangeAllRandomMessage{requestedAllRandomValue = newOption});
     }
 
     public void OnStageDropdownChanged(int newOption)
     {
-        NetworkClient.Send(new LobbyServerClientRequestedChangeStageMessage { newValue = newOption });
+        NetworkClient.Send(new ServerClientLobbyRequestedToChangeStageMessage{requestedStageValue = (StageName)newOption});
     }
 
     public void OnGameModeDropdownChanged(int newOption)
     {
-        NetworkClient.Send(new LobbyServerClientRequestedChangeGamemodeMessage { newValue = newOption });
+        NetworkClient.Send(new ServerClientLobbyRequestedToChangeGamemodeMessage { requestedGamemodeValue = newOption });
     }
 
     public void OnVoiceChatDropdownChanged()
@@ -598,7 +484,7 @@ public class LobbyUI : MonoBehaviour
         // and the dictionary in the file Stages.cs.
         StageName name = (StageName)stageDropdown.value;
         string sceneName = Stages.Name(name);
-        NetworkClient.Send(new LobbyServerClientRequestedToStartGameMessage { newSceneName = sceneName });
+        NetworkClient.Send(new ServerClientLobbyRequestedToStartGameMessage{});
     }
 
     #endregion
@@ -633,7 +519,7 @@ public class LobbyUI : MonoBehaviour
             if (chatMessageBoxInput.text != string.Empty)
             {
                 string chatMessageText = chatMessageBoxInput.text;
-                NetworkClient.Send(new LobbyServerPlayerChatMessage { clientName = Settings.PROFILE_NAME, text = chatMessageText });
+                NetworkClient.Send(new ServerClientPlayerSentChatMessage { playerName = Settings.PROFILE_NAME, text = chatMessageText });
                 chatMessageBoxInput.text = string.Empty;
                 chatMessageBoxInput.Select();
             }
@@ -644,7 +530,7 @@ public class LobbyUI : MonoBehaviour
 
     public void OnJamalButtonClicked()
     {
-        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Jamal });
+        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Jamal });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -652,28 +538,28 @@ public class LobbyUI : MonoBehaviour
 
     public void OnAliceButtonClicked()
     {
-        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Alice });
+        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Alice });
         DisableSelectCharacterControls();
         //EnableControls();
     }
 
     public void OnChadButtonClicked()
     {
-        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Chad });
+        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Chad });
         DisableSelectCharacterControls();
         //EnableControls();
     }
 
     public void OnJesusButtonClicked()
     {
-        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Jesus });
+        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Jesus });
         DisableSelectCharacterControls();
         //EnableControls();
     }
 
     public void OnLurkerButtonClicked()
     {
-        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Lurker });
+        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Lurker });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -681,7 +567,7 @@ public class LobbyUI : MonoBehaviour
 
     public void OnPhantomButtonClicked()
     {
-        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Phantom });
+        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Phantom });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -689,7 +575,7 @@ public class LobbyUI : MonoBehaviour
 
     public void OnMaryButtonClicked()
     {
-        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Mary });
+        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Mary });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -697,14 +583,14 @@ public class LobbyUI : MonoBehaviour
 
     public void OnFallenButtonClicked()
     {
-        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Fallen });
+        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Fallen });
         DisableSelectCharacterControls();
         //EnableControls();
     }
 
     public void OnRandomCharacterButtonClicked()
     {
-        NetworkClient.Send(new LobbyServerClientChangedCharacterMessage { newValue = Character.Random });
+        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Random });
         DisableSelectCharacterControls();
         //EnableControls();
     }

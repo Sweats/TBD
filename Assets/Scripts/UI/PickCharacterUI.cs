@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
 
@@ -71,14 +69,14 @@ public class PickCharacterUI : MonoBehaviour
 
     private void Start()
     {
-        EventManager.serverAskedYouToPickCharacterEvent.AddListener(OnServerAskedYouToPickCharacter);
+        EventManager.clientServerGameAskedYouToPickCharacterEvent.AddListener(OnServerAskedYouToPickCharacter);
     }
 
     public void OnCharacterButtonClicked(int value)
     {
         Debug.Log($"You clicked on a button and the value is {value}");
         Character character = (Character)value;
-        NetworkClient.Send(new ServerClientPickedCharacterMessage{pickedCharacter = character });
+        NetworkClient.Send(new ServerClientGamePlayerPickedCharacterMessage{pickedCharacter = character });
         Hide();
     }
 

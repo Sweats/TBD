@@ -7,26 +7,23 @@ public enum DoorType
 }
 
 
+// This cl
 public class Door : NetworkBehaviour
 {
     // Start is called before the first frame update
     [SerializeField]
-    [SyncVar]
     private int unlockMask = -1;
 
     [SerializeField]
-    [SyncVar]
     private string doorName = "door";
 
-    [SyncVar(hook = nameof(HookSurvivorUnlockedDoor))]
     [SerializeField]
+    [SyncVar]
     private bool unlocked;
 
-    [SyncVar(hook = nameof(HookSurvivorGrabbedDoor))]
     [SerializeField]
     private bool grabbed;
 
-    [SyncVar]
     [SerializeField]
     private float doorPushStrength;
 
@@ -91,53 +88,6 @@ public class Door : NetworkBehaviour
     }
     */
 
-    [Command(requiresAuthority=false)]
-    public void CmdPlayerClickedOnLockedDoor(NetworkConnectionToClient sender = null)
-    {
-        Survivor survivor = sender.identity.GetComponent<Survivor>();
-
-        //NOTE: If null, it must be a monster
-        if (survivor == null)
-        {
-            RpcFailedToUnlockDoor();
-            return;
-        }
-
-        var keys = survivor.Items();
-        bool found = false;
-        int foundKeyIndex = 0;
-
-        for (var i = 0; i < keys.Count; i++)
-        {
-            int keyMask = keys[i].Mask();
-
-            if (this.unlockMask == keyMask)
-            {
-                found = true;
-                foundKeyIndex = i;
-                break;
-            }
-        }
-
-        if (found)
-        {
-            string foundKeyName = keys[foundKeyIndex].Name();
-
-            PlayerUnlockedDoorMessage unlockDoorMessage = new PlayerUnlockedDoorMessage
-            {
-                playerName = survivor.Name(),
-                doorName = this.doorName,
-                keyName = foundKeyName
-            };
-
-            RpcUnlockDoorMessage(unlockDoorMessage);
-            unlocked = true;
-            doorRigidBody.isKinematic = false;
-            return;
-        }
-
-        RpcFailedToUnlockDoor();
-    }
 
     [Command(requiresAuthority = false)]
     public void CmdPlayerHitDoor(Vector3 moveDirection)
@@ -148,37 +98,6 @@ public class Door : NetworkBehaviour
             Vector3 velocity = newMoveDirection * doorPushStrength;
             doorRigidBody.AddForce(velocity);
         }
-    }
-
-    [ClientRpc]
-    private void RpcUnlockDoorMessage(PlayerUnlockedDoorMessage serverMessage)
-    {
-        string playerName = serverMessage.playerName;
-        string doorName = serverMessage.doorName;
-        string keyName = serverMessage.keyName;
-        EventManager.survivorUnlockDoorEvent.Invoke(playerName, doorName, keyName);
-    }
-
-    [ClientRpc]
-    private void RpcFailedToUnlockDoor()
-    {
-        lockedSound.Play();
-    }
-
-    [Client]
-    private void HookSurvivorUnlockedDoor(bool oldValue, bool newValue)
-    {
-        unlockedSound.Play();
-        doorJoint.enableCollision = newValue;
-        doorRigidBody.detectCollisions = newValue;
-    }
-
-
-    [Client]
-    private void HookSurvivorGrabbedDoor(bool oldValue, bool newValue)
-    {
-        doorJoint.enableCollision = newValue;
-        doorRigidBody.detectCollisions = newValue;
     }
 
     [Client]
@@ -199,6 +118,12 @@ public class Door : NetworkBehaviour
     public bool Unlocked()
     {
         return unlocked;
+    }
+
+    [Server]
+    public void Unlock()
+    {
+        unlocked = true;
     }
 
     public int UnlockMask()

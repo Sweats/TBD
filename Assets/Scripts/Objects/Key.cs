@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum KeyType
+public enum KeyType: byte
 {
     Rusty = 0,
     Metal,

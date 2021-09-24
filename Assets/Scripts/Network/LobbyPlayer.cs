@@ -4,12 +4,50 @@ public class LobbyPlayer : NetworkBehaviour
 {
     // NOTE: We have to do this here because apparently the net identity is not set inside the NetworkManager OnServerConnect() function.
 
-    public override void OnStartClient()
+
+    [SyncVar]
+    private bool hosting;
+
+    [SyncVar]
+    private Character character;
+
+    [SyncVar]
+    private string name;
+    public override void OnStartLocalPlayer()
     {
-        if (isLocalPlayer)
-        {
-            NetworkClient.Send(new ServerPlayerJoinedMessage { clientName = Settings.PROFILE_NAME, clientIdentity = netIdentity });
-            base.OnStartClient();
-        }
+        this.name = Settings.PROFILE_NAME;
+        CmdSetProfileName(this.name);
+    }
+
+    [Command]
+    private void CmdSetProfileName(string name)
+    {
+        this.name = name;
+    }
+
+
+    public string Name()
+    {
+        return name;
+    }
+
+    public void SetCharacter(Character character)
+    {
+        this.character = character;
+    }
+
+    public bool Hosting()
+    {
+        return hosting;
+    }
+
+    public void SetHosting(bool value)
+    {
+        this.hosting = value;
+    }
+
+    public Character SelectedCharacter() 
+    {
+        return character;
     }
 }

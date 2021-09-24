@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Mirror;
 
 public class PlayerSpectator : NetworkBehaviour
@@ -17,11 +15,5 @@ public class PlayerSpectator : NetworkBehaviour
         spectatorCamera.GetComponent<AudioListener>().enabled = true;
         Settings.PROFILE_NAME = PlayerPrefs.GetString(PROFILE_NAME_KEY_STRING, "player");
         NetworkClient.Send(new ServerPlayerJoinedMessage{clientName = Settings.PROFILE_NAME, clientIdentity = netIdentity});
-    }
-
-    [Command]
-    private void test()
-    {
-
     }
 }
