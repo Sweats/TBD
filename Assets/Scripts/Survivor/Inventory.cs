@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class Inventory : MonoBehaviour
 {
-    [SerializeField]
+
     private List<Key> keys;
 
     private Rect currentPosition;

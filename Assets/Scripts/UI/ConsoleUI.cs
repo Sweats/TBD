@@ -25,17 +25,17 @@ public class ConsoleUI : MonoBehaviour
     {
         this.enabled = false;
         stringBuilder = new StringBuilder();
-        EventManager.monsterWonEvent.AddListener(OnMonsterWon);
-        EventManager.playerConnectedEvent.AddListener(OnPlayerConnected);
-        EventManager.playerDisconnectedEvent.AddListener(OnPlayerDisconnected);
-        EventManager.survivorDeathEvent.AddListener(OnSurvivorDeath);
-        EventManager.playerSentChatMessageEvent.AddListener(OnPlayerSentChatMessage);
+        EventManager.clientServerGameMonsterWonEvent.AddListener(OnMonsterWon);
+        EventManager.clientServerGamePlayerConnectedEvent.AddListener(OnPlayerConnected);
+        EventManager.clientServerGamePlayerDisconnectedEvent.AddListener(OnPlayerDisconnected);
+        EventManager.clientServerGameSurvivorDeathEvent.AddListener(OnSurvivorDeath);
+        EventManager.clientServerGamePlayerSentChatMessageEvent.AddListener(OnPlayerSentChatMessage);
         EventManager.playerRecievedChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStage);
         EventManager.failedToLoadStageEvent.AddListener(OnFailedToLoadStage);
-        EventManager.playerPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
-        EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
-        EventManager.playerChangedNameEvent.AddListener(OnPlayerChangedProfileName);
+        EventManager.clientServerGameSurvivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
+        EventManager.clientServerGameSurvivorUnlockedDoorEvent.AddListener(OnSurvivorUnlockedDoor);
+        EventManager.clientServerGamePlayerChangedNameEvent.AddListener(OnPlayerChangedProfileName);
     }
 
 

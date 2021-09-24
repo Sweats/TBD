@@ -31,5 +31,6 @@ public static class Tags
 
 	public static string DARNED_OBJECT = "Darned Object";
 
+	public static string ESCAPE = "Escape";
 
 }

@@ -39,7 +39,7 @@ public class Chat : MonoBehaviour
         stringBuilder = new StringBuilder();
         chatMessageBoxInput.text = string.Empty;
         EventManager.playerRecievedChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
-        EventManager.playerChangedNameEvent.AddListener(OnPlayerChangedProfileNameEvent);
+        EventManager.clientServerGamePlayerChangedNameEvent.AddListener(OnPlayerChangedProfileNameEvent);
         StartCoroutine(ChatRoutine());
     }
 

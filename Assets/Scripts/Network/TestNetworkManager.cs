@@ -220,7 +220,7 @@ public class TestNetworkManager : NetworkManager
         string oldProfileName = message.oldName;
         string newProfileName = message.newName;
         Debug.Log("Detected profile message from the server");
-        EventManager.playerChangedNameEvent.Invoke(oldProfileName, newProfileName);
+        EventManager.clientServerGamePlayerChangedNameEvent.Invoke(oldProfileName, newProfileName);
     }
 
     private void ClientOnPlayerSentChatMessage(NetworkConnection connection, ClientPlayerSentChatMessage message)
@@ -235,26 +235,26 @@ public class TestNetworkManager : NetworkManager
     {
         Character[] characters = message.availableCharacters;
         Debug.Log("Server asked to is pick a character");
-        EventManager.serverAskedYouToPickCharacterEvent.Invoke(characters);
+        EventManager.clientServerGameAskedYouToPickCharacterEvent.Invoke(characters);
     }
 
     private void OnClientPlayerDisconnected(NetworkConnection connection, ClientPlayerDisconnectedMessage message)
     {
         string name = message.clientName;
-        EventManager.playerDisconnectedEvent.Invoke(name);
+        EventManager.clientServerGamePlayerDisconnectedEvent.Invoke(name);
     }
 
     private void ClientPlayerJoined(NetworkConnection connection, ClientPlayerJoinedMessage message)
     {
         string name = message.clientName;
-        EventManager.playerJoinedEvent.Invoke(name);
+        EventManager.clientServerGamePlayerJoinedEvent.Invoke(name);
     }
 
 
     private void ServerClientPickedCharacter(NetworkConnection connection, ServerClientPickedCharacterMessage message)
     {
         Character pickedCharacter = message.pickedCharacter;
-        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
+        List<ServerPlayer> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
         uint netId = connection.identity.netId;
         ServerSpawnPlayer(connection, pickedCharacter, true);
     }
@@ -265,7 +265,7 @@ public class TestNetworkManager : NetworkManager
 
     private void ServerOnClientLoadedScene(NetworkConnection connection, ServerClientLoadedSceneMessage message)
     {
-        List<Player> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
+        List<ServerPlayer> players = DarnedNetworkManager.PLAYERS_IN_SERVER;
         uint netId = connection.identity.netId;
 
         for (var i = 0; i < players.Count; i++)

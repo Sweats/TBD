@@ -462,7 +462,7 @@ public class Lurker : NetworkBehaviour
     private void TargetReadyToGoIntoPhysicalForm()
     {
         lurkerReadyToTransformSound.Play();
-        EventManager.lurkerReadyToGoIntoPhysicalFormEvent.Invoke();
+        EventManager.clientServerGameLurkerReadyToGoIntoPhysicalFormEvent.Invoke();
     }
 
     [Server]

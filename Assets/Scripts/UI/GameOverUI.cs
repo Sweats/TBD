@@ -14,7 +14,7 @@ public class GameOverUI : MonoBehaviour
     private void Start()
     {
         EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
-        EventManager.monsterWonEvent.AddListener(OnSurvivorsLost);
+        EventManager.clientServerGameMonsterWonEvent.AddListener(OnSurvivorsLost);
     }
 
     private void OnSurvivorsEscapedStageEvent()

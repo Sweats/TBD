@@ -1,33 +1,22 @@
 ﻿using UnityEngine;
-using System.Collections;
 using Mirror;
+using System.Collections.Generic;
 
 public class Survivor : NetworkBehaviour
 {
-    [SerializeField]
-    [SyncVar]
-    private string playerName = "player";
-
-    [SyncVar]
-    public bool matchOver;
-
-    [SerializeField]
-    [SyncVar]
-    private bool isInEscapeRoom;
-
-    [SyncVar]
-    [SerializeField]
-    readonly private SyncList<Key> keys = new SyncList<Key>();
-
-    [SyncVar]
-    public bool dead;
-
     public Insanity insanity;
 
     [SerializeField]
     private AudioSource deathSound;
 
     private CharacterController controller;
+
+    private string name;
+
+    private Inventory inventory;
+
+    //NOTE: Server will send us the key type when we pick it up. Client side OnGUI will loop through this and draw depending on the key type
+    private List<KeyType> keyTypes;
 
     private Animator animator;
 
@@ -95,10 +84,9 @@ public class Survivor : NetworkBehaviour
     private Light flashlight;
 
     [SerializeField]
-    [SyncVar(hook = nameof(SurvivorFlashlightChargeChanged))]
+    [SyncVar]
     private float charge;
 
-    [SyncVar(hook = nameof(SurvivorToggledFlashlight))]
     [SerializeField]
     private bool toggled;
 
@@ -106,34 +94,26 @@ public class Survivor : NetworkBehaviour
     [SerializeField]
     private bool flashlightDead;
 
-    private IEnumerator flashlightRoutine;
-
     [Header("Sprint Settings")]
     [SerializeField]
-    [SyncVar]
     private bool sprinting;
 
     [SerializeField]
-    [SyncVar]
     private float sprintMaxEnergy;
 
     [SerializeField]
-    [SyncVar]
     private float sprintMinEnergy;
 
     [SerializeField]
-    [SyncVar]
     private float sprintConsumptionRate;
 
     [SerializeField]
-    [SyncVar]
     private float sprintRegenerationRate;
 
     [SerializeField]
     private float energyNeededToSprint;
 
     [SerializeField]
-    [SyncVar]
     private float sprintEnergy;
 
     [SerializeField]
@@ -150,6 +130,8 @@ public class Survivor : NetworkBehaviour
     [SerializeField]
     private DarnedObject grabbedObject;
 
+    private bool matchOver;
+
     // NOTE: Did someone join and then disconnect and die?
     private bool disconnected;
 
@@ -162,21 +144,16 @@ public class Survivor : NetworkBehaviour
     [SerializeField]
     private GameObject hand;
 
+    private bool escaped;
+
     private Vector3 mPrevPos = Vector3.zero;
 
     private Vector3 mPosDelta = Vector3.zero;
 
-//NOTE: For drowing the keys in the inventory
+    private Character character;
+
+    //NOTE: For drawing the keys in the inventory
     private Rect currentPosition;
-
-    public override void OnStartClient()
-    {
-        if (!isLocalPlayer)
-        {
-            EventManager.playerConnectedEvent.Invoke(playerName);
-        }
-
-    }
 
     public override void OnStartLocalPlayer()
     {
@@ -186,10 +163,7 @@ public class Survivor : NetworkBehaviour
         survivorCamera.enabled = true;
         survivorCamera.GetComponent<AudioListener>().enabled = true;
         controller.enabled = true;
-        this.insanity.enabled = true;
         Cursor.lockState = CursorLockMode.Locked;
-        playerName = Settings.PROFILE_NAME;
-        CmdSetName(playerName);
 
         currentPosition = new Rect
         {
@@ -198,14 +172,7 @@ public class Survivor : NetworkBehaviour
         };
     }
 
-    public override void OnStartServer()
-    {
-        flashlightRoutine = FlashlightRoutine();
-        StartCoroutine(flashlightRoutine);
-        StartCoroutine(TrapDetectionRoutine());
-        StartCoroutine(ServerCalcStamina());
-    }
-
+    [Client]
     private void LateUpdate()
     {
         if (!isLocalPlayer)
@@ -243,6 +210,7 @@ public class Survivor : NetworkBehaviour
         flashlight.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
     }
 
+    [Client]
     private void Update()
     {
         if (!isLocalPlayer)
@@ -293,7 +261,7 @@ public class Survivor : NetworkBehaviour
 
         if (Keybinds.GetKey(Action.SwitchFlashlight))
         {
-            CmdToggleFlashlight();
+            NetworkClient.Send(new ServerClientGameToggledFlashlightMessage{toggled = !this.toggled});
         }
 
         else if (Keybinds.GetKey(Action.Crouch))
@@ -310,12 +278,12 @@ public class Survivor : NetworkBehaviour
 
         else if (Keybinds.GetKey(Action.Sprint) && isMoving)
         {
-            CmdStartSprinting(isMoving);
+
         }
 
         else if (Keybinds.GetKey(Action.Sprint, true) && !isMoving)
         {
-            CmdStopSprinting();
+
         }
 
 
@@ -334,7 +302,7 @@ public class Survivor : NetworkBehaviour
 
         else if (Keybinds.GetKey(Action.Grab))
         {
-            CmdActionGrab();
+            Grab();
         }
 
         else if (Keybinds.GetKey(Action.Grab, true))
@@ -348,113 +316,74 @@ public class Survivor : NetworkBehaviour
         controller.Move(secondMove * currentSpeed * Time.deltaTime);
     }
 
-
-
-    [ClientRpc]
-    private void RpcDie(string playerName)
-    {
-        EventManager.survivorDeathEvent.Invoke(playerName);
-
-        if (!isLocalPlayer)
-        {
-            deathSound.Play();
-        }
-    }
-
-
-
-
-    [ClientRpc]
-    private void RpcPlayerRecievedChatMessage(string playerName, string message)
-    {
-        EventManager.playerRecievedChatMessageEvent.Invoke(playerName, message);
-    }
-
-    [ClientRpc]
-    private void RpcPlayerChangedProfileName(string oldName, string newName)
-    {
-        EventManager.playerChangedNameEvent.Invoke(oldName, newName);
-    }
-
-
-    // TODO: DO we need the command and targets for these functions?
-    // NOTE: Called if the player is the Lurker.
-
-    [TargetRpc]
-    private void TargetHide()
-    {
-        survivorRenderer.enabled = false;
-    }
-
-    // NOTE: Called if the player is the Lurker.
-
-    [TargetRpc]
-    private void TargetShow()
-    {
-        survivorRenderer.enabled = true;
-    }
-
-    public string Name()
-    {
-        return playerName;
-    }
-
-    public bool Dead()
-    {
-        return dead;
-
-    }
-
-    public bool Disconnected()
-    {
-        return disconnected;
-
-    }
-
-    public bool Escaped()
-    {
-        return isInEscapeRoom;
-    }
-
-    public void SetEscaped(bool escaped)
-    {
-        isInEscapeRoom = escaped;
-    }
-
-    public SyncList<Key> Items()
-    {
-        return keys;
-    }
-
-    [Command]
-    public void CmdToggleFlashlight()
-    {
-        toggled = !toggled;
-    }
-
-    [Client]
-    private void SurvivorToggledFlashlight(bool oldToggle, bool newToggle)
-    {
-        flashlightToggleSound.Play();
-        flashlight.enabled = newToggle;
-    }
-
-    [Client]
-    private void SurvivorFlashlightChargeChanged(float oldValue, float newValue)
-    {
-        flashlight.intensity = newValue;
-    }
-
-    public float GetEnergyNeededToSprint()
-    {
-        return energyNeededToSprint;
-    }
-
     public GameObject Hand()
     {
         return hand;
     }
 
+    public Character PlayerCharacter()
+    {
+        return character;
+    }
+
+    public bool Dead()
+    {
+        return isDead;
+    }
+
+    public void SetDead(bool value)
+    {
+        isDead = value;
+    }
+
+    [Server]
+    public Insanity SurvivorInsanity()
+    {
+        return insanity;
+
+    }
+
+    public float TrapDistance()
+    {
+        return trapDistance;
+    }
+
+    [Server]
+    public float FlashlightCharge()
+    {
+        return charge;
+    }
+
+    [Server]
+    public void RechargeFlashlight()
+    {
+        charge = maxCharge;
+    }
+
+    [Server]
+    public Inventory Items()
+    {
+        return inventory;
+    }
+
+    [Server]
+    public void SetEscaped(bool value)
+    {
+        escaped = value;
+    }
+
+    [Server]
+    public bool Escaped()
+    {
+        return escaped;
+    }
+
+    public string Name()
+    {
+        return name;
+    }
+
+    [Server]
     public float GrabDistance()
     {
         return grabDistance;
@@ -473,181 +402,45 @@ public class Survivor : NetworkBehaviour
         }
     }
 
-    [Client]
-    public void OnGui()
-    {
-        if (windows.IsWindowOpen())
-        {
-            return;
-        }
+    //[Client]
+    //public void OnGui()
+    //{
+    //    if (windows.IsWindowOpen())
+    //    {
+    //        return;
+    //    }
 
-        int currentX = Screen.width - 20;
-        int currentY = 20;
+    //    int currentX = Screen.width - 20;
+    //    int currentY = 20;
 
-        for (var i = 0; i < keys.Count; i++)
-        {
-            Texture itemIcon = keys[i].Texture();
+    //    // TODO: Client only needs to know the key type to draw it. Everything else is server sided.
+    //    for (var i = 0; i < keyTypes.Count; i++)
+    //    {
+    //        if (i % 8 == 0)
+    //        {
+    //            // Go back to the top where we were when we started and then go left 50 because images will be 50 in pixels
+    //            currentX -= 50;
+    //            currentY = 20;
+    //        }
 
-            if (i % 8 == 0)
-            {
-                // Go back to the top where we were when we started and then go left 50 because images will be 50 in pixels
-                currentX -= 50;
-                currentY = 20;
-            }
+    //        currentPosition.x = currentX;
+    //        currentPosition.y = currentY;
+    //        Texture texture = null;
 
-            currentPosition.x = currentX;
-            currentPosition.y = currentY;
-            GUI.DrawTexture(currentPosition, itemIcon);
-            currentY += 35;
+    //        switch (keyTypes[i])
+    //        {
 
-        }
-    }
+    //        }
+    //        GUI.DrawTexture(currentPosition, itemIcon);
+    //        currentY += 35;
+
+    //    }
+    //}
 
     #region SERVER
 
-    [Server]
-    private IEnumerator FlashlightRoutine()
-    {
-        while (true)
-        {
-            if (toggled && !flashlightDead)
-            {
-                ServerUpdateFlashlight();
-            }
-
-            else if (matchOver || dead)
-            {
-                Debug.Log("Flashlight routine stopped.");
-                yield break;
-            }
-
-            yield return new WaitForSeconds(1);
-        }
-    }
-
-    [Server]
-    private void ServerUpdateFlashlight()
-    {
-        charge -= dischargeRate;
-
-        if (charge <= minCharge)
-        {
-            charge = minCharge;
-            flashlightDead = true;
-        }
-    }
-
-    [Server]
-    private IEnumerator ServerCalcStamina()
-    {
-        while (true)
-        {
-            //don't need to do any calcs if Match is over or Char is dead, so check first.
-            if (isMatchOver || isDead)
-            {
-                yield break;
-            }
-
-            if (sprinting)
-            {
-                sprintEnergy -= sprintConsumptionRate;
-
-                if (sprintEnergy > sprintMinEnergy)
-                {
-                    sprintEnergy = sprintMinEnergy;
-                }
-
-                else
-                {
-                    outOfBreath.Play();
-                    sprinting = false;
-                }
-
-                yield return new WaitForSeconds(sprintConsumptionRate);
-            }
-
-            else
-            {
-                if (sprintEnergy < sprintMaxEnergy)
-                {
-                    sprintEnergy += sprintRegenerationRate;
-                }
-
-                else if (sprintEnergy >= sprintMaxEnergy)
-                {
-                    sprintEnergy = sprintMaxEnergy;
-                }
-            }
-
-            yield return new WaitForSeconds(sprintRegenerationRate);
-        }
-    }
-
-    [Server]
-    public float GetEnergy()
-    {
-        return sprintEnergy;
-    }
-
-    [Server]
-    public float FlashlightCharge()
-    {
-        return charge;
-    }
-
-    [Server]
-    public bool FlashlightToggled()
-    {
-        return toggled;
-    }
-
-    [Server]
-    public bool FlashlightDead()
-    {
-        return flashlightDead;
-    }
-
-    [Server]
-    public void ServerRechargeFlashlight()
-    {
-        charge = maxCharge;
-        flashlight.intensity = maxCharge;
-        flashlightDead = false;
-    }
-
-    [Server]
-    private IEnumerator TrapDetectionRoutine()
-    {
-        while (true)
-        {
-            RaycastHit[] objectsHit = Physics.SphereCastAll(transform.position, trapDistance, transform.forward, trapDistance);
-
-            for (var i = 0; i < objectsHit.Length; i++)
-            {
-                GameObject hitObject = objectsHit[i].collider.gameObject;
-
-                if (hitObject.CompareTag(Tags.TRAP))
-                {
-                    Trap trap = hitObject.GetComponent<Trap>();
-
-                    if (trap.Armed())
-                    {
-                        trap.CmdTriggerTrap();
-                    }
-                }
-            }
-
-            if (matchOver || dead)
-            {
-                yield break;
-            }
-
-            yield return new WaitForSeconds(0.5f);
-        }
-    }
-
-    [Command]
-    private void CmdActionGrab()
+    [Client]
+    private void Grab()
     {
         RaycastHit hit;
 
@@ -659,25 +452,21 @@ public class Survivor : NetworkBehaviour
 
             if (gameObject.CompareTag(Tags.KEY))
             {
-                KeyObject keyObject = gameObject.GetComponent<KeyObject>();
-                keyObject.CmdPlayerClickedOnKey();
+                uint clickedkeyId = gameObject.GetComponent<KeyObject>().netIdentity.netId;
+                NetworkClient.Send(new ServerClientGameClickedOnKeyMessage{requestedKeyId = clickedkeyId});
             }
 
             else if (gameObject.CompareTag(Tags.DOOR))
             {
-                Door door = gameObject.GetComponent<Door>();
-
-                if (!door.Unlocked())
-                {
-                    door.CmdPlayerClickedOnLockedDoor();
-                    return;
-                }
+                uint clickedDoorId = gameObject.GetComponent<Door>().netIdentity.netId;
+                NetworkClient.Send(new ServerClientGameClickedOnDoorMessage{requestedDoorID = clickedDoorId});
+            
             }
 
             else if (gameObject.CompareTag(Tags.BATTERY))
             {
-                Battery battery = gameObject.GetComponent<Battery>();
-                battery.CmdPlayerClickedOnBattery();
+                uint clickedBatteryId = gameObject.GetComponent<Battery>().netIdentity.netId;
+                NetworkClient.Send(new ServerClientGameClickedOnBatteryMessage{requestedBatteryId = clickedBatteryId});
             }
 
             else if (gameObject.CompareTag(Tags.DARNED_OBJECT))
@@ -688,63 +477,5 @@ public class Survivor : NetworkBehaviour
             }
         }
     }
-
-    [Command]
-    public void CmdDie()
-    {
-        dead = true;
-        sprinting = false;
-        RpcDie(this.playerName);
-    }
-
-    [Command]
-    private void CmdStopSprinting()
-    {
-        sprinting = false;
-    }
-
-    [Command]
-    public void Hide()
-    {
-        TargetHide();
-    }
-
-    [Command]
-    public void Show()
-    {
-        TargetShow();
-    }
-
-    [Command]
-    private void CmdSetName(string newPlayerName)
-    {
-        playerName = newPlayerName;
-    }
-
-    [Command]
-    private void CmdOnPlayerChangedProfileNameEvent(string oldName, string newName)
-    {
-        playerName = newName;
-        RpcPlayerChangedProfileName(oldName, newName);
-    }
-
-    [Command]
-    private void CmdOnPlayerSentMessage(string playerName, string message)
-    {
-        RpcPlayerRecievedChatMessage(playerName, message);
-    }
-
-    [Command]
-    private void CmdStartSprinting(bool isMoving)
-    {
-        if (isMoving && (sprintEnergy >= energyNeededToSprint))
-        {
-            sprinting = true;
-            sprintEnergy -= 3f;
-            //immediately consume energy
-            //sprintEnergy = -3.0f / sprintTickRate;
-        }
-    }
-
 }
 #endregion

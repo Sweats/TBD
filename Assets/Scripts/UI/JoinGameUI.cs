@@ -76,7 +76,7 @@ public class JoinGameUI : MonoBehaviour
     {
         lobbyButtonList = new List<LobbyButton>();
         this.enabled = false;
-        EventManager.masterServerSentLobbyListEvent.AddListener(OnGetServers);
+        EventManager.masterServerClientSentUsLobbyListEvent.AddListener(OnGetServers);
 
     }
 
@@ -96,10 +96,10 @@ public class JoinGameUI : MonoBehaviour
         for (var i = 0; i < lobbies.Length; i++)
         {
             Lobby lobby = lobbies[i];
-            string lobbyName = lobby.lobbyName;
+            string lobbyName = lobby.name;
             string hostName = lobby.hostname;
             byte players = lobby.players;
-            bool isPrivate = lobby.privateLobby;
+            bool isPrivate = lobby.isPrivate;
             int id = lobby.id;
             StageName stage = lobby.stage;
             AddLobbyToList(lobby);
@@ -134,9 +134,9 @@ public class JoinGameUI : MonoBehaviour
         stageButton.transform.SetParent(buttonTemplate.transform.parent);
 
         idButton.GetComponentInChildren<Text>().text = $"{lobby.id}";
-        lobbyNameButton.GetComponentInChildren<Text>().text = lobby.lobbyName;
+        lobbyNameButton.GetComponentInChildren<Text>().text = lobby.name;
         playerCountButton.GetComponentInChildren<Text>().text = $"{lobby.players}/5";
-        privateButton.GetComponentInChildren<Text>().text = $"{lobby.privateLobby}";
+        privateButton.GetComponentInChildren<Text>().text = $"{lobby.isPrivate}";
         inLobbyButton.GetComponentInChildren<Text>().text = $"{lobby.inLobby}";
         stageButton.GetComponentInChildren<Text>().text = Stages.Name(lobby.stage);
 

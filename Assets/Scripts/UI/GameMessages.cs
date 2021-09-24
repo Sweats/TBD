@@ -26,21 +26,21 @@ public class GameMessages : MonoBehaviour
         stringBuilder = new StringBuilder();
         messages = new List<string>();
 
-        EventManager.survivorDeathEvent.AddListener(OnSurvivorDeath);
-        EventManager.survivorFailedToPickUpBatteryEvent.AddListener(OnFailedToPickUpBatteryEvent);
-        EventManager.playerPickedUpKeyEvent.AddListener(OnSurvivorGrabbedKey);
+        EventManager.clientServerGameSurvivorDeathEvent.AddListener(OnSurvivorDeath);
+        EventManager.clientServerGameFaliedToPickUpBatteryEvent.AddListener(OnFailedToPickUpBatteryEvent);
+        EventManager.clientServerGameSurvivorPickedUpKeyEvent.AddListener(OnSurvivorGrabbedKey);
         EventManager.survivorPickedUpBatteryEvent.AddListener(OnPickedUpBatteryEvent);
-        EventManager.survivorUnlockDoorEvent.AddListener(OnSurvivorUnlockedDoor);
-        EventManager.playerConnectedEvent.AddListener(OnPlayerConnect);
-        EventManager.playerDisconnectedEvent.AddListener(OnPlayerDisconnect);
-        EventManager.lurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
-        EventManager.maryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
-        EventManager.maryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
-        EventManager.lobbyClientKickedEvent.AddListener(OnLobbyHostKickedPlayer);
-        EventManager.lobbyYouHaveBeenKickedEvent.AddListener(OnLobbyHostKickedYou);
-        EventManager.stageClientServerDisconnectdEvent.AddListener(OnStageClientServerDisconnected);
-        EventManager.lobbyClientServerPickedNewHostEvent.AddListener(OnLobbyServerAssignedANewHost);
-        EventManager.lobbyClientServerAssignedYouHostEvent.AddListener(OnLobbyServerAssignedYouHost);
+        EventManager.clientServerGameSurvivorUnlockedDoorEvent.AddListener(OnSurvivorUnlockedDoor);
+        EventManager.clientServerGamePlayerConnectedEvent.AddListener(OnPlayerConnect);
+        EventManager.clientServerGamePlayerDisconnectedEvent.AddListener(OnPlayerDisconnect);
+        EventManager.clientServerGameLurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
+        EventManager.ClientServerGameMaryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
+        EventManager.clientServerGameMaryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
+        EventManager.clientServerLobbyClientKickedEvent.AddListener(OnLobbyHostKickedPlayer);
+        EventManager.clientServerLobbyHostKickedYouEvent.AddListener(OnLobbyHostKickedYou);
+        EventManager.ClientServerGamePlayerDisconnectEvent.AddListener(OnStageClientServerDisconnected);
+        EventManager.clientServerLobbyServerPickedNewHostEvent.AddListener(OnLobbyServerAssignedANewHost);
+        EventManager.clientServerLobbyServerAssignedYouHostEvent.AddListener(OnLobbyServerAssignedYouHost);
         //EventManager.lobbyServerPlayerJoinedLobbyEvent.AddListener(OnPlayerJoinedLobby);
     }
 

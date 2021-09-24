@@ -256,13 +256,13 @@ public class Mary : NetworkBehaviour
     [TargetRpc]
     private void TargetReadyToTeleport()
     {
-        EventManager.maryReadyToTeleportEvent.Invoke();
+        EventManager.clientServerGameMaryReadyToTeleportEvent.Invoke();
     }
 
     [TargetRpc]
     private void TargetReadyToFrenzy()
     {
-        EventManager.maryReadyToFrenzyEvent.Invoke();
+        EventManager.ClientServerGameMaryReadyToFrenzyEvent.Invoke();
     }
 
 
