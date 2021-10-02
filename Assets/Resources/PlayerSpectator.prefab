@@ -1282,6 +1282,10 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   spectatorCamera: {fileID: 7240891219159024207}
+  name: 
+  pickCharacterUI: {fileID: 7976944816727031556}
+  inputModule: {fileID: 6637064507634116591}
+  eventSystem: {fileID: 3463344266864509330}
 --- !u!1 &6042486542563636986
 GameObject:
   m_ObjectHideFlags: 0
@@ -1533,7 +1537,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6189322000779586417}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
   m_Name: 
@@ -1548,7 +1552,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6189322000779586417}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
   m_Name: 
@@ -2408,7 +2412,7 @@ Canvas:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8954008182245123443}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_RenderMode: 0
   m_Camera: {fileID: 0}

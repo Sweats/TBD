@@ -43,7 +43,7 @@ public class ServerLobby: MonoBehaviour
 
             if (oldSurvivorObject != null)
             {
-                Character survivorCharacter = oldSurvivorObject.PlayerCharacter();
+                Character survivorCharacter = oldSurvivorObject.ServerPlayerCharacter();
                 RespawnAsLobbyPlayer(connection, survivorCharacter);
                 NetworkServer.Destroy(oldSurvivorObject.gameObject);
                 continue;

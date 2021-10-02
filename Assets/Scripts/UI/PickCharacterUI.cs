@@ -67,17 +67,16 @@ public class PickCharacterUI : MonoBehaviour
     [SerializeField]
     private Canvas pickCharacterCanvas;
 
-    private void Start()
-    {
-        EventManager.clientServerGameAskedYouToPickCharacterEvent.AddListener(OnServerAskedYouToPickCharacter);
-    }
-
     public void OnCharacterButtonClicked(int value)
     {
-        Debug.Log($"You clicked on a button and the value is {value}");
         Character character = (Character)value;
         NetworkClient.Send(new ServerClientGamePlayerPickedCharacterMessage{pickedCharacter = character });
         Hide();
+    }
+
+    public void LocalPlayerStart()
+    {
+        EventManager.clientServerGameAskedYouToPickCharacterEvent.AddListener(OnServerAskedYouToPickCharacter);
     }
 
     public void Show()
@@ -91,9 +90,8 @@ public class PickCharacterUI : MonoBehaviour
 
     }
 
-    private void OnServerAskedYouToPickCharacter(Character[] unavailableCharacters)
+    public void OnServerAskedYouToPickCharacter(Character[] unavailableCharacters)
     {
-        Debug.Log("Server asked you to pick a character!");
         int count = 0;
 
         for (var i = 0; i < unavailableCharacters.Length; i++)

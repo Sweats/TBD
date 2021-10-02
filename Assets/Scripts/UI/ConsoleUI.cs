@@ -20,24 +20,20 @@ public class ConsoleUI : MonoBehaviour
     [SerializeField]
     private Windows window;
 
-    // Start is called before the first frame update
-    private void Start()
+    public void LocalPlayerStart()
     {
         this.enabled = false;
         stringBuilder = new StringBuilder();
         EventManager.clientServerGameMonsterWonEvent.AddListener(OnMonsterWon);
         EventManager.clientServerGamePlayerConnectedEvent.AddListener(OnPlayerConnected);
         EventManager.clientServerGamePlayerDisconnectedEvent.AddListener(OnPlayerDisconnected);
-        EventManager.clientServerGameSurvivorDeathEvent.AddListener(OnSurvivorDeath);
+        EventManager.clientServerGameSurvivorKilledEvent.AddListener(OnSurvivorKilled);
         EventManager.clientServerGamePlayerSentChatMessageEvent.AddListener(OnPlayerSentChatMessage);
-        EventManager.playerRecievedChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
-        EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStage);
-        EventManager.failedToLoadStageEvent.AddListener(OnFailedToLoadStage);
+        EventManager.clientServerGameSurvivorsEscapedEvent.AddListener(OnSurvivorsEscapedStage);
         EventManager.clientServerGameSurvivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
         EventManager.clientServerGameSurvivorUnlockedDoorEvent.AddListener(OnSurvivorUnlockedDoor);
         EventManager.clientServerGamePlayerChangedNameEvent.AddListener(OnPlayerChangedProfileName);
     }
-
 
     private void Update()
     {
@@ -83,10 +79,10 @@ public class ConsoleUI : MonoBehaviour
     }
 
 
-    private void OnSurvivorDeath(string playerName)
+    private void OnSurvivorKilled(string playerName)
     {
         stringBuilder.AppendLine();
-        string text = string.Empty;
+        string text = $"{playerName} died!";
         UpdateConsoleText(text);
     }
 
@@ -135,16 +131,8 @@ public class ConsoleUI : MonoBehaviour
         DateTime currentDateTime = DateTime.Now;
         return currentDateTime.ToString("HH:mm:ss");
     }
-
-    private void OnPlayerRecievedChatMessage(string playerName, string message)
+    private void OnPlayerSentChatMessage(string text)
     {
-        string text = $"{playerName}: {message}";
-        UpdateConsoleText(text);
-    }
-
-    private void OnPlayerSentChatMessage(string playerName, string message)
-    {
-        string text = $"{playerName}: {message}";
         UpdateConsoleText(text);
     }
 

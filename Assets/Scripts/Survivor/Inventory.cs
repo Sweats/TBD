@@ -8,34 +8,22 @@ public class Inventory : MonoBehaviour
 
     private Rect currentPosition;
 
-
-    private void Start()
+    public void ServerInit()
     {
         keys = new List<Key>();
-
     }
 
-    public void Add(Key key, Texture keyIcon)
+    public void ServerAdd(Key key)
     {
         keys.Add(key);
     }
 
-    public void Add(Key key)
-    {
-        keys.Add(key);
-    }
-
-    public Key[] Keys()
+    public Key[] ServerKeys()
     {
         return keys.ToArray();
     }
 
-    public void Clear()
-    {
-        keys.Clear();
-    }
-
-    public void Draw()
+    public void ClientDraw()
     {
         int currentX = Screen.width - 20;
         int currentY = 20;

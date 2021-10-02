@@ -4,6 +4,8 @@ using Mirror;
 
 public class Phantom : NetworkBehaviour
 {
+    [SyncVar]
+    private string name;
     [SerializeField]
     [SyncVar]
     private float speed;
@@ -68,6 +70,12 @@ public class Phantom : NetworkBehaviour
     public override void OnStartServer()
     {
 
+    }
+
+    [Server]
+    public string Name()
+    {
+        return name;
     }
 
     [Client]
@@ -203,7 +211,6 @@ public class Phantom : NetworkBehaviour
                 if (hitGameObject.CompareTag(Tags.SURVIVOR))
                 {
                     Survivor survivor = hitGameObject.GetComponent<Survivor>();
-                    survivor.CmdDie();
                 }
             }
 

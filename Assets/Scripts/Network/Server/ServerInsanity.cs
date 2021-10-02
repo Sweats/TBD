@@ -14,10 +14,38 @@ public class ServerInsanity: MonoBehaviour
     {
         this.insanityRate = insanityRate;
         this.insanityEnabled = insanityEnabled;
+    }
 
+    public void RegisterNetworkHandlers()
+    {
+        NetworkServer.RegisterHandler<ServerClientGameHostRequestedToStartGameMessage>(OnServerClientGameHostStartedGame);
+        EventManager.serverClientGameSurvivorsEscapedEvent.AddListener(OnServerClientGameSurvivorsEscapedEvent);
+        EventManager.serverClientGameSurvivorsDeadEvent.AddListener(OnServerClientGameSurvivorsDeadEvent);
+
+    }
+
+    private void OnServerClientGameHostStartedGame(NetworkConnection connection, ServerClientGameHostRequestedToStartGameMessage message)
+    {
         if (insanityEnabled)
         {
             insanityRoutine = StartCoroutine(ServerInsanityRoutine());
+        }
+
+    }
+
+    private void OnServerClientGameSurvivorsEscapedEvent()
+    {
+        if (insanityEnabled)
+        {
+            StopCoroutine(insanityRoutine);
+        }
+    }
+
+    private void OnServerClientGameSurvivorsDeadEvent()
+    {
+        if (insanityEnabled)
+        {
+            StopCoroutine(insanityRoutine);
         }
 
     }

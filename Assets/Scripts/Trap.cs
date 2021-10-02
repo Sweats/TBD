@@ -21,8 +21,9 @@ public class Trap : NetworkBehaviour
     public float trapTimerRate;
 
     [SerializeField]
-    [SyncVar(hook = nameof(OnTrapTriggered))]
     private bool armed;
+
+    private bool armable;
 
     [SerializeField]
     private MeshRenderer trapRenderer;
@@ -35,17 +36,19 @@ public class Trap : NetworkBehaviour
     private void Start()
     {
         originalColor = trapRenderer.material.color;
-        armed = true;
+        armable = false;
     }
 
-    public bool Armed()
+    [Server]
+    public bool ServerArmed()
     {
         return armed;
     }
 
-    public void Disarm()
+    [Server]
+    public void ServerArm()
     {
-        armed = false;
+        armed = true;
     }
 
     [Server]
@@ -55,33 +58,31 @@ public class Trap : NetworkBehaviour
 
     }
 
-    // For the Lurker monster.
-    [Client]
-    public void Glow()
+    [Server]
+    public void ServerDisarm()
     {
-        Debug.Log("Glowing...");
-        trapRenderer.material.SetColor("_Color", Color.white);
+        armed = false;
+    }
 
+    [Server]
+    public bool ServerArmable()
+    {
+        return armable;
+    }
+
+    [Server]
+    public void ServerSetArmable(bool armable)
+    {
+        this.armable = armable;
     }
 
     [Client]
-    public void Unglow()
+    public void ClientTrapTriggered()
     {
-        Debug.Log("Unglowing...");
-        trapRenderer.material.SetColor("_Color", originalColor);
+        trapSound.Play();
     }
 
-    [Client]
-    private void OnTrapTriggered()
-    {
-        if (!armed)
-        {
-            //AudioSource.PlayClipAtPoint(trapSound, this.transform.position);
-
-        }
-
-    }
-
+    [Server]
     public float HitAmount()
     {
         return trapInsanityHitAmount;

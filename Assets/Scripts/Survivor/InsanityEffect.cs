@@ -1,10 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.Events;
 using System.Collections;
 using UnityEngine.Audio;
-
-// will be used to show spectating players the insaniy effect that the player is currently seeing.
-//public class InsanityEffectEvent : UnityEvent<InsanityEffect> { }
 
 public class InsanityEffect : MonoBehaviour
 {
@@ -16,7 +12,6 @@ public class InsanityEffect : MonoBehaviour
     public float timer = 100;
 
     public AudioSource insanitySoundEffect;
-    public InsanityEffectEvent insanityEffectEvent;
 
     public AudioMixer audioMixer;
 

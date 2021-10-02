@@ -18,11 +18,6 @@ public class PauseUI : MonoBehaviour
     [SerializeField]
     private Windows windows;
 
-    private void Start()
-    {
-        this.enabled = false;
-    }
-
     private void Update()
     {
         if (Keybinds.GetKey(Action.GuiReturn))

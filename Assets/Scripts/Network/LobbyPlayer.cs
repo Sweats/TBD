@@ -13,10 +13,10 @@ public class LobbyPlayer : NetworkBehaviour
 
     [SyncVar]
     private string name;
+
     public override void OnStartLocalPlayer()
     {
-        this.name = Settings.PROFILE_NAME;
-        CmdSetProfileName(this.name);
+        CmdSetProfileName(Settings.PROFILE_NAME);
     }
 
     [Command]

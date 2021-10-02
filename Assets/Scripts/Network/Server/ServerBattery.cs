@@ -1,6 +1,6 @@
 using Mirror;
 using UnityEngine;
-public class ServerBattery
+public class ServerBattery: MonoBehaviour
 {
     private ServerBattery(){}
 

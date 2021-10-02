@@ -1,7 +1,7 @@
 using UnityEngine;
 using Mirror;
 
-public class ClientLobby : MonoBehaviour
+public class ClientLobby: MonoBehaviour
 {
     private ClientLobby(){}
 
@@ -36,9 +36,8 @@ public class ClientLobby : MonoBehaviour
 
     private void OnClientServerLobbyPlayerSentChat(NetworkConnection connection, ClientServerLobbyPlayerSentChatMessage message)
     {
-        string text = message.text;
-        string clientName = message.clientName;
-        EventManager.clientServerLobbyPlayerSentChatMessageEvent.Invoke(text, clientName);
+        string text = message.chatMessage;
+        EventManager.clientServerLobbyPlayerSentChatMessageEvent.Invoke(text);
 
     }
 

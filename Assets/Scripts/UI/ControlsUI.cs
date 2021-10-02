@@ -123,13 +123,9 @@ public class ControlsUI : MonoBehaviour
         }
     }
 
-    private void Awake()
-    {
-        Keybinds.Init();
-    }
-
     private void Start()
     {
+        Keybinds.Init();
         this.enabled = false;
         SetUpButtons();
 

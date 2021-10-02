@@ -29,12 +29,6 @@ public class Stages
         {
             SceneManager.LoadScene(stagesDict[stageName]);
         }
-
-        else
-        {
-            string stageNameFailedToLoad = stagesDict[stageName];
-            EventManager.failedToLoadStageEvent.Invoke(stageNameFailedToLoad);
-        }
     }
 
     public static string Name(StageName name)

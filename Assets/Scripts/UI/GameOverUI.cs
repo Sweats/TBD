@@ -10,10 +10,9 @@ public class GameOverUI : MonoBehaviour
     [SerializeField]
     private Canvas gameOverCanvas;
 
-
-    private void Start()
+    public void LocalPlayerStart()
     {
-        EventManager.survivorsEscapedStageEvent.AddListener(OnSurvivorsEscapedStageEvent);
+        EventManager.clientServerGameSurvivorsEscapedEvent.AddListener(OnSurvivorsEscapedStageEvent);
         EventManager.clientServerGameMonsterWonEvent.AddListener(OnSurvivorsLost);
     }
 
@@ -42,7 +41,7 @@ public class GameOverUI : MonoBehaviour
 
     private void OnSurvivorsLost()
     {
-        const string MONSTER_WON_TEXT = "The monster has won...";
+         const string MONSTER_WON_TEXT = "The monster has won...";
          StartCoroutine(CountDown(MONSTER_WON_TEXT));
     }
  }

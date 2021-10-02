@@ -1,13 +1,14 @@
 using Mirror;
 using UnityEngine;
 
-public class ServerDoor
+public class ServerDoor: MonoBehaviour
 {
     private ServerDoor(){}
 
     public void RegisterNetworkHandlers()
     {
         NetworkServer.RegisterHandler<ServerClientGameClickedOnDoorMessage>(OnServerClientPlayerClickedOnDoor);
+        NetworkServer.RegisterHandler<ServerClientGameDoorBumpedIntoMessage>(OnServerClientGameDoorBumpedInto);
 
     }
 
@@ -21,19 +22,27 @@ public class ServerDoor
 
         Survivor survivor = connection.identity.GetComponent<Survivor>();
 
-        // NOTE: The player is a monster.
-        if (survivor == null)
+        Door door = NetworkIdentity.spawned[message.requestedDoorID].GetComponent<Door>();
+        //NOTE: Seeing as we trust the client to send us the correct netid, a malicious client could crash the server by sending net ids that does not match a door.
+        if (door == null)
         {
-            ClientServerGameDoorFailedToUnlockMessage clientServerGameDoorFailedToUnlockMessage = new ClientServerGameDoorFailedToUnlockMessage{};
-            NetworkServer.SendToReady(clientServerGameDoorFailedToUnlockMessage);
             return;
         }
 
-        Door door = NetworkIdentity.spawned[message.requestedDoorID].GetComponent<Door>();
-
-        //NOTE: Seeing as we trust the client to send us the correct netid, a malicious client could crash the server by sending net ids that don't match a door.
-        if (door == null)
+        if (door.ServerUnlocked())
         {
+            return;
+        }
+
+        // NOTE: The player is a monster.
+        if (survivor == null)
+        {
+            ClientServerGameDoorFailedToUnlockMessage clientServerGameDoorFailedToUnlockMessage = new ClientServerGameDoorFailedToUnlockMessage
+            {
+                doorId = door.netIdentity.netId,
+            };
+
+            NetworkServer.SendToReady(clientServerGameDoorFailedToUnlockMessage);
             return;
         }
 
@@ -47,7 +56,7 @@ public class ServerDoor
             return;
         }
 
-        Key[] keys = survivor.Items().Keys();
+        Key[] keys = survivor.Items().ServerKeys();
         bool unlocked = false;
 
         for (var i = 0; i < keys.Length; i++)
@@ -57,26 +66,58 @@ public class ServerDoor
             if (key.Mask() == door.UnlockMask())
             {
                 unlocked = true;
-                door.Unlock();
+                door.ServerUnlock();
                 string survivorName = survivor.Name();
                 string doorName = door.Name();
 
                 ClientServerGameDoorUnlockedMessage clientServerGameDoorUnlockedMessage = new ClientServerGameDoorUnlockedMessage()
                 {
-                    doorName  = doorName,
-                    playerName = survivorName
+                    doorId = door.netIdentity.netId,
+                    playerName = survivorName,
+                    keyName = key.Name()
                 };
 
 
-                NetworkServer.SendToReady(message);
+                NetworkServer.SendToReady(clientServerGameDoorUnlockedMessage);
                 break;
             }
         }
 
         if (!unlocked)
         {
-            ClientServerGameDoorFailedToUnlockMessage clientServerGameDoorFailedToUnlockMessage = new ClientServerGameDoorFailedToUnlockMessage{};
+            ClientServerGameDoorFailedToUnlockMessage clientServerGameDoorFailedToUnlockMessage = new ClientServerGameDoorFailedToUnlockMessage
+            {
+                doorId = door.netIdentity.netId,
+            };
+
             NetworkServer.SendToReady(clientServerGameDoorFailedToUnlockMessage);
         }
+    }
+
+    private void OnServerClientGameDoorBumpedInto(NetworkConnection connection, ServerClientGameDoorBumpedIntoMessage message)
+    {
+        uint id = message.requestedDoorID;
+
+        if (!NetworkIdentity.spawned.ContainsKey(id))
+        {
+            return;
+        }
+
+        Door door = NetworkIdentity.spawned[id].GetComponent<Door>();
+
+        if (door == null)
+        {
+            return;
+        }
+
+        if (!door.ServerUnlocked())
+        {
+            return;
+        }
+
+        //NOTE: Mirror will sync the movement for us
+        float doorPushStrength = door.PushStrength();
+        Vector3 velocity = doorPushStrength * message.moveDirection;
+        door.AddForce(velocity);
     }
 }

@@ -425,7 +425,6 @@ public class LobbyUI : MonoBehaviour
         if (hostingLobby)
         {
             NetworkManager.singleton.StopHost();
-            DarnedNetworkManager.Log("You are no longer hosting the server!");
         }
 
         else
@@ -438,10 +437,9 @@ public class LobbyUI : MonoBehaviour
         Stages.Load(StageName.Menu);
     }
 
-    private void OnPlayerRecievedChatMessage(string text, string clientName)
+    private void OnPlayerRecievedChatMessage(string text)
     {
-        string newText = $"{clientName}: {text}";
-        chatStringBuilder.AppendLine(newText);
+        chatStringBuilder.AppendLine(text);
         chatMessageBox.text = chatStringBuilder.ToString();
     }
 
@@ -519,7 +517,7 @@ public class LobbyUI : MonoBehaviour
             if (chatMessageBoxInput.text != string.Empty)
             {
                 string chatMessageText = chatMessageBoxInput.text;
-                NetworkClient.Send(new ServerClientPlayerSentChatMessage { playerName = Settings.PROFILE_NAME, text = chatMessageText });
+                NetworkClient.Send(new ServerClientLobbyPlayerSentChatMessage {text = chatMessageText});
                 chatMessageBoxInput.text = string.Empty;
                 chatMessageBoxInput.Select();
             }

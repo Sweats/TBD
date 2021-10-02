@@ -82,7 +82,6 @@ public class JoinGameUI : MonoBehaviour
 
     private void CreateMasterServerManager()
     {
-        DarnedNetworkManager.CLIENT_HOSTING_LOBBY = false;
         GameObject dedicatedServerObject = (GameObject)Resources.Load("Darned Master Server Manager");
         GameObject spawnedGameobject = Instantiate(dedicatedServerObject);
         NetworkManager.singleton.StartClient();

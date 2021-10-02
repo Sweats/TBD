@@ -46,8 +46,10 @@ public class DarnedNetworkManager: NetworkManager
     private ClientKey clientKey;
 
     [SerializeField]
-    private float survivorInsanityRate;
+    private ClientStage clientStage;
 
+    [SerializeField]
+    private float survivorInsanityRate;
 
     public override void OnStartServer()
     {
@@ -74,12 +76,6 @@ public class DarnedNetworkManager: NetworkManager
         }
     }
 
-    public override void OnClientConnect(NetworkConnection conn)
-    {
-        base.OnClientConnect(conn);
-        clientLobby.RegisterNetworkHandlers();
-    }
-
     public override void OnServerSceneChanged(string sceneName)
     {
         base.OnServerSceneChanged(sceneName);
@@ -100,6 +96,16 @@ public class DarnedNetworkManager: NetworkManager
 
         }
 
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        clientBattery.RegisterNetworkHandlers();
+        clientDoor.RegisterNetworkHandlers();
+        clientKey.RegisterNetworkHandlers();
+        clientLobby.RegisterNetworkHandlers();
+        clientStage.RegisterNetworkHandlers();
     }
 
 

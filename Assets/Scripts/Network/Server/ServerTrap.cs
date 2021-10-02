@@ -6,7 +6,6 @@ public class ServerTrap: MonoBehaviour
 {
     private ServerTrap(){}
 
-    private IEnumerator trapRoutine;
     private Coroutine survivorTrapRoutine;
 
     private bool insanityEnabled;
@@ -15,6 +14,32 @@ public class ServerTrap: MonoBehaviour
         this.insanityEnabled = insanityEnabled;
         survivorTrapRoutine = StartCoroutine(ServerSurvivorTrapRoutine());
     }
+
+    public void RegisterNetworkHandlers()
+    {
+        NetworkServer.RegisterHandler<ServerClientGameHostRequestedToStartGameMessage>(OnServerClientGameHostStartedGame);
+        EventManager.serverClientGameSurvivorsDeadEvent.AddListener(OnServerClientSurvivorsDeadEvent);
+        EventManager.serverClientGameSurvivorsEscapedEvent.AddListener(OnServerClientGameSurvivorsEscapedEvent);
+    }
+
+    private void OnServerClientGameSurvivorsEscapedEvent()
+    {
+        StopCoroutine(survivorTrapRoutine);
+
+    }
+
+    private void OnServerClientSurvivorsDeadEvent()
+    {
+        StopCoroutine(survivorTrapRoutine);
+
+    }
+
+    private void OnServerClientGameHostStartedGame(NetworkConnection connection, ServerClientGameHostRequestedToStartGameMessage message)
+    {
+        survivorTrapRoutine = StartCoroutine(ServerSurvivorTrapRoutine());
+    }
+
+
 
     private IEnumerator ServerSurvivorTrapRoutine()
     {
@@ -50,7 +75,13 @@ public class ServerTrap: MonoBehaviour
                     {
                         Trap trap = hitObject.gameObject.GetComponent<Trap>();
 
-                        NetworkServer.SendToReady(new ClientServerGameSurvivorHitTrapMessage{});
+                        if (trap.ServerArmed())
+                        {
+                            trap.ServerDisarm();
+                            uint trapId = trap.netIdentity.netId;
+                            NetworkServer.SendToAll(new ClientServerGameTrapTriggeredMessage{triggeredTrapId = trapId});
+
+                        }
 
                         if (insanityEnabled)
                         {

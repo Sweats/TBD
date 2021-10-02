@@ -32,11 +32,11 @@ public class PlayerStatsUI : MonoBehaviour
     [SerializeField]
     private KeyGUI[] keyGUI;
 
-    private void Start()
+    public void LocalPlayerStart()
     {
-        this.enabled = false;
         //NOTE: Commented out because I'm working on the survivor networking stuff at the moment.
         //EventManager.survivorPickedUpKeyEvent.AddListener(OnSurvivorPickedUpKey);
+
     }
 
     // TO DO: Make this a lot better?
@@ -45,11 +45,11 @@ public class PlayerStatsUI : MonoBehaviour
         //uint id = survivor.SurvivorID();
         uint id = 0;
         int keyType = (int)key.Type();
-        var keys = survivor.Items();
+        var keys = survivor.Items().ServerKeys();
         int rustyKeyCount = 0, metalKeyCount = 0, oldKeyCount = 0, silverKeyCount = 0;
         int crowbarCount = 0, hammerCount = 0, codeCount = 0;
 
-        for (var i = 0; i < keys.Count; i++)
+        for (var i = 0; i < keys.Length; i++)
         {
             Key currentKey = keys[i];
             int type = (int)currentKey.Type();

@@ -38,7 +38,7 @@ public class Chat : MonoBehaviour
         this.enabled = false;
         stringBuilder = new StringBuilder();
         chatMessageBoxInput.text = string.Empty;
-        EventManager.playerRecievedChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
+        EventManager.clientServerGamePlayerSentChatMessageEvent.AddListener(OnPlayerRecievedChatMessage);
         EventManager.clientServerGamePlayerChangedNameEvent.AddListener(OnPlayerChangedProfileNameEvent);
         StartCoroutine(ChatRoutine());
     }
@@ -81,7 +81,7 @@ public class Chat : MonoBehaviour
 
                 if (NetworkClient.active)
                 {
-                    NetworkClient.Send(new ServerPlayerSentChatMessage { playerName = localPlayerName, text = message });
+                    NetworkClient.Send(new ServerClientGamePlayerSentChatMessage{chatText = text });
 
                 }
             }
@@ -154,9 +154,8 @@ public class Chat : MonoBehaviour
         return currentDateTime.ToString("HH:mm:ss");
     }
 
-    private void OnPlayerRecievedChatMessage(string playerName, string message)
+    private void OnPlayerRecievedChatMessage(string text)
     {
-        string text = $"{playerName}: {message}";
         UpdateChatMessagesBox(text);
     }
 

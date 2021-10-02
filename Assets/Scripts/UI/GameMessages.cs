@@ -21,27 +21,28 @@ public class GameMessages : MonoBehaviour
 
     private StringBuilder stringBuilder;
 
-    private void Start()
+    public void LocalPlayerStart()
     {
         stringBuilder = new StringBuilder();
         messages = new List<string>();
+        gameMessagesCanvas.enabled = true;
 
-        EventManager.clientServerGameSurvivorDeathEvent.AddListener(OnSurvivorDeath);
-        EventManager.clientServerGameFaliedToPickUpBatteryEvent.AddListener(OnFailedToPickUpBatteryEvent);
+        EventManager.clientServerGameSurvivorKilledEvent.AddListener(OnSurvivorKilled);
+        EventManager.clientServerGameRejectBatteryPickupEvent.AddListener(OnFailedToPickUpBatteryEvent);
         EventManager.clientServerGameSurvivorPickedUpKeyEvent.AddListener(OnSurvivorGrabbedKey);
-        EventManager.survivorPickedUpBatteryEvent.AddListener(OnPickedUpBatteryEvent);
+        EventManager.clientServerGameYouPickedUpBatteryEvent.AddListener(OnPickedUpBatteryEvent);
         EventManager.clientServerGameSurvivorUnlockedDoorEvent.AddListener(OnSurvivorUnlockedDoor);
-        EventManager.clientServerGamePlayerConnectedEvent.AddListener(OnPlayerConnect);
-        EventManager.clientServerGamePlayerDisconnectedEvent.AddListener(OnPlayerDisconnect);
+        EventManager.clientServerGamePlayerDisconnectedEvent.AddListener(OnPlayerDisconnectMidGame);
         EventManager.clientServerGameLurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
         EventManager.ClientServerGameMaryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
         EventManager.clientServerGameMaryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
         EventManager.clientServerLobbyClientKickedEvent.AddListener(OnLobbyHostKickedPlayer);
         EventManager.clientServerLobbyHostKickedYouEvent.AddListener(OnLobbyHostKickedYou);
-        EventManager.ClientServerGamePlayerDisconnectEvent.AddListener(OnStageClientServerDisconnected);
         EventManager.clientServerLobbyServerPickedNewHostEvent.AddListener(OnLobbyServerAssignedANewHost);
         EventManager.clientServerLobbyServerAssignedYouHostEvent.AddListener(OnLobbyServerAssignedYouHost);
-        //EventManager.lobbyServerPlayerJoinedLobbyEvent.AddListener(OnPlayerJoinedLobby);
+        EventManager.clientServerGamePlayerChangedNameEvent.AddListener(OnPlayerChangedName);
+        EventManager.clientServerGamePlayerConnectedEvent.AddListener(OnPlayerConnectedMidGame);
+        EventManager.clientServerGamePlayerJoinedEvent.AddListener(OnPlayerJoinedMidGame);
     }
 
     private void UpdateChatText()
@@ -62,16 +63,23 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnSurvivorUnlockedDoor(string survivorName, string doorName, string keyName)
+    private void OnPlayerChangedName(string oldName, string newName)
+    {
+        string newMessage = $"{oldName} changed their name to {newName}!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+
+    }
+
+    private void OnSurvivorUnlockedDoor(string survivorName, string keyName, string doorName)
     {
         string newMessage = $"{survivorName} used a {keyName} to unlock a {doorName}!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
 
-    private void OnSurvivorDeath(string playerName)
+    private void OnSurvivorKilled(string playerName)
     {
-        string newMessage = playerName;
+        string newMessage = $"{playerName} died!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
 
     }
@@ -82,7 +90,7 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnPickedUpBatteryEvent(Survivor survivor, Battery battery)
+    private void OnPickedUpBatteryEvent()
     {
         string newMessage = "You picked up a battery!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
@@ -95,7 +103,7 @@ public class GameMessages : MonoBehaviour
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 
-    private void OnPlayerDisconnect(string playerName)
+    private void OnPlayerDisconnectMidGame(string playerName)
     {
         string newMessage = $"Player {playerName} has disconnected!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
@@ -136,6 +144,19 @@ public class GameMessages : MonoBehaviour
     private void OnPlayerJoinedLobby(int index, string playerName)
     {
         string newMessage = $"Player {playerName} connected!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnPlayerJoinedMidGame(string name)
+    {
+        string newMessage = $"Player {name} has joined the game!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+
+    }
+
+    private void OnPlayerConnectedMidGame(string name)
+    {
+        string newMessage = $"Player {name} connected!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 

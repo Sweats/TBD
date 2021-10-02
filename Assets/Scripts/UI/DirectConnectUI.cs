@@ -63,6 +63,17 @@ public class DirectConnectUI : MonoBehaviour
         directConnectCanvas.enabled = false;
     }
 
+    private void JoinDarnedServer()
+    {
+        GameObject darnedNetworkManager = (GameObject)Resources.Load("Darned Network Manager");
+        GameObject spawnedObject = Instantiate(darnedNetworkManager);
+        string port = portField.text;
+        string hostname = hostnameField.text;
+        string address = $"{hostname}:{port}";
+        Uri uri = new Uri(address);
+        NetworkManager.singleton.StartClient();
+    }
+
     public void Show()
     {
         this.enabled = true;
@@ -77,11 +88,6 @@ public class DirectConnectUI : MonoBehaviour
         {
             Destroy(NetworkManager.singleton.gameObject);
         }
-
-        DarnedNetworkManager.PORT = port;
-        DarnedNetworkManager.HOSTNAME = hostname;
-        // NOTE: We load the lobby scene first and then have the client get the updates from the server.
-        Stages.Load(StageName.Lobby);
     }
 
     private void OnFailedToConnectToHost(int errorCode)

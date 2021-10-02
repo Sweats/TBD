@@ -1,23 +1,42 @@
 using Mirror;
 using UnityEngine;
 
-public class ClientDoor
+public class ClientDoor : MonoBehaviour
 {
     private ClientDoor(){}
 
     public void RegisterNetworkHandlers()
     {
         NetworkClient.RegisterHandler<ClientServerGameDoorFailedToUnlockMessage>(OnClientServerGameFailedToUnlockDoor);
+        NetworkClient.RegisterHandler<ClientServerGameDoorUnlockedMessage>(OnClientServerGameDoorUnlocked);
     }
 
 
     private void OnClientServerGameFailedToUnlockDoor(NetworkConnection connection, ClientServerGameDoorFailedToUnlockMessage message)
     {
-        Vector3 position = message.position;
-        float x = position.x;
-        float y = position.y;
-        float z = position.z;
-        EventManager.clientServerGameFaliedToUnlockDoorEvent.Invoke(x, y, z);
+        uint doorId = message.doorId;
+
+        Door door = NetworkIdentity.spawned[doorId].GetComponent<Door>();
+
+        if (door != null)
+        {
+            Vector3 position = door.transform.position;
+            door.ClientPlayLockedSound();
+        }
+    }
+
+    private void OnClientServerGameDoorUnlocked(NetworkConnection connection, ClientServerGameDoorUnlockedMessage message)
+    {
+        uint doorId = message.doorId;
+
+        Door door = NetworkIdentity.spawned[doorId].GetComponent<Door>();
+
+        if (door != null)
+        {
+            Vector3 position = door.transform.position;
+            door.ClientPlayUnlockedSound();
+            EventManager.clientServerGameSurvivorUnlockedDoorEvent.Invoke(message.playerName, message.keyName, door.Name());
+        }
 
     }
 }

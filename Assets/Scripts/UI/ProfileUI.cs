@@ -92,6 +92,12 @@ public class ProfileUI : MonoBehaviour
         failedText.enabled = false;
         Settings.PROFILE_NAME = newName;
         nameChanged = true;
+
+        if (NetworkClient.active)
+        {
+            NetworkClient.Send(new ServerClientGamePlayerChangedProfileNameMessage{oldProfileName = oldName, newProfileName = newName});
+        }
+
     }
 
     private void SaveProfileConfig()

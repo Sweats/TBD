@@ -11,8 +11,10 @@ public class Survivor : NetworkBehaviour
 
     private CharacterController controller;
 
-    private string name;
+    [SyncVar]
+    private string survivorName;
 
+    [SerializeField]
     private Inventory inventory;
 
     //NOTE: Server will send us the key type when we pick it up. Client side OnGUI will loop through this and draw depending on the key type
@@ -84,10 +86,11 @@ public class Survivor : NetworkBehaviour
     private Light flashlight;
 
     [SerializeField]
-    [SyncVar]
+    [SyncVar(hook = nameof(OnClientServerGameUpdatedFlashlight))]
     private float charge;
 
     [SerializeField]
+    [SyncVar(hook = nameof(OnClientServerGameToggledFlashlight))]
     private bool toggled;
 
     [SyncVar]
@@ -139,27 +142,34 @@ public class Survivor : NetworkBehaviour
     private Renderer survivorRenderer;
 
     [SerializeField]
+    private GameObject chadModel;
+
+    [SerializeField]
     private Windows windows;
 
     [SerializeField]
     private GameObject hand;
 
+    [SerializeField]
+    private MeshCollider meshCollider;
+
     private bool escaped;
-
-    private Vector3 mPrevPos = Vector3.zero;
-
-    private Vector3 mPosDelta = Vector3.zero;
 
     private Character character;
 
     //NOTE: For drawing the keys in the inventory
     private Rect currentPosition;
 
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        inventory.ServerInit();
+    }
+
     public override void OnStartLocalPlayer()
     {
         controller = GetComponent<CharacterController>();
         this.enabled = true;
-        windows.enabled = true;
         survivorCamera.enabled = true;
         survivorCamera.GetComponent<AudioListener>().enabled = true;
         controller.enabled = true;
@@ -170,6 +180,10 @@ public class Survivor : NetworkBehaviour
             height = 30,
             width = 30
         };
+
+        EventManager.clientServerGameSurvivorsDeadEvent.AddListener(OnAllSurvivorsDead);
+        EventManager.clientServerGameSurvivorsEscapedEvent.AddListener(OnAllSurvivorsEscaped);
+        windows.LocalPlayerStart();
     }
 
     [Client]
@@ -261,7 +275,7 @@ public class Survivor : NetworkBehaviour
 
         if (Keybinds.GetKey(Action.SwitchFlashlight))
         {
-            NetworkClient.Send(new ServerClientGameToggledFlashlightMessage{toggled = !this.toggled});
+            NetworkClient.Send(new ServerClientGameToggledFlashlightMessage { });
         }
 
         else if (Keybinds.GetKey(Action.Crouch))
@@ -321,7 +335,8 @@ public class Survivor : NetworkBehaviour
         return hand;
     }
 
-    public Character PlayerCharacter()
+    [Server]
+    public Character ServerPlayerCharacter()
     {
         return character;
     }
@@ -337,10 +352,23 @@ public class Survivor : NetworkBehaviour
     }
 
     [Server]
+    public void ServerKill()
+    {
+        isDead = true;
+
+    }
+
+    [Server]
     public Insanity SurvivorInsanity()
     {
         return insanity;
 
+    }
+
+    [Server]
+    public void ServerSetName(string name)
+    {
+        this.survivorName = name;
     }
 
     public float TrapDistance()
@@ -352,6 +380,29 @@ public class Survivor : NetworkBehaviour
     public float FlashlightCharge()
     {
         return charge;
+    }
+
+    [Server]
+    public float ServerFlashlightDischargeRate()
+    {
+        return dischargeRate;
+    }
+
+    [Server]
+    public void ServerToggleFlashlight()
+    {
+        toggled = !toggled;
+    }
+
+    public bool ServerFlashlightToggled()
+    {
+        return toggled;
+    }
+
+    [Server]
+    public void ServerSetFlashlightCharge(float value)
+    {
+        this.charge = value;
     }
 
     [Server]
@@ -367,20 +418,28 @@ public class Survivor : NetworkBehaviour
     }
 
     [Server]
-    public void SetEscaped(bool value)
+    public void ServerSetEscaped(bool value)
     {
         escaped = value;
     }
 
     [Server]
-    public bool Escaped()
+    public bool ServerEscaped()
     {
         return escaped;
     }
 
     public string Name()
     {
-        return name;
+        return survivorName;
+    }
+
+    [Client]
+    public void ClientHide()
+    {
+        survivorRenderer.enabled = false;
+        meshCollider.enabled = false;
+        chadModel.SetActive(false);
     }
 
     [Server]
@@ -390,52 +449,38 @@ public class Survivor : NetworkBehaviour
     }
 
     [Client]
-    private void OnControllerColliderHit(ControllerColliderHit hit)
+    public void OnClientServerGameToggledFlashlight(bool oldValue, bool newValue)
     {
-        var gameObject = hit.gameObject;
-
-        if (gameObject.CompareTag(Tags.DOOR))
-        {
-            Door door = gameObject.GetComponent<Door>();
-            Vector3 moveDirection = hit.moveDirection;
-            door.CmdPlayerHitDoor(moveDirection);
-        }
+        flashlight.enabled = newValue;
+        flashlightToggleSound.Play();
     }
 
-    //[Client]
-    //public void OnGui()
-    //{
-    //    if (windows.IsWindowOpen())
-    //    {
-    //        return;
-    //    }
+    [Client]
+    public void ClientPlayDeathSound()
+    {
+        deathSound.Play();
+    }
 
-    //    int currentX = Screen.width - 20;
-    //    int currentY = 20;
+    [Client]
+    public void OnClientServerGameUpdatedFlashlight(float oldValue, float newValue)
+    {
+        flashlight.intensity = newValue;
+    }
 
-    //    // TODO: Client only needs to know the key type to draw it. Everything else is server sided.
-    //    for (var i = 0; i < keyTypes.Count; i++)
-    //    {
-    //        if (i % 8 == 0)
-    //        {
-    //            // Go back to the top where we were when we started and then go left 50 because images will be 50 in pixels
-    //            currentX -= 50;
-    //            currentY = 20;
-    //        }
 
-    //        currentPosition.x = currentX;
-    //        currentPosition.y = currentY;
-    //        Texture texture = null;
+    [Client]
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        var hitGameObject = hit.gameObject;
 
-    //        switch (keyTypes[i])
-    //        {
-
-    //        }
-    //        GUI.DrawTexture(currentPosition, itemIcon);
-    //        currentY += 35;
-
-    //    }
-    //}
+        if (hitGameObject.CompareTag(Tags.DOOR))
+        {
+            Door door = hitGameObject.GetComponent<Door>();
+            uint id = door.netIdentity.netId;
+            Vector3 hitMoveDirection = hit.moveDirection;
+            NetworkClient.Send(new ServerClientGameDoorBumpedIntoMessage { requestedDoorID = id, moveDirection = hitMoveDirection });
+        }
+    }
 
     #region SERVER
 
@@ -453,20 +498,20 @@ public class Survivor : NetworkBehaviour
             if (gameObject.CompareTag(Tags.KEY))
             {
                 uint clickedkeyId = gameObject.GetComponent<KeyObject>().netIdentity.netId;
-                NetworkClient.Send(new ServerClientGameClickedOnKeyMessage{requestedKeyId = clickedkeyId});
+                NetworkClient.Send(new ServerClientGameClickedOnKeyMessage { requestedKeyId = clickedkeyId });
             }
 
             else if (gameObject.CompareTag(Tags.DOOR))
             {
                 uint clickedDoorId = gameObject.GetComponent<Door>().netIdentity.netId;
-                NetworkClient.Send(new ServerClientGameClickedOnDoorMessage{requestedDoorID = clickedDoorId});
-            
+                NetworkClient.Send(new ServerClientGameClickedOnDoorMessage { requestedDoorID = clickedDoorId });
+
             }
 
             else if (gameObject.CompareTag(Tags.BATTERY))
             {
                 uint clickedBatteryId = gameObject.GetComponent<Battery>().netIdentity.netId;
-                NetworkClient.Send(new ServerClientGameClickedOnBatteryMessage{requestedBatteryId = clickedBatteryId});
+                NetworkClient.Send(new ServerClientGameClickedOnBatteryMessage { requestedBatteryId = clickedBatteryId });
             }
 
             else if (gameObject.CompareTag(Tags.DARNED_OBJECT))
@@ -477,5 +522,28 @@ public class Survivor : NetworkBehaviour
             }
         }
     }
+
+    [Client]
+    private void OnAllSurvivorsDead()
+    {
+        matchOver = true;
+
+    }
+
+    [Client]
+    private void OnAllSurvivorsEscaped()
+    {
+        matchOver = true;
+    }
+
+    [Client]
+    public void ClientShow()
+    {
+        this.survivorRenderer.enabled = true;
+        this.meshCollider.enabled = true;
+        this.chadModel.SetActive(true);
+        // TODO: Enable collisions here at some point
+    }
 }
+
 #endregion

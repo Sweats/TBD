@@ -1,6 +1,7 @@
 using Mirror;
+using UnityEngine;
 
-public class ClientBattery
+public class ClientBattery: MonoBehaviour
 {
     private ClientBattery(){}
 

@@ -24,7 +24,7 @@ public class ServerEscape: MonoBehaviour
         int escapedSurvivorsCount = 0;
         int survivorsCount = 0;
 
-        survivor.SetEscaped(true);
+        survivor.ServerSetEscaped(true);
 
         var keys = NetworkServer.connections.Keys;
 
@@ -32,7 +32,7 @@ public class ServerEscape: MonoBehaviour
         {
             int connectionId = key;
 
-            if (!NetworkServer.connections.ContainsKey(key))
+            if (!NetworkServer.connections.ContainsKey(connectionId))
             {
                 continue;
             }
@@ -53,7 +53,7 @@ public class ServerEscape: MonoBehaviour
 
             survivorsCount++;
 
-            if (foundSurvivor.Escaped())
+            if (foundSurvivor.ServerEscaped())
             {
                 escapedSurvivorsCount++;
             }
@@ -61,7 +61,7 @@ public class ServerEscape: MonoBehaviour
 
         if (escapedSurvivorsCount == survivorsCount)
         {
-            NetworkServer.SendToReady<ClientServerGameSurvivorsEscapedMessage>(new ClientServerGameSurvivorsEscapedMessage{});
+            NetworkServer.SendToReady(new ClientServerGameSurvivorsEscapedMessage{});
         }
 
     }
@@ -75,7 +75,7 @@ public class ServerEscape: MonoBehaviour
             return;
         }
 
-        survivor.SetEscaped(false);
+        survivor.ServerSetEscaped(false);
 
     }
 

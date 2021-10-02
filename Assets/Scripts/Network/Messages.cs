@@ -7,7 +7,12 @@ using UnityEngine;
 // If a client sends us this, then that means they toggled their flashlight. 
 public struct ServerClientGameToggledFlashlightMessage: NetworkMessage
 {
-    public bool toggled;
+
+}
+
+public struct ServerClientGameHostRequestedToStartGameMessage: NetworkMessage
+{
+
 }
 
 // If a client sends us this, then that means that they clicked on a battery and we need to make sure that they are allowed to do that. Checks must be done on the server side.
@@ -16,10 +21,29 @@ public struct ServerClientGameClickedOnBatteryMessage: NetworkMessage
     public uint requestedBatteryId;
 }
 
+public struct ServerClientGamePlayerChangedProfileNameMessage: NetworkMessage
+{
+    public string oldProfileName;
+    public string newProfileName;
+}
+
 // If a client sends us this, then that means that they clicked on a door and we need to tell them whether or not they can unlock it. Checks must be done on the server side.
 public struct ServerClientGameClickedOnDoorMessage: NetworkMessage
 {
     public uint requestedDoorID;
+}
+
+
+public struct ServerClientGameDoorBumpedIntoMessage: NetworkMessage
+{
+    public uint requestedDoorID;
+
+    public Vector3 moveDirection;
+
+}
+public struct ServerClientGamePlayerSentChatMessage: NetworkMessage
+{
+    public string chatText;
 }
 
 // If a client sends us this, then that means they requested to change the stage for the server. Only a host should be able to do this.
@@ -85,14 +109,18 @@ public struct ServerClientLobbyRequestedToChangeVoiceChatMessage: NetworkMessage
 
 }
 
+public struct ServerClientGamePlayerSpectatorJoinedMessage: NetworkMessage
+{
+
+}
+
 public struct ServerClientGamePlayerPickedCharacterMessage: NetworkMessage
 {
     public Character pickedCharacter;
 }
 
-public struct ServerClientPlayerSentChatMessage: NetworkMessage
+public struct ServerClientLobbyPlayerSentChatMessage: NetworkMessage
 {
-    public string playerName;
     public string text;
 }
 
@@ -106,6 +134,36 @@ public struct ServerClientGameSurvivorNoLongerEscapedMessage: NetworkMessage
 
 }
 
+
+public struct ServerClientGameLurkerRequestToChangeFormMessage: NetworkMessage
+{
+
+}
+
+
+public struct ServerClientGameLurkerSwingAttackMessage: NetworkMessage
+{
+    public uint requestedTargetId;
+}
+
+public struct ServerClientGameLurkerSwingAtNothingMessage: NetworkMessage
+{
+
+}
+
+public struct ServerClientGameLurkerRequestToArmTrapMessage: NetworkMessage
+{
+    public uint requestedTrapId;
+
+}
+
+public struct ServerClientGameLurkerJoinedMessage: NetworkMessage
+{
+
+}
+
+
+
 #endregion
 
 //NOTE: These messages are what clients will get from the host/server when the server sends it. The logic for all of these are implemented in DarnedNetworkManager.cs.
@@ -117,6 +175,7 @@ public struct ClientServerLobbyHostChangedInsanityOption: NetworkMessage
     public bool newInsanityValue;
 }
 
+
 public struct ClientServerLobbyHostChangedVoiceChatMessage: NetworkMessage
 {
     public bool newVoiceChatValue;
@@ -125,6 +184,13 @@ public struct ClientServerLobbyHostChangedVoiceChatMessage: NetworkMessage
 // If the server sends us this, then that means that the server rejected our character change request because another client has already chosen that character.
 public struct ClientServerLobbyCharacterAlreadyTakenMessage: NetworkMessage
 {
+
+}
+
+public struct ClientServerGamePlayerChangedProfileNameMessage: NetworkMessage
+{
+    public string oldName;
+    public string newName;
 
 }
 
@@ -184,27 +250,42 @@ public struct ClientServerLobbyHostKickedPlayerMessage: NetworkMessage
 // If the server sends this, then that means that the server said that we cannot unlock that door because it failed its required checks.
 public struct ClientServerGameDoorFailedToUnlockMessage: NetworkMessage
 {
-    // Where should we play the sound?
-    public Vector3 position;
+    // The door id. We need this to play the sound associated with the door itself.
+    public uint doorId;
+}
+
+public struct ClientServerGameSurvivorKilledMessage: NetworkMessage
+{
+    public uint survivorId;
 
 }
 
 // If the server sends us is, then that means the server said that the door is now unlocked.
 public struct ClientServerGameDoorUnlockedMessage: NetworkMessage
 {
+
+    // The door id. We need this to play the sound associated with the door itself.
+    public uint doorId;
     // Who unlocked the door?
     public string playerName;
-    // What kind of door is it?
-    public string doorName;
+    // The name of the key that unlocked the door.
+    public string keyName;
+}
+
+public struct ClientServerGameTrapTriggeredMessage: NetworkMessage
+{
+    public uint triggeredTrapId;
+
 }
 
 // If the server sends us this, then that means the server  has allowed a fellow survivor to pick up a key.
 public struct ClientServerGameSurvivorPickedUpKeyMessage: NetworkMessage
 {
-    // Who picked up a key?
-    public string playerName;
-    // What kind of key is it?
-    public string keyName;
+    // net ID of the key. Needed to send to client so they know which sound to play for the key
+    public uint keyId;
+
+    // net id of the survivor
+    public uint survivorId;
 }
 
 // If the server sends us this, then that means the server has allowed us to pick up the key we clicked on.
@@ -254,18 +335,59 @@ public struct ClientServerGamePlayerToggledFlashlight: NetworkMessage
 
 }
 
-// If the server sends us this, then that means that the server decided to let us know the latest value of a survivors flashlight. This will only happen a little bit to avoid network spam.
-public struct ClientServerGamePlayerUpdatedFlashlightValue: NetworkMessage
+
+public struct ClientServerGameLurkerTrapArmedMessage: NetworkMessage
 {
-    public float newValue;
+    public uint trapId;
 }
 
-public struct ClientServerGameSurvivorHitTrapMessage: NetworkMessage
+public struct ClientServerGameLurkerAttackedMessage: NetworkMessage
+{
+    public uint lurkerId;
+
+}
+
+
+public struct ClientServerGameLurkerArmableTrapsMessage: NetworkMessage
+{
+    public uint[] armableTraps;
+}
+
+public struct ClientServerGameLurkerAllowGhostToPhysicalFormChangeMessage: NetworkMessage
 {
 
 }
 
-public struct ClientServerPlayerConnectedMessage: NetworkMessage
+public struct ClientServerGameLurkerAllowPhysicalToGhostFormChangeMessage: NetworkMessage
+{
+
+}
+
+public struct ClientServerGameLurkerReadyToGoIntoPhysicalFormMessage: NetworkMessage
+{
+
+}
+
+
+public struct ClientServerGameLurkerForceBackIntoGhostFormMessage: NetworkMessage
+{
+
+}
+
+
+public struct ClientServerGamePlayerConnectedMessage: NetworkMessage
+{
+    public string name;
+
+}
+
+public struct ClientServerGamePlayerJoinedMessage: NetworkMessage
+{
+    public string name;
+
+}
+
+public struct ClientServerGamePlayerDisconnectedMessage: NetworkMessage
 {
     public string name;
 
@@ -279,14 +401,20 @@ public struct ClientServerLobbyPlayerJoinedMessage: NetworkMessage
 }
 public struct ClientServerLobbyPlayerSentChatMessage: NetworkMessage
 {
-    public string clientName;
-    public string text;
+    public string chatMessage;
 }
+
 
 public struct ClientServerGameSurvivorsEscapedMessage: NetworkMessage
 {
 
 }
+
+public struct ClientServerGameSurvivorsDeadMessage: NetworkMessage
+{
+
+}
+
 
 public struct ClientServerLobbyUnavailableCharactersMessage: NetworkMessage
 {
@@ -295,6 +423,17 @@ public struct ClientServerLobbyUnavailableCharactersMessage: NetworkMessage
 public struct ClientServerGamePickCharacterMessage: NetworkMessage
 {
     public Character[] unavailableCharacters;
+}
+
+public struct ClientServerGameHostStartedGameMessage: NetworkMessage
+{
+
+}
+
+public struct ClientServerGamePlayerSentChatMessage: NetworkMessage
+{
+    public string chatMessage;
+
 }
 
 #endregion
@@ -340,6 +479,8 @@ public struct MasterServerDedicatedServerRequestToBeRemovedMessage: NetworkMessa
 
 public struct MasterClientServerAddedClientHostServerMessage: NetworkMessage
 {
+    // The id that the master server gave us. Store this for when the dedicated server disconnects and requests to be removed from the server listing.
+    public int id;
 
 }
 

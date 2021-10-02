@@ -16,7 +16,7 @@ public class ServerKey: MonoBehaviour
 
     }
 
-    public void OnServerSceneChanged(int keyPath)
+    public void OnServerSceneChanged()
     {
         ServerChooseKeyPath();
         ServerSpawnKeys();
@@ -169,7 +169,7 @@ public class ServerKey: MonoBehaviour
             return;
         }
 
-        Key[] keys = survivor.Items().Keys();
+        Key[] keys = survivor.Items().ServerKeys();
 
         int foundKeyMask = keyObject.Mask();
         KeyType type = keyObject.Type();
@@ -197,12 +197,14 @@ public class ServerKey: MonoBehaviour
         {
             ClientServerGameSurvivorPickedUpKeyMessage clientServerGameSurvivorPickedUpKeyMessage = new ClientServerGameSurvivorPickedUpKeyMessage
             {
-                playerName = survivor.Name(),
-                keyName = keyObject.Name()
+                keyId = keyObject.netIdentity.netId,
+                survivorId = survivor.netIdentity.netId
             };
 
+            Key newKey = new Key(keyObject.Name(), keyObject.Mask(), keyObject.Type());
+            survivor.Items().ServerAdd(newKey);
             NetworkServer.SendToReady(clientServerGameSurvivorPickedUpKeyMessage);
-            NetworkServer.Destroy(keyObject.gameObject);
+            // NOTE: Normally we would destroy it but we just hide it on the client instead because we can't destroy the key itself while also letting the client play the sound for it.
 
         }
     }

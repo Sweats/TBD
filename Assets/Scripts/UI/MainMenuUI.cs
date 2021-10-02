@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using Mirror;
+using System.IO;
+using System;
 using kcp2k;
 
 public class MainMenuUI : MonoBehaviour
@@ -23,35 +25,84 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField]
     private Color buttonTextColor;
 
+    private bool dedicatedServerBuild = false;
+
+    private bool masterServerBuild = false;
+
     private void Start()
     {
 #if UNITY_SERVER && DEDICATED_SERVER_BUILD
-        DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY = true;
-        DarnedNetworkManager.CLIENT_HOSTING_LOBBY = false;
+        dedicatedServerBuild = true;
 #elif UNITY_SERVER && MASTER_SERVER_BUILD
-        DarnedMasterServerManager.ENABLED = true;
+        masterServerBuild = true;
 #elif UNITY_SERVER && MASTER_SERVER_BUILD && DEDICATED_SERVER_BUILD
-        DarnedNetworkManager.Log("You have built both the dedicated server and the master server. Please only define one of the two, not both. Exiting...");
         Application.Quit();
         return;
 #endif
-        if (DarnedNetworkManager.DEDICATED_SERVER_HOSTING_LOBBY)
+
+        if (dedicatedServerBuild)
         {
-            DarnedNetworkManager.Log("SWITCHING TO THE LOBBY SCENE...");
-            Stages.Load(StageName.Lobby);
+            EventManager.masterClientServerAddedDedicatedServerEvent.AddListener(OnMasterServerAddedDedicatedServer);
+            AddDedicatedServerToMasterServerLobbyListing();
             return;
         }
 
-        else if (DarnedMasterServerManager.ENABLED)
+        if (masterServerBuild)
         {
-            Stages.Load(StageName.MasterServer);
-            return;
+            CreateAndStartDarnedMasterServer();
         }
 
-        else
+        if (!dedicatedServerBuild && !masterServerBuild)
         {
             Cursor.lockState = CursorLockMode.Confined;
         }
+
+    }
+
+    private void OnMasterServerAddedDedicatedServer(int id)
+    {
+        NetworkManager.singleton.StopClient();
+        HostLobby.LOBBY_ID = id;
+        Destroy(NetworkManager.singleton.gameObject);
+        GameObject darnedNetworkManager = (GameObject)Resources.Load("Darned Network Manager");
+        GameObject spawnedObject = Instantiate(darnedNetworkManager);
+        NetworkManager.singleton.StartServer();
+        string lobbySceneName = Stages.Name(StageName.Lobby);
+        NetworkManager.singleton.ServerChangeScene(lobbySceneName);
+    }
+
+    private void CreateAndStartDarnedMasterServer()
+    {
+        GameObject darnedMasterServerManager = (GameObject)Resources.Load("Darned Master Server Manager");
+        GameObject spawnedObject = Instantiate(darnedMasterServerManager);
+        NetworkManager.singleton.StartServer();
+
+    }
+
+    private void AddDedicatedServerToMasterServerLobbyListing()
+    {
+        string configName = "Darned Dedicated Server Configuration.yml";
+        bool exists = DedicatedServerConfiguration.Exists(configName);
+
+        if (!exists)
+        {
+            string currentDirectoryName = Directory.GetCurrentDirectory();
+            DedicatedServerConfiguration.GenerateConfig(currentDirectoryName);
+            Debug.Log($"[Darned Server]: Generated configuration file {configName} in {currentDirectoryName}");
+            Application.Quit();
+            return;
+        }
+
+        DedicatedServerConfiguration config = DedicatedServerConfiguration.Load(configName);
+        GameObject darnedMasterServerManager = (GameObject)Resources.Load("Darned Master Server Manager");
+        GameObject spawnedObject = Instantiate(darnedMasterServerManager);
+        string lobbyName = config.serverName;
+        string password = config.lobbyPassword;
+        bool isPrivate = password == string.Empty;
+        //TODO: Put this in a config file somewhere.
+        string masterServerAddress = "localhost:7777";
+        Uri uri = new Uri(masterServerAddress);
+        NetworkManager.singleton.StartClient(uri);
     }
 
 

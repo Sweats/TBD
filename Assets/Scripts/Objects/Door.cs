@@ -1,13 +1,6 @@
 ﻿using UnityEngine;
 using Mirror;
 
-public enum DoorType
-{
-    Normal = 0
-}
-
-
-// This cl
 public class Door : NetworkBehaviour
 {
     // Start is called before the first frame update
@@ -18,7 +11,7 @@ public class Door : NetworkBehaviour
     private string doorName = "door";
 
     [SerializeField]
-    [SyncVar]
+    [SyncVar(hook = nameof(OnServerUnlockedDoor))]
     private bool unlocked;
 
     [SerializeField]
@@ -54,50 +47,27 @@ public class Door : NetworkBehaviour
 
     private GameObject playerGrabDoorObject;
 
-    [ServerCallback]
+
+    [Client]
     private void Start()
     {
-        doorRigidBody = GetComponent<Rigidbody>();
         doorJoint = GetComponent<HingeJoint>();
+        doorRigidBody = GetComponent<Rigidbody>();
+    }
 
-        if (unlocked)
+    [Client]
+    private void OnServerUnlockedDoor(bool oldvalue, bool newValue)
+    {
+        if (newValue)
         {
-            doorJoint.enableCollision = true;
-            doorRigidBody.detectCollisions = true;
+            doorRigidBody.isKinematic = false;
         }
 
         else
         {
-            doorJoint.enableCollision = false;
-            //doorRigidBody.detectCollisions = false;
-        }
-    }
-
-    /*
-    [Server]
-    private void Update()
-    {
-        if (!grabbed)
-        {
-            return;
+            doorRigidBody.isKinematic = true;
         }
 
-        Transform position = playerGrabDoorObject.transform.position;
-        Transform doorPosition = this.transform.position;
-
-    }
-    */
-
-
-    [Command(requiresAuthority = false)]
-    public void CmdPlayerHitDoor(Vector3 moveDirection)
-    {
-        if (unlocked)
-        {
-            Vector3 newMoveDirection = new Vector3(moveDirection.x, 0, moveDirection.z);
-            Vector3 velocity = newMoveDirection * doorPushStrength;
-            doorRigidBody.AddForce(velocity);
-        }
     }
 
     [Client]
@@ -115,15 +85,29 @@ public class Door : NetworkBehaviour
         doorCollider.enabled = true;
     }
 
-    public bool Unlocked()
+    [Server]
+    public bool ServerUnlocked()
     {
         return unlocked;
     }
 
     [Server]
-    public void Unlock()
+    public void AddForce(Vector3 moveDirection)
+    {
+        doorRigidBody.AddForce(moveDirection);
+    }
+
+    [Server]
+    public void ServerUnlock()
     {
         unlocked = true;
+    }
+
+    [Server]
+    public float PushStrength()
+    {
+        return doorPushStrength;
+
     }
 
     public int UnlockMask()
@@ -134,6 +118,20 @@ public class Door : NetworkBehaviour
     public bool Grabbed()
     {
         return grabbed;
+    }
+
+    [Client]
+    public void ClientPlayLockedSound()
+    {
+        lockedSound.Play();
+
+    }
+
+    [Client]
+    public void ClientPlayUnlockedSound()
+    {
+        unlockedSound.Play();
+
     }
 
     public string Name()

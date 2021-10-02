@@ -4,62 +4,52 @@ using Mirror;
 
 public class Lurker : NetworkBehaviour
 {
+    [SyncVar]
+    private string name;
     private CharacterController lurkerController;
 
-    [SyncVar]
     [SerializeField]
     private float physicalFormSpeed;
 
-    [SyncVar]
     [SerializeField]
     private float ghostFormSpeed;
 
     [SerializeField]
-    [SyncVar]
     private float maxEnergy = 100;
 
-    [SyncVar]
     [SerializeField]
     private float minEnergy = 0;
 
     [SerializeField]
-    [SyncVar]
     private float energy;
 
     [SerializeField]
-    [SyncVar]
     private float energyRegenerationRate;
 
     [SerializeField]
-    [SyncVar]
     private float energyConsumptionRate;
 
     [SerializeField]
-    [SyncVar]
     private float attackDistance;
 
     [SerializeField]
-    [SyncVar]
     private float trapArmDistance;
 
     [SerializeField]
-    [SyncVar]
     private float speed;
 
-    [SyncVar]
+    [SyncVar(hook = nameof(OnLurkerFormChanged))]
+    [SerializeField]
     private bool ghostForm = true;
 
-    [SyncVar]
     private bool isReadyToGoIntoPhysicalForm;
 
-    [SyncVar]
+    [SerializeField]
     private bool canAttack = false;
 
     [SerializeField]
-    [SyncVar]
     private int attackCoolDownInSeconds;
 
-    [SyncVar]
     private bool hostStartedGame;
 
     private bool matchOver = false;
@@ -99,11 +89,9 @@ public class Lurker : NetworkBehaviour
 
 
     // Get the list of objects on the stage and cache them for the match.
-    private GameObject[] traps;
-
     private GameObject[] doors;
 
-    private GameObject[] survivors;
+    private GameObject[] traps;
 
     private GameObject[] keys;
 
@@ -125,37 +113,35 @@ public class Lurker : NetworkBehaviour
     [SerializeField]
     private Texture crosshair;
 
-    private Coroutine ghostFormRoutine;
+    [SerializeField]
+    private int trapPercentage;
 
-    private Coroutine physicalFormRoutine;
+    [SerializeField]
+    private Renderer lurkerRenderer;
 
-    public override void OnStartServer()
-    {
-        //EventManager.hostStartedGameEvent.AddListener(OnHostStartedTheGame);
-        speed = ghostFormSpeed;
-        ghostFormRoutine = StartCoroutine(ServerGhostFormEnergyRoutine());
-        base.OnStartServer();
-    }
+    [SerializeField]
+    private MeshCollider meshCollider;
 
     public override void OnStartLocalPlayer()
     {
+        this.speed = ghostFormSpeed;
         this.enabled = true;
         lurkerController = GetComponent<CharacterController>();
         lurkerController.enabled = true;
         lurkerCamera.enabled = true;
         lurkerCamera.GetComponent<AudioListener>().enabled = true;
         windows.enabled = true;
-        StartCoroutine(GlowRoutine());
+        windows.LocalPlayerStart();
         doors = GameObject.FindGameObjectsWithTag(Tags.DOOR);
         keys = GameObject.FindGameObjectsWithTag(Tags.KEY);
         batteries = GameObject.FindGameObjectsWithTag(Tags.BATTERY);
+        traps = GameObject.FindGameObjectsWithTag(Tags.TRAP);
         HideImportantObjects();
         Cursor.lockState = CursorLockMode.Locked;
-
-        EventManager.survivorsEscapedStageEvent.AddListener(ServerOnMatchOver);
-        //EventManager.hostStartedGameEvent.AddListener(OnHostStartedTheGame);
-
-        base.OnStartLocalPlayer();
+        EventManager.clientServerGameLurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnReadyToGoIntoPhysicalFormEvent);
+        EventManager.clientServerGameLurkerArmableTrapsEvent.AddListener(OnArmableTrapsEvent);
+        EventManager.clientServerGameLurkerTrapArmedEvent.AddListener(OnTrapArmed);
+        NetworkClient.Send(new ServerClientGameLurkerJoinedMessage { });
     }
 
     [Client]
@@ -214,92 +200,22 @@ public class Lurker : NetworkBehaviour
             return;
         }
 
-        //        if (!hostStartedGame)
-        //        {
-        //            return;
-        //        }
-
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
         Vector3 secondmove = transform.right * x + transform.forward * z;
-        //bool isMoving = moving != secondmove;
         bool isMoving = transform.hasChanged;
 
         if (Keybinds.GetKey(Action.Transform))
         {
-            if (ghostForm)
-            {
-                if (isReadyToGoIntoPhysicalForm)
-                {
-                    CmdOnLurkerFormChanged();
-                }
-            }
-
-            else
-            {
-                CmdOnLurkerFormChanged();
-            }
-
+            NetworkClient.Send(new ServerClientGameLurkerRequestToChangeFormMessage());
         }
 
         else if (Keybinds.GetKey(Action.Attack))
         {
-            CmdAttack();
-        }
-
-        else if (Keybinds.GetKey(Action.Grab))
-        {
-            CmdHandleGrab();
+            AttackOrGrab();
         }
 
         lurkerController.Move(secondmove * speed * Time.deltaTime);
-    }
-
-    [TargetRpc]
-    private void TargetPlayPhysicalFormMusic()
-    {
-        if (lurkerGhostFormMusic.isPlaying)
-        {
-            lurkerGhostFormMusic.Stop();
-        }
-
-        lurkerPhysicalFormMusic.Play();
-    }
-
-    [TargetRpc]
-    private void TargetPlayGhostFormMusic()
-    {
-        if (lurkerPhysicalFormMusic.isPlaying)
-        {
-            lurkerPhysicalFormMusic.Stop();
-        }
-
-        lurkerGhostFormMusic.Play();
-    }
-
-
-    [TargetRpc]
-    private void TargetPlayAttackSound()
-    {
-        attackSound.Play();
-    }
-
-    [TargetRpc]
-    private void TargetPlayTransformSound()
-    {
-        lurkerChangeFormSound.Play();
-    }
-
-    [TargetRpc]
-    private void TargetPlayArmedSound()
-    {
-        trapArmSound.Play();
-    }
-
-    [Client]
-    private void UpdateScreen()
-    {
-        // TO DO: Change what the color of the screen looks like. Not sure how to do this in Unity yet.
     }
 
     [Client]
@@ -311,15 +227,6 @@ public class Lurker : NetworkBehaviour
             {
                 Door door = doors[i].GetComponent<Door>();
                 door.Hide();
-            }
-        }
-
-        if (survivors != null)
-        {
-            for (var i = 0; i < survivors.Length; i++)
-            {
-                Survivor survivor = survivors[i].GetComponent<Survivor>();
-                survivor.Hide();
             }
         }
 
@@ -340,6 +247,84 @@ public class Lurker : NetworkBehaviour
                 battery.Hide();
             }
         }
+
+        HideSurviors();
+    }
+
+    [Client]
+    private void HideSurviors()
+    {
+        //TODO: Cache this. We don't cache it above because survivors can connect and leave the game as they please.
+        
+        GameObject[] survivors = GameObject.FindGameObjectsWithTag(Tags.SURVIVOR);
+
+        for (var i = 0; i < survivors.Length; i++)
+        {
+            Survivor survivor = survivors[i].GetComponent<Survivor>();
+            survivor.ClientHide();
+        }
+    }
+
+
+    private void ShowSurvivors()
+    {
+        //TODO: Cache this. We don't cache it above because survivors can connect and leave the game as they please.
+        GameObject[] survivors = GameObject.FindGameObjectsWithTag(Tags.SURVIVOR);
+
+        for (var i = 0; i < survivors.Length; i++)
+        {
+            Survivor survivor = survivors[i].GetComponent<Survivor>();
+            survivor.ClientShow();
+        }
+
+    }
+
+    [Client]
+    private void AttackOrGrab()
+    {
+        Ray ray = lurkerCamera.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+
+        if (!ghostForm)
+        {
+            if (Physics.Raycast(ray, out hit, attackDistance))
+            {
+                GameObject hitGameObject = hit.collider.gameObject;
+
+                if (hitGameObject.CompareTag(Tags.DOOR))
+                {
+                    uint doorId = hitGameObject.GetComponent<Door>().netIdentity.netId;
+                    NetworkClient.Send(new ServerClientGameClickedOnDoorMessage { requestedDoorID = doorId });
+                }
+
+                else if (hitGameObject.CompareTag(Tags.SURVIVOR))
+                {
+                    Debug.Log("TUHEUTNAH");
+                    uint survivorId = hitGameObject.GetComponent<Survivor>().netIdentity.netId;
+                    NetworkClient.Send(new ServerClientGameLurkerSwingAttackMessage { requestedTargetId = survivorId });
+                }
+            }
+
+            else
+            {
+                NetworkClient.Send(new ServerClientGameLurkerSwingAtNothingMessage { });
+            }
+        }
+
+        else
+        {
+            if (Physics.Raycast(ray, out hit, trapArmDistance))
+            {
+                GameObject hitGameObject = hit.collider.gameObject;
+
+                if (hitGameObject.CompareTag(Tags.TRAP))
+                {
+                    Trap trap = hitGameObject.GetComponent<Trap>();
+                    uint trapId = trap.netIdentity.netId;
+                    NetworkClient.Send(new ServerClientGameLurkerRequestToArmTrapMessage { requestedTrapId = trapId });
+                }
+            }
+        }
     }
 
     [Client]
@@ -351,15 +336,6 @@ public class Lurker : NetworkBehaviour
             {
                 Door door = doors[i].GetComponent<Door>();
                 door.Show();
-            }
-        }
-
-        if (survivors != null)
-        {
-            for (var i = 0; i < survivors.Length; i++)
-            {
-                Survivor survivor = survivors[i].GetComponent<Survivor>();
-                survivor.Show();
             }
         }
 
@@ -380,71 +356,10 @@ public class Lurker : NetworkBehaviour
                 battery.Show();
             }
         }
+
+        ShowSurvivors();
     }
 
-    // TODO. Figure out how the game should pick which traps that the lurker can actually arm.
-    [Client]
-    private IEnumerator DoLurkerTraps()
-    {
-        while (true)
-        {
-            if (matchOver)
-            {
-                yield break;
-            }
-
-            yield return new WaitForSeconds(1);
-        }
-    }
-
-    // TODO. Rewrite this probably.
-    [Client]
-    private IEnumerator GlowRoutine()
-    {
-        bool glowing = false;
-
-        while (true)
-        {
-            if (matchOver)
-            {
-                yield break;
-            }
-
-            if (traps != null)
-            {
-                for (var i = 0; i < traps.Length; i++)
-                {
-                    Trap trap = traps[i].GetComponent<Trap>();
-
-                    if (trap.Armed())
-                    {
-                        continue;
-                    }
-
-                    if (!glowing)
-                    {
-                        Debug.Log("Glowing trap...");
-                        trap.Glow();
-                    }
-
-                    else
-                    {
-                        Debug.Log("Unglowing trap..."); trap.Unglow();
-                    }
-                }
-            }
-
-            if (glowing)
-            {
-                yield return new WaitForSeconds(trapGlowTime);
-            }
-
-            else
-            {
-                yield return new WaitForSeconds(secondsBetweenGlows);
-            }
-        }
-    }
 
     [Client]
     private void OnGUI()
@@ -458,181 +373,190 @@ public class Lurker : NetworkBehaviour
         GUI.DrawTexture(new Rect(Screen.width / 2, Screen.height / 2, 2, 2), crosshair);
     }
 
-    [TargetRpc]
-    private void TargetReadyToGoIntoPhysicalForm()
+    [Server]
+    public float ServerMaxEnergy()
+    {
+        return maxEnergy;
+
+    }
+
+    [Server]
+    public float ServerAttackDistance()
+    {
+        return attackDistance;
+
+    }
+
+    [Server]
+    public void ServerSetEnergy(float value)
+    {
+        energy = value;
+    }
+
+    public float ServerEnergy()
+    {
+        return energy;
+
+    }
+
+    public bool IsGhostForm()
+    {
+        return ghostForm == true;
+
+    }
+
+    public bool IsPhysicalForm()
+    {
+        return ghostForm != true;
+
+    }
+
+    public void SetGhostForm()
+    {
+        ghostForm = true;
+
+    }
+
+    [Server]
+    public void ServerSetPhysicalForm()
+    {
+        ghostForm = false;
+    }
+
+
+    [Server]
+    public float ServerMinEnergy()
+    {
+        return minEnergy;
+
+    }
+
+    [Server]
+    public float ServerTrapArmDistance()
+    {
+        return trapArmDistance;
+    }
+
+    [Server]
+    public float ServerEnergyConsumptionRate()
+    {
+        return energyConsumptionRate;
+
+    }
+
+    [Server]
+    public float ServerEnergyRegenerationRate()
+    {
+        return energyRegenerationRate;
+
+    }
+
+    [Server]
+    public string Name()
+    {
+        return name;
+    }
+
+    [Server]
+    public int TrapPercentage()
+    {
+        return trapPercentage;
+    }
+
+    [Server]
+    public int AttackCooldownInSeconds()
+    {
+        return attackCoolDownInSeconds;
+    }
+
+    [Server]
+    public void AllowToAttack(bool value)
+    {
+        canAttack = value;
+
+    }
+
+    [Server]
+    public bool CanAttack()
+    {
+        return canAttack;
+    }
+
+
+    [Client]
+    public void ClientPlayAttackSound()
+    {
+        attackSound.Play();
+    }
+
+    [Client]
+    private void OnLurkerFormChanged(bool oldValue, bool newValue)
+    {
+        //NOTE: We are in ghost form here.
+        if (newValue)
+        {
+            this.lurkerRenderer.enabled = false;
+            this.meshCollider.enabled = false;
+        }
+
+        // NOTE: We are in physical form here.
+        else if (!newValue)
+        {
+            this.lurkerRenderer.enabled = true;
+            this.meshCollider.enabled = true;
+        }
+
+        lurkerChangeFormSound.Play();
+
+        if (isLocalPlayer)
+        {
+            if (!newValue)
+            {
+                this.speed = physicalFormSpeed;
+                ShowImportantObjects();
+
+            }
+
+            else
+            {
+                this.speed = ghostFormSpeed;
+                HideImportantObjects();
+
+            }
+
+        }
+    }
+    private void OnReadyToGoIntoPhysicalFormEvent()
     {
         lurkerReadyToTransformSound.Play();
-        EventManager.clientServerGameLurkerReadyToGoIntoPhysicalFormEvent.Invoke();
+
     }
 
-    [Server]
-    private void OnHostStartedTheGame()
+    [Client]
+    private void OnTrapArmed()
     {
-        hostStartedGame = true;
-        ghostFormRoutine = StartCoroutine(ServerGhostFormEnergyRoutine());
+        trapArmSound.Play();
     }
 
-    [Server]
-    public bool ServerIsInPhysicalForm()
-    {
-        return ghostForm;
-    }
 
-    [Server]
-    private void ServerOnMatchOver()
+    [Client]
+    private void OnArmableTrapsEvent(uint[] armableTraps)
     {
-        matchOver = true;
-    }
-
-    [Server]
-    private IEnumerator ServerGhostFormEnergyRoutine()
-    {
-        while (energy < maxEnergy)
+        for (var i = 0; i < armableTraps.Length; i++)
         {
-            if (matchOver)
+            uint netIdOfTrap = armableTraps[i];
+
+            for (var j = 0; j < traps.Length; j++)
             {
-                yield break;
-            }
+                Trap trap = traps[j].GetComponent<Trap>();
+                uint trapId = trap.netIdentity.netId;
 
-            //if (!hostStartedGame)
-            //{
-            //    continue;
-            //}
-
-            energy++;
-            yield return new WaitForSeconds(energyRegenerationRate);
-        }
-
-        isReadyToGoIntoPhysicalForm = true;
-        TargetReadyToGoIntoPhysicalForm();
-    }
-
-
-    [Server]
-    private IEnumerator ServerPhysicalFormEnergyRoutine()
-    {
-        while (energy > minEnergy)
-        {
-            if (matchOver || ghostForm)
-            {
-                yield break;
-            }
-
-            energy--;
-
-            yield return new WaitForSeconds(energyConsumptionRate);
-        }
-
-
-        CmdOnLurkerFormChanged();
-        TargetPlayTransformSound();
-    }
-
-    [Server]
-    private IEnumerator ServerAttackCoolDownRoutine()
-    {
-        canAttack = false;
-        yield return new WaitForSeconds(attackCoolDownInSeconds);
-        canAttack = true;
-    }
-
-    [Command]
-    private void CmdHandleGrab()
-    {
-
-    }
-
-    [Command]
-    private void CmdOnLurkerFormChanged()
-    {
-        ghostForm = !ghostForm;
-
-        if (!ghostForm)
-        {
-            StopCoroutine(ghostFormRoutine);
-            physicalFormRoutine = StartCoroutine(ServerPhysicalFormEnergyRoutine());
-            isReadyToGoIntoPhysicalForm = false;
-            canAttack = true;
-            speed = physicalFormSpeed;
-            ShowImportantObjects();
-            TargetPlayPhysicalFormMusic();
-            Debug.Log("Now in physical form...");
-        }
-
-        else
-        {
-            StopCoroutine(physicalFormRoutine);
-            ghostFormRoutine = StartCoroutine(ServerGhostFormEnergyRoutine());
-            canAttack = false;
-            speed = ghostFormSpeed;
-            HideImportantObjects();
-            TargetPlayGhostFormMusic();
-            Debug.Log("Now in ghost form...");
-        }
-    }
-
-    [Command]
-    private void CmdAttack()
-    {
-        Ray ray = lurkerCamera.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-
-        if (!ghostForm && canAttack)
-        {
-            StartCoroutine(ServerAttackCoolDownRoutine());
-            TargetPlayAttackSound();
-
-            if (Physics.Raycast(ray, out hit, attackDistance))
-            {
-                GameObject hitGameObject = hit.collider.gameObject;
-
-                if (hitGameObject.CompareTag(Tags.SURVIVOR))
+                if (trapId == netIdOfTrap)
                 {
-                    Survivor survivor = hitGameObject.GetComponent<Survivor>();
-                    // TODO: Play an animation here.
-                    survivor.CmdDie();
-                }
-
-                else if (hitGameObject.CompareTag(Tags.TRAP))
-                {
-                    Trap trap = hitGameObject.GetComponent<Trap>();
-
-                    if (trap.Armed())
-                    {
-                        return;
-                    }
-
-                    TargetPlayArmedSound();
-                    trap.CmdArm();
-                }
-
-                else if (hitGameObject.CompareTag(Tags.DOOR))
-                {
-                    Door door = hitGameObject.GetComponent<Door>();
-                    door.CmdPlayerClickedOnLockedDoor();
+                    Debug.Log($"Trap {trapId} is armable!");
                 }
             }
         }
 
-        else
-        {
-            if (Physics.Raycast(ray, out hit, trapArmDistance))
-            {
-                GameObject hitGameObject = hit.collider.gameObject;
-
-                if (hitGameObject.CompareTag(Tags.TRAP))
-                {
-                    Trap trap = hitGameObject.GetComponent<Trap>();
-
-                    if (trap.Armed())
-                    {
-                        return;
-                    }
-
-                    TargetPlayArmedSound();
-                    trap.CmdArm();
-                }
-            }
-        }
     }
 }

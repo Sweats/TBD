@@ -1,5 +1,6 @@
 using Mirror;
-public class ClientKey
+using UnityEngine;
+public class ClientKey: MonoBehaviour
 {
     private ClientKey(){}
 
@@ -19,9 +20,18 @@ public class ClientKey
 
     private void OnClientServerGameSurvivorPickedUpKey(NetworkConnection connection, ClientServerGameSurvivorPickedUpKeyMessage message)
     {
-        string keyName = message.keyName;
-        string survivorName = message.playerName;
-        EventManager.clientServerGameSurvivorPickedUpKeyEvent.Invoke(keyName, survivorName);
+        uint keyId = message.keyId;
+        uint survivorId = message.survivorId;
 
+        KeyObject keyObject = NetworkIdentity.spawned[keyId].GetComponent<KeyObject>();
+
+        if (keyObject != null)
+        {
+            string keyName = keyObject.Name();
+            string survivorName = NetworkIdentity.spawned[survivorId].GetComponent<Survivor>().Name();
+            keyObject.ClientPlayPickupSound();
+            keyObject.Hide();
+            EventManager.clientServerGameSurvivorPickedUpKeyEvent.Invoke(survivorName, keyName);
+        }
     }
 }

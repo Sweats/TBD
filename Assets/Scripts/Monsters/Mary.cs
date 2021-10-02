@@ -6,6 +6,10 @@ using Mirror;
 // NOTE: This class may need a lot more testing. I think I covered all of the bugs though. It's a tricky problem to solve lol.
 public class Mary : NetworkBehaviour
 {
+
+    [SyncVar]
+    private string name;
+
     [SyncVar]
     [SerializeField]
     private float energy;
@@ -196,6 +200,19 @@ public class Mary : NetworkBehaviour
         maryCamera.enabled = true;
         maryCamera.GetComponent<AudioListener>().enabled = true;
         Cursor.lockState = CursorLockMode.Locked;
+
+    }
+
+    [Server]
+    public void ServerSetName(string name)
+    {
+        this.name = name;
+    }
+
+    [Server]
+    public string Name()
+    {
+        return name;
 
     }
 
@@ -451,7 +468,7 @@ public class Mary : NetworkBehaviour
                 if (hitGameObject.CompareTag(Tags.DOOR))
                 {
                     Door door = hitGameObject.GetComponent<Door>();
-                    door.CmdPlayerClickedOnLockedDoor();
+                    //door.CmdPlayerClickedOnLockedDoor();
                 }
             }
         }
@@ -468,13 +485,13 @@ public class Mary : NetworkBehaviour
                 if (hitGameObject.CompareTag(Tags.SURVIVOR))
                 {
                     Survivor survivor = hitGameObject.GetComponent<Survivor>();
-                    survivor.CmdDie();
+                    //survivor.CmdDie();
                 }
 
                 else if (hitGameObject.CompareTag(Tags.DOOR))
                 {
                     Door door = hitGameObject.GetComponent<Door>();
-                    door.CmdPlayerClickedOnLockedDoor(); ;
+                    //door.CmdPlayerClickedOnLockedDoor(); ;
                 }
             }
         }
@@ -532,7 +549,7 @@ public class Mary : NetworkBehaviour
     {
         for (var i = 0; i < oldTraps.Count; i++)
         {
-            oldTraps[i].Disarm();
+            oldTraps[i].ServerDisarm();
         }
 
         oldTraps.Clear();
@@ -546,7 +563,7 @@ public class Mary : NetworkBehaviour
             if (trapObject.CompareTag(Tags.TRAP))
             {
                 Trap trap = trapObject.GetComponent<Trap>();
-                trap.CmdArm();
+                //trap.CmdArm();
                 oldTraps.Add(trap);
             }
         }

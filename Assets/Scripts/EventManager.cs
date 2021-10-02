@@ -3,9 +3,11 @@ using UnityEngine.Events;
 public static class EventManager
 {
     #region STAGE_CLIENT
-    public static ClientServerGameSurvivorDeathEvent clientServerGameSurvivorDeathEvent = new ClientServerGameSurvivorDeathEvent();
+    public static ClientServerGameSurvivorDeathEvent clientServerGameSurvivorKilledEvent = new ClientServerGameSurvivorDeathEvent();
 
-    public static ClientServerGameSurvivorsEscapedEvent survivorsEscapedStageEvent = new ClientServerGameSurvivorsEscapedEvent();
+    public static ClientServerGameSurvivorsEscapedEvent clientServerGameSurvivorsEscapedEvent = new ClientServerGameSurvivorsEscapedEvent();
+
+    public static ClientServerGameSurvivorsDeadEvent clientServerGameSurvivorsDeadEvent = new ClientServerGameSurvivorsDeadEvent();
 
     public static ClientServerGameSurvivorPickedUpKeyEvent clientServerGameSurvivorPickedUpKeyEvent = new ClientServerGameSurvivorPickedUpKeyEvent();
 
@@ -23,6 +25,7 @@ public static class EventManager
 
     public static ClientServerGamePlayerSentChatMessageEvent clientServerGamePlayerSentChatMessageEvent = new ClientServerGamePlayerSentChatMessageEvent();
 
+
     public static ClientServerGameSurvivorUnlockedDoorEvent clientServerGameSurvivorUnlockedDoorEvent = new ClientServerGameSurvivorUnlockedDoorEvent();
 
     public static ClientServerGameFaliedToUnlockDoorEvent clientServerGameFaliedToUnlockDoorEvent = new ClientServerGameFaliedToUnlockDoorEvent();
@@ -31,17 +34,32 @@ public static class EventManager
 
     public static ClientServerGamePlayerDisconnectedEvent clientServerGamePlayerDisconnectedEvent = new ClientServerGamePlayerDisconnectedEvent();
 
+
     public static ClientServerGamePlayerChangedNameEvent clientServerGamePlayerChangedNameEvent = new ClientServerGamePlayerChangedNameEvent();
 
     public static ClientServerGameMonsterWonEvent clientServerGameMonsterWonEvent = new ClientServerGameMonsterWonEvent();
 
     public static ClientServerGameLurkerReadyToGoIntoPhysicalFormEvent clientServerGameLurkerReadyToGoIntoPhysicalFormEvent = new ClientServerGameLurkerReadyToGoIntoPhysicalFormEvent();
 
+    public static ClientServerGameLurkerTrapArmedEvent clientServerGameLurkerTrapArmedEvent = new ClientServerGameLurkerTrapArmedEvent();
+
+    public static ClientServerGameLurkerArmableTrapsEvent clientServerGameLurkerArmableTrapsEvent = new ClientServerGameLurkerArmableTrapsEvent();
+
     public static ClientServerGameMaryReadyToFrenzyEvent ClientServerGameMaryReadyToFrenzyEvent = new ClientServerGameMaryReadyToFrenzyEvent();
 
     public static ClientServerGameMaryReadyToTeleportEvent clientServerGameMaryReadyToTeleportEvent = new ClientServerGameMaryReadyToTeleportEvent();
 
+    public static ClientServerGameHostStartedGameEvent clientServerGameHostStartedGameEvent = new ClientServerGameHostStartedGameEvent();
+
 #endregion
+
+#region STAGE_SERVER
+
+    public static ServerClientGameSurvivorsEscapedEvent serverClientGameSurvivorsEscapedEvent = new ServerClientGameSurvivorsEscapedEvent();
+
+    public static ServerClientGameSurvivorsDeadEvent serverClientGameSurvivorsDeadEvent = new ServerClientGameSurvivorsDeadEvent();
+
+    public static ServerClientGameLurkerJoinedEvent serverClientGameLurkerJoinedEvent = new ServerClientGameLurkerJoinedEvent();
 
 #region LOBBY_CLIENT
 
@@ -76,7 +94,11 @@ public static class EventManager
     public static ClientServerLobbyHostKickedYouEvent clientServerLobbyHostKickedYouEvent = new ClientServerLobbyHostKickedYouEvent();
 
 #endregion
-    public static MasterServerClientSentUsLobbyListEvent masterServerClientSentUsLobbyListEvent = new MasterServerClientSentUsLobbyListEvent();
+    public static MasterClientServerSentUsLobbyListEvent masterServerClientSentUsLobbyListEvent = new MasterClientServerSentUsLobbyListEvent();
+
+    public static MasterClientServerAddedClientHostEvent masterClientServerAddedClientHostEvent = new MasterClientServerAddedClientHostEvent();
+
+    public static MasterClientServerAddedDedicatedServerEvent masterClientServerAddedDedicatedServerEvent = new MasterClientServerAddedDedicatedServerEvent();
 
 
 }
@@ -95,34 +117,38 @@ public class ClientServerGameRejectBatteryPickupEvent: UnityEvent{}
 
 public class ClientServerGameYouPickedUpBatteryEvent: UnityEvent{}
 
-public class ClientServerGamePlayerSentChatMessageEvent : UnityEvent<string, string> { }
+public class ClientServerGamePlayerSentChatMessageEvent : UnityEvent<string> { }
 
-#endregion
+public class ClientServerGameSurvivorsEscapedEvent: UnityEvent{}
 
-#region STAGE_EVENTS
-
-public class ClientServerGameSurvivorsEscapedEvent : UnityEvent { }
+public class ClientServerGameSurvivorsDeadEvent: UnityEvent{}
 
 public class ClientServerGameMonsterWonEvent : UnityEvent { }
 
-#endregion
-
-#region LURKER_EVENTS
-
-public class LurkerChangedFormEvent : UnityEvent<bool> { }
-
-
 public class ClientServerGameLurkerReadyToGoIntoPhysicalFormEvent : UnityEvent { }
 
+public class ClientServerGameLurkerTrapArmedEvent: UnityEvent{}
+
+public class ClientServerGameLurkerArmableTrapsEvent: UnityEvent<uint[]>{}
 
 #endregion
 
+#region SERVER_GAME_EVENTS
+public class ServerClientGameSurvivorsEscapedEvent: UnityEvent{}
+
+public class ServerClientGameSurvivorsDeadEvent: UnityEvent{}
+
+public class ServerClientGameLurkerJoinedEvent: UnityEvent<uint>{}
+
+#endregion
 
 #region MARY_EVENTS
 
 public class ClientServerGameMaryReadyToFrenzyEvent : UnityEvent { }
 
 public class ClientServerGameMaryReadyToTeleportEvent : UnityEvent { }
+
+public class ClientServerGameHostStartedGameEvent: UnityEvent{}
 
 #endregion
 
@@ -210,7 +236,7 @@ public class ClientServerLobbyPlayerDisconnectEvent: UnityEvent<string, int>{}
 
 public class ClientServerLobbyPlayerChangedCharacterEvent: UnityEvent<Character, int>{}
 
-public class ClientServerLobbyPlayerSentChatMessageEvent: UnityEvent<string, string>{}
+public class ClientServerLobbyPlayerSentChatMessageEvent: UnityEvent<string>{}
 
 public class LobbyClientServerDisconnectedEvent: UnityEvent{}
 
@@ -220,9 +246,12 @@ public class ClientServerLobbyServerAssignedYouHostEvent: UnityEvent<int>{}
 
 public class DedicatedServerReceivedIdEvent: UnityEvent<int>{}
 
-public class MasterServerClientSentUsLobbyListEvent: UnityEvent<Lobby[]>{}
+public class MasterClientServerSentUsLobbyListEvent: UnityEvent<Lobby[]>{}
+
+public class MasterClientServerAddedClientHostEvent: UnityEvent<int>{}
+public class MasterClientServerAddedDedicatedServerEvent: UnityEvent<int>{}
 
 public class ClientServerPickedNewHostEvent: UnityEvent<string>{}
 
 #endregion
-
+#endregion

@@ -75,12 +75,10 @@ public class SoundUI : MonoBehaviour
 
     public static string INSANITY_MIXER_STRING = "Insanity";
 
-
     public AudioMixer audioMixer;
 
-    private void Start()
+    public void LocalPlayerStart()
     {
-        this.enabled = false;
         LoadSoundsFromConfig();
     }
 

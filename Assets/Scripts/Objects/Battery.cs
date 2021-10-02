@@ -50,12 +50,9 @@ public class Battery : NetworkBehaviour
 
     private bool glowing = false;
 
-    private int batteryID;
-
     [Client]
     private void Start()
     {
-        batteryID = Random.Range(0, 10000);
         noGlowTimer = maxTimerForGlow;
         //defaultSpecular = batteryRenderer.material.GetFloat("_Shininess");
         //batteryRenderer.material.SetColor("_Color", originalMeshColor);

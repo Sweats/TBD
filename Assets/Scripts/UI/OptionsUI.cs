@@ -29,11 +29,6 @@ public class OptionsUI : MonoBehaviour
     [SerializeField]
     private GraphicsUI graphicsUI;
 
-    private void Start()
-    {
-        this.enabled = false;
-    }
-
     private void Update()
     {
         if (Keybinds.GetKey(Action.GuiReturn))

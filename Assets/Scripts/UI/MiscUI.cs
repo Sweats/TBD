@@ -10,12 +10,6 @@ public class MiscUI : MonoBehaviour
     [SerializeField]
     private OptionsUI optionsUI;
 
-    private void Start()
-    {
-        this.enabled = false;
-
-    }
-
     private void Update()
     {
         if (Keybinds.GetKey(Action.GuiReturn))

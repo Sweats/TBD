@@ -2,9 +2,9 @@ using UnityEngine;
 using Mirror;
 using System.Collections.Generic;
 
-public class ServerStage: MonoBehaviour
+public class ServerStage : MonoBehaviour
 {
-    private ServerStage(){}
+    private ServerStage() { }
 
     private SurvivorSpawnPoint[] survivorSpawnPoints;
 
@@ -18,13 +18,71 @@ public class ServerStage: MonoBehaviour
     public void RegisterNetworkHandlers()
     {
         NetworkServer.RegisterHandler<ServerClientGamePlayerPickedCharacterMessage>(ServerClientGameOnPlayerPickedCharacterMessage);
+        NetworkServer.RegisterHandler<ServerClientGameHostRequestedToStartGameMessage>(OnServerClientGameHostStartedGame);
+        NetworkServer.RegisterHandler<ServerClientGamePlayerChangedProfileNameMessage>(OnServerClientGamePlayerChangedProfileName);
+        NetworkServer.RegisterHandler<ServerClientGameLurkerJoinedMessage>(OnServerClientGameLurkerJoined);
+        NetworkServer.RegisterHandler<ServerClientGamePlayerSpectatorJoinedMessage>(OnServerClientGamePlayerSpectatorConnected);
 
+    }
+
+    private void OnServerClientGamePlayerSpectatorConnected(NetworkConnection connection, ServerClientGamePlayerSpectatorJoinedMessage message)
+    {
+        Character[] unavailableCharactersOnServer = ServerUnavailableCharacters();
+        PlayerSpectator spectator = connection.identity.GetComponent<PlayerSpectator>();
+        string connectedPlayerName = spectator.ServerName();
+        connection.identity.connectionToClient.Send(new ClientServerGamePickCharacterMessage { unavailableCharacters = unavailableCharactersOnServer });
+        NetworkServer.SendToReady(new ClientServerGamePlayerConnectedMessage { name = connectedPlayerName });
+
+    }
+
+    private void OnServerClientGameLurkerJoined(NetworkConnection connection, ServerClientGameLurkerJoinedMessage message)
+    {
+        Lurker lurker = connection.identity.GetComponent<Lurker>();
+
+        if (lurker == null)
+        {
+            return;
+        }
+
+        EventManager.serverClientGameLurkerJoinedEvent.Invoke(lurker.netIdentity.netId);
+
+    }
+
+    private void OnServerClientGamePlayerChangedProfileName(NetworkConnection connection, ServerClientGamePlayerChangedProfileNameMessage message)
+    {
+        Survivor survivor = connection.identity.GetComponent<Survivor>();
+
+        if (survivor == null)
+        {
+            return;
+        }
+
+        survivor.ServerSetName(message.newProfileName);
+
+        // NOTE: Is there a point in setting the player name for the monster?
+
+        NetworkServer.SendToReady(new ClientServerGamePlayerChangedProfileNameMessage { oldName = message.oldProfileName, newName = message.newProfileName });
+
+    }
+
+    private void OnServerClientGameHostStartedGame(NetworkConnection connection, ServerClientGameHostRequestedToStartGameMessage message)
+    {
+        NetworkServer.SendToReady(new ClientServerGameHostStartedGameMessage { });
     }
 
     private void ServerClientGameOnPlayerPickedCharacterMessage(NetworkConnection connection, ServerClientGamePlayerPickedCharacterMessage message)
     {
-
         Character pickedCharacter = message.pickedCharacter;
+
+        PlayerSpectator spectator = connection.identity.GetComponent<PlayerSpectator>();
+
+        if (spectator == null)
+        {
+            return;
+        }
+
+
+        string playerName = spectator.ServerName();
 
         if ((byte)pickedCharacter >= 5)
         {
@@ -33,16 +91,62 @@ public class ServerStage: MonoBehaviour
 
         else
         {
-            ServerSpawnSurvivor(connection, pickedCharacter);
+            ServerSpawnSurvivorMidGame(connection, pickedCharacter);
         }
+
+        NetworkServer.SendToReady(new ClientServerGamePlayerJoinedMessage { name = playerName });
+
     }
 
     // NOTE: Only called when someone joins a game mid match.
     public void OnServerConnect(NetworkConnection connection)
     {
         SpawnPlayerSpectator(connection);
-        Character [] character = ServerUnavailableCharacters();
-        connection.identity.connectionToClient.Send(new ClientServerGamePickCharacterMessage{unavailableCharacters = character});
+        Character[] character = ServerUnavailableCharacters();
+        connection.identity.connectionToClient.Send(new ClientServerGamePickCharacterMessage { unavailableCharacters = character });
+    }
+
+    public void OnServerDisconnect(NetworkConnection connection)
+    {
+        Survivor survivor;
+        string disconnectedName = string.Empty;
+
+        bool isSurvivor  = connection.identity.TryGetComponent<Survivor>(out survivor);
+
+        if (isSurvivor)
+        {
+            disconnectedName = survivor.Name();
+        }
+
+        Mary mary;
+
+        bool isMary = connection.identity.TryGetComponent<Mary>(out mary);
+
+        if (isMary)
+        {
+            disconnectedName = mary.Name();
+        }
+
+        Lurker lurker;
+
+        bool isLurker = connection.identity.TryGetComponent<Lurker>(out lurker);
+
+        if (isLurker)
+        {
+            disconnectedName = lurker.Name();
+
+        }
+
+        Phantom  phantom;
+
+        bool isPhantom = connection.identity.TryGetComponent<Phantom>(out phantom);
+
+        if (isPhantom)
+        {
+            disconnectedName = phantom.Name();
+        }
+
+        NetworkServer.SendToReady(new ClientServerGamePlayerDisconnectedMessage { name = disconnectedName });
     }
 
     private void SpawnPlayerSpectator(NetworkConnection connection)
@@ -69,7 +173,7 @@ public class ServerStage: MonoBehaviour
 
             if (survivor != null)
             {
-                unAvailableCharacters.Add(survivor.PlayerCharacter());
+                unAvailableCharacters.Add(survivor.ServerPlayerCharacter());
                 continue;
             }
 
@@ -134,7 +238,7 @@ public class ServerStage: MonoBehaviour
 
             if ((byte)selectedCharacter <= 5)
             {
-                ServerSpawnSurvivor(connection, player.SelectedCharacter());
+                ServerSpawnSurvivorLobby(connection, player.SelectedCharacter());
             }
 
             else
@@ -144,7 +248,7 @@ public class ServerStage: MonoBehaviour
         }
     }
 
-    private void ServerSpawnMonster(NetworkConnection connection, Character monster) 
+    private void ServerSpawnMonster(NetworkConnection connection, Character monster)
     {
         GameObject[] monsterSpawnPoints = GameObject.FindGameObjectsWithTag(Tags.MONSTER_SPAWN_POINT);
         int randomNumber = UnityEngine.Random.Range(0, monsterSpawnPoints.Length);
@@ -157,7 +261,7 @@ public class ServerStage: MonoBehaviour
         NetworkServer.Destroy(playerGameObject);
     }
 
-    private void ServerSpawnSurvivor(NetworkConnection connection, Character survivorCharacter)
+    private void ServerSpawnSurvivorMidGame(NetworkConnection connection, Character survivorCharacter)
     {
         for (var i = 0; i < survivorSpawnPoints.Length; i++)
         {
@@ -172,11 +276,40 @@ public class ServerStage: MonoBehaviour
             survivorSpawnPoint.SetUsed();
             GameObject survivorObject = Survivor(survivorCharacter);
             GameObject spawnedSurvivor = Instantiate(survivorObject, survivorSpawnPoint.gameObject.transform.position, Quaternion.identity);
-            GameObject lobbyPlayerObject = connection.identity.gameObject;
+            PlayerSpectator playerSpectator = connection.identity.GetComponent<PlayerSpectator>();
+            string playerName = playerSpectator.ServerName();
             NetworkServer.ReplacePlayerForConnection(connection, spawnedSurvivor);
-            NetworkServer.Destroy(lobbyPlayerObject);
+            Survivor spawnedSurvivorPlayer = spawnedSurvivor.GetComponent<Survivor>();
+            spawnedSurvivorPlayer.ServerSetName(playerName);
+            NetworkServer.Destroy(playerSpectator.gameObject);
             break;
         }
+    }
+
+    private void ServerSpawnSurvivorLobby(NetworkConnection connection, Character survivorCharacter)
+    {
+        for (var i = 0; i < survivorSpawnPoints.Length; i++)
+        {
+            SurvivorSpawnPoint survivorSpawnPoint = survivorSpawnPoints[i];
+
+            // We found a spawn point.
+            if (survivorSpawnPoint.Used())
+            {
+                continue;
+            }
+
+            survivorSpawnPoint.SetUsed();
+            GameObject survivorObject = Survivor(survivorCharacter);
+            GameObject spawnedSurvivor = Instantiate(survivorObject, survivorSpawnPoint.gameObject.transform.position, Quaternion.identity);
+            LobbyPlayer lobbyPlayer = connection.identity.GetComponent<LobbyPlayer>();
+            string playerName = lobbyPlayer.Name();
+            NetworkServer.ReplacePlayerForConnection(connection, spawnedSurvivor);
+            Survivor spawnedSurvivorPlayer = spawnedSurvivor.GetComponent<Survivor>();
+            spawnedSurvivorPlayer.ServerSetName(playerName);
+            NetworkServer.Destroy(lobbyPlayer.gameObject);
+            break;
+        }
+
     }
 
     private void ServerSetSurvivorSpawnPoints()

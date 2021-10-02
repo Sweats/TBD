@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Windows : MonoBehaviour
 {
@@ -12,10 +13,25 @@ public class Windows : MonoBehaviour
     private Chat chatUI;
 
     [SerializeField]
+    private GameMessages gameMessagesUI;
+
+    [SerializeField]
     private PlayerStatsUI playerStatsUI;
 
     [SerializeField]
+    private GameOverUI gameOverUI;
+
+    [SerializeField]
+    private SoundUI soundUI;
+
+    [SerializeField]
     private Texture crosshair;
+
+    [SerializeField]
+    private EventSystem eventSystem;
+
+    [SerializeField]
+    private StandaloneInputModule inputModule;
 
     private bool consoleWindowOpened;
 
@@ -65,6 +81,17 @@ public class Windows : MonoBehaviour
             playerStatsWindowOpened = false;
 
         }
+    }
+
+    public void LocalPlayerStart()
+    {
+        gameMessagesUI.enabled = true;
+        eventSystem.enabled = true;
+        inputModule.enabled = true;
+        gameMessagesUI.LocalPlayerStart();
+        consoleUI.LocalPlayerStart();
+        gameOverUI.LocalPlayerStart();
+        soundUI.LocalPlayerStart();
     }
 
     private void OnGUI()

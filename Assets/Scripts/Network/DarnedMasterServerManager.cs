@@ -31,6 +31,7 @@ public class DarnedMasterServerManager : NetworkManager
     public override void OnStartServer()
     {
         base.OnStartServer();
+        masterServer.RegisterNetworkHandlers();
         Log("Master server has started successfully!");
     }
 
@@ -40,6 +41,12 @@ public class DarnedMasterServerManager : NetworkManager
         {
 
         }
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        masterClient.RegisterNetworkHandlers();
     }
 
     public static void Log(string text)

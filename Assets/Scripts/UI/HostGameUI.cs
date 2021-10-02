@@ -2,7 +2,6 @@
 using UnityEngine.UI;
 using System;
 using Mirror;
-using kcp2k;
 
 public class HostGameUI : MonoBehaviour
 {
@@ -30,6 +29,7 @@ public class HostGameUI : MonoBehaviour
     private void Start()
     {
         this.enabled = false;
+        EventManager.masterClientServerAddedClientHostEvent.AddListener(OnMasterServerAddedClientHost);
     }
 
 
@@ -78,13 +78,54 @@ public class HostGameUI : MonoBehaviour
             HostLobby.LOBBY_PORT = port;
         }
 
-        DarnedNetworkManager.CLIENT_HOSTING_LOBBY = true;
         string lobbySceneName = Stages.Name(StageName.Lobby);
         HostLobby.LOBBY_NAME = lobbyText;
         HostLobby.LOBBY_PASSWORD = password;
-        Stages.Load(StageName.Lobby);
-        //Hide();
-        //lobbyUI.Show(true);
+
+        bool noMasterServer = true;
+
+        if (noMasterServer)
+        {
+            CreateDarnedServer();
+
+        }
+
+        else
+        {
+            CreateDarnedServerAndAddToMasterServerList();
+        }
+    }
+
+    private void CreateDarnedServerAndAddToMasterServerList()
+    {
+        GameObject masterServerManager = (GameObject)Resources.Load("Darned Master Server Manager");
+        GameObject spawnedObject = Instantiate(masterServerManager);
+        string address = "localhost:7777";
+        Uri uri = new Uri(address);
+        NetworkManager.singleton.StartClient();
+        string name = HostLobby.LOBBY_NAME;
+        string lobbyPassword = HostLobby.LOBBY_PASSWORD;
+        NetworkClient.Send(new MasterServerClientHostRequestToBeAddedMessage{lobbyName = name, password = lobbyPassword});
+
+    }
+
+    private void CreateDarnedServer()
+    {
+        GameObject darnedNetworkManager = (GameObject)Resources.Load("Darned Network Manager");
+        GameObject spawnedObject = Instantiate(darnedNetworkManager);
+        string address = "localhost:7777";
+        Uri uri = new Uri(address);
+        NetworkManager.singleton.StartHost();
+        string sceneToLoad = Stages.Name(StageName.Lobby);
+        NetworkManager.singleton.ServerChangeScene(sceneToLoad);
+    }
+
+    private void OnMasterServerAddedClientHost(int id)
+    {
+        NetworkManager.singleton.StopClient();
+        HostLobby.LOBBY_ID = id;
+        Destroy(NetworkManager.singleton.gameObject);
+        CreateDarnedServer();
     }
 
 

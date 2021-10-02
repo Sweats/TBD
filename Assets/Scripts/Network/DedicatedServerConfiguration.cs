@@ -23,17 +23,17 @@ public class DedicatedServerConfiguration
     {
         if (!File.Exists(configPath))
         {
-            DarnedNetworkManager.Log($"The configuration file {configPath} does not exist. Generating a new one...");
+            //DarnedNetworkManager.Log($"The configuration file {configPath} does not exist. Generating a new one...");
             string currentDirectoryName = Directory.GetCurrentDirectory();
             GenerateConfig(configPath);
-            DarnedNetworkManager.Log($"Generated new configuration file named {configPath} in the directory {currentDirectoryName}");
+            //DarnedNetworkManager.Log($"Generated new configuration file named {configPath} in the directory {currentDirectoryName}");
             return false;
         }
 
         return true;
     }
 
-    private static void GenerateConfig(string configPath)
+    public static void GenerateConfig(string configPath)
     {
         var config = new DedicatedServerConfiguration
         {

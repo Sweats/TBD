@@ -103,6 +103,7 @@ public class KeyObject : NetworkBehaviour
     public void Hide()
     {
         keyRenderer.enabled = false;
+        this.enabled = false;
         keyCollider.enabled = false;
     }
 
@@ -113,6 +114,12 @@ public class KeyObject : NetworkBehaviour
             keyRenderer.enabled = true;
             keyCollider.enabled = true;
         }
+    }
+
+    [Client]
+    public void ClientPlayPickupSound()
+    {
+        pickupSound.Play();
     }
 
     public void SetName(string name)
