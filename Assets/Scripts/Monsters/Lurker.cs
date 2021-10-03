@@ -266,6 +266,7 @@ public class Lurker : NetworkBehaviour
     }
 
 
+    [Client]
     private void ShowSurvivors()
     {
         //TODO: Cache this. We don't cache it above because survivors can connect and leave the game as they please.

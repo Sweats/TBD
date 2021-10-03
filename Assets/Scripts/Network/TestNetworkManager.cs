@@ -36,6 +36,9 @@ public class TestNetworkManager : NetworkManager
     private ServerLurker serverLurker;
 
     [SerializeField]
+    private ServerPhantom serverPhantom;
+
+    [SerializeField]
     private ClientLobby clientLobby;
 
     [SerializeField]
@@ -53,8 +56,14 @@ public class TestNetworkManager : NetworkManager
     [SerializeField]
     private ClientEscape clientEscape;
 
+
     [SerializeField]
     private ClientLurker clientLurker;
+
+
+
+    [SerializeField]
+    private ClientPhantom clientPhantom;
 
     [SerializeField]
     private ClientTrap clientTrap;
@@ -78,6 +87,7 @@ public class TestNetworkManager : NetworkManager
         serverBattery.RegisterNetworkHandlers();
         serverFlashlight.RegisterNetworkHandlers();
         serverLurker.RegisterNetworkHandlers();
+        serverPhantom.RegisterNetworkHandlers();
         serverTrap.RegisterNetworkHandlers();
 
         serverStage.OnServerSceneChanged();
@@ -115,6 +125,7 @@ public class TestNetworkManager : NetworkManager
         clientEscape.RegisterNetworkHandlers();
         clientLurker.RegisterNetworkHandlers();
         clientTrap.RegisterNetworkHandlers();
+        clientPhantom.RegisterNetworkHandlers();
 
 
     }

@@ -155,6 +155,8 @@ public class Survivor : NetworkBehaviour
 
     private bool escaped;
 
+    private bool detectedByPhantom;
+
     private Character character;
 
     //NOTE: For drawing the keys in the inventory
@@ -371,6 +373,19 @@ public class Survivor : NetworkBehaviour
         this.survivorName = name;
     }
 
+    [Server]
+    public bool ServerDetectedByPhantom()
+    {
+        return detectedByPhantom;
+
+    }
+
+    [Server]
+    public void ServerSetDetectedByPhantom(bool value)
+    {
+        this.detectedByPhantom = value;
+    }
+
     public float TrapDistance()
     {
         return trapDistance;
@@ -439,6 +454,7 @@ public class Survivor : NetworkBehaviour
     {
         survivorRenderer.enabled = false;
         meshCollider.enabled = false;
+        flashlight.enabled = false;
         chadModel.SetActive(false);
     }
 
@@ -541,8 +557,9 @@ public class Survivor : NetworkBehaviour
     {
         this.survivorRenderer.enabled = true;
         this.meshCollider.enabled = true;
+        // NOTE: Don't want to show it here just in case if the survivors flashlight is actually off. We use the toggle syncvar instead.
+        this.flashlight.enabled = toggled;
         this.chadModel.SetActive(true);
-        // TODO: Enable collisions here at some point
     }
 }
 

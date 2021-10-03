@@ -61,6 +61,8 @@ public static class EventManager
 
     public static ServerClientGameLurkerJoinedEvent serverClientGameLurkerJoinedEvent = new ServerClientGameLurkerJoinedEvent();
 
+    public static ServerClientGamePhantomJoinedEvent serverClientGamePhantomJoinedEvent = new ServerClientGamePhantomJoinedEvent();
+
 #region LOBBY_CLIENT
 
     //NOTE: Lobby client.
@@ -139,6 +141,8 @@ public class ServerClientGameSurvivorsEscapedEvent: UnityEvent{}
 public class ServerClientGameSurvivorsDeadEvent: UnityEvent{}
 
 public class ServerClientGameLurkerJoinedEvent: UnityEvent<uint>{}
+
+public class ServerClientGamePhantomJoinedEvent: UnityEvent<uint>{}
 
 #endregion
 

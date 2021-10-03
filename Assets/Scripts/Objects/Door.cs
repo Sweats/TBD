@@ -77,6 +77,12 @@ public class Door : NetworkBehaviour
         doorCollider.enabled = false;
     }
 
+    [Client]
+    public void DisableCollision()
+    {
+        doorCollider.enabled = false;
+    }
+
     //NOTE: Lurker
     [Client]
     public void Show()

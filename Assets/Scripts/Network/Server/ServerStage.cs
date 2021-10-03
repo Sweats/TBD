@@ -21,6 +21,7 @@ public class ServerStage : MonoBehaviour
         NetworkServer.RegisterHandler<ServerClientGameHostRequestedToStartGameMessage>(OnServerClientGameHostStartedGame);
         NetworkServer.RegisterHandler<ServerClientGamePlayerChangedProfileNameMessage>(OnServerClientGamePlayerChangedProfileName);
         NetworkServer.RegisterHandler<ServerClientGameLurkerJoinedMessage>(OnServerClientGameLurkerJoined);
+        NetworkServer.RegisterHandler<ServerClientGamePhantomJoinedMessage>(OnServerClientGamePhantomJoined);
         NetworkServer.RegisterHandler<ServerClientGamePlayerSpectatorJoinedMessage>(OnServerClientGamePlayerSpectatorConnected);
 
     }
@@ -37,15 +38,33 @@ public class ServerStage : MonoBehaviour
 
     private void OnServerClientGameLurkerJoined(NetworkConnection connection, ServerClientGameLurkerJoinedMessage message)
     {
-        Lurker lurker = connection.identity.GetComponent<Lurker>();
+        Lurker lurker;
 
-        if (lurker == null)
+        bool isLurker = connection.identity.TryGetComponent<Lurker>(out lurker);
+
+        if (!isLurker)
         {
             return;
         }
 
         EventManager.serverClientGameLurkerJoinedEvent.Invoke(lurker.netIdentity.netId);
 
+    }
+
+    private void OnServerClientGamePhantomJoined(NetworkConnection connection, ServerClientGamePhantomJoinedMessage message)
+    {
+        Phantom phantom;
+
+        bool isPhantom = connection.identity.TryGetComponent<Phantom>(out phantom);
+
+        if (!isPhantom)
+        {
+            return;
+        }
+        
+        uint netid = phantom.netIdentity.netId;
+
+        EventManager.serverClientGamePhantomJoinedEvent.Invoke(netid);
     }
 
     private void OnServerClientGamePlayerChangedProfileName(NetworkConnection connection, ServerClientGamePlayerChangedProfileNameMessage message)
@@ -143,7 +162,7 @@ public class ServerStage : MonoBehaviour
 
         if (isPhantom)
         {
-            disconnectedName = phantom.Name();
+            disconnectedName = phantom.ServerName();
         }
 
         NetworkServer.SendToReady(new ClientServerGamePlayerDisconnectedMessage { name = disconnectedName });

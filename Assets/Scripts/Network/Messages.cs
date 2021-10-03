@@ -157,7 +157,23 @@ public struct ServerClientGameLurkerRequestToArmTrapMessage: NetworkMessage
 
 }
 
+public struct ServerClientGamePhantomSwingAtNothingMessage: NetworkMessage
+{
+
+}
+
+public struct ServerClientGamePhantomSwingAttackMessage: NetworkMessage
+{
+    public uint requestedSurvivorId;
+
+}
+
 public struct ServerClientGameLurkerJoinedMessage: NetworkMessage
+{
+
+}
+
+public struct ServerClientGamePhantomJoinedMessage: NetworkMessage
 {
 
 }
@@ -346,6 +362,24 @@ public struct ClientServerGameLurkerAttackedMessage: NetworkMessage
     public uint lurkerId;
 
 }
+
+public struct ClientServerGamePhantomAttackedMessage: NetworkMessage
+{
+    public uint phantomId;
+
+}
+
+public struct ClientServerGamePhantomSurvivorDetectedMesasge: NetworkMessage
+{
+    public uint detectedSurvivorId;
+
+}
+
+public struct ClientServerGamePhantomSurvivorNoLongerDetected: NetworkMessage
+{
+    public uint noLongerDetectedSurvivorId;
+}
+
 
 
 public struct ClientServerGameLurkerArmableTrapsMessage: NetworkMessage

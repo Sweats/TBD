@@ -6,19 +6,20 @@ public class Phantom : NetworkBehaviour
 {
     [SyncVar]
     private string name;
+
     [SerializeField]
-    [SyncVar]
     private float speed;
 
     [SerializeField]
-    [SyncVar]
     private float attackDistance;
 
+
     [SerializeField]
-    [SyncVar]
+    private float detectionDistance;
+
+    [SerializeField]
     private int attackCoolDownInSeconds;
 
-    [SyncVar]
     [SerializeField]
     private bool canAttack = true;
 
@@ -58,24 +59,55 @@ public class Phantom : NetworkBehaviour
     {
         this.enabled = true;
         phantomController = GetComponent<CharacterController>();
+        EventManager.clientServerGameSurvivorsDeadEvent.AddListener(OnAllSurvivorsDead);
+        EventManager.clientServerGameSurvivorsEscapedEvent.AddListener(OnAllSurvivorsEscaped);
         windows.enabled = true;
+        windows.LocalPlayerStart();
         phantomCamera.enabled = true;
         phantomCamera.GetComponent<AudioListener>().enabled = true;
         Cursor.lockState = CursorLockMode.Locked;
         phantomController.enabled = true;
         HideImportantObjects();
-        base.OnStartLocalPlayer();
+        DisableCollisionOnDoors();
+        NetworkClient.Send(new ServerClientGamePhantomJoinedMessage());
     }
 
-    public override void OnStartServer()
+    [Server]
+    public string ServerName()
     {
+        return name;
+    }
+
+    [Server]
+    public float ServerDetectionDistance()
+    {
+        return detectionDistance;
+    }
+
+    [Server]
+    public float ServerAttackDistance()
+    {
+        return attackDistance;
 
     }
 
     [Server]
-    public string Name()
+    public bool ServerCanAttack()
     {
-        return name;
+        return canAttack;
+
+    }
+
+    [Server]
+    public int AttackCoolDownInSeconds()
+    {
+        return attackCoolDownInSeconds;
+    }
+
+    [Server]
+    public void ServerSetAttack(bool value)
+    {
+        canAttack = value;
     }
 
     [Client]
@@ -132,9 +164,15 @@ public class Phantom : NetworkBehaviour
             velocity.y = -2f;
         }
 
+
         windows.Tick();
 
         if (windows.IsWindowOpen())
+        {
+            return;
+        }
+        
+        if (matchOver)
         {
             return;
         }
@@ -145,25 +183,27 @@ public class Phantom : NetworkBehaviour
 
         if (Keybinds.GetKey(Action.Attack))
         {
-            CmdAttack();
+            Attack();
+
         }
 
         phantomController.Move(secondmove * speed * Time.deltaTime);
     }
 
+    private void OnAllSurvivorsDead()
+    {
+
+    }
+
+
+    private void OnAllSurvivorsEscaped()
+    {
+
+    }
+
     [Client]
     private void HideImportantObjects()
     {
-        GameObject[] doors = GameObject.FindGameObjectsWithTag(Tags.DOOR);
-
-        if (doors != null)
-        {
-            for (var i = 0; i < doors.Length; i++)
-            {
-                Door door = doors[i].GetComponent<Door>();
-                door.Hide();
-            }
-        }
 
         GameObject[] keys = GameObject.FindGameObjectsWithTag(Tags.KEY);
 
@@ -188,59 +228,52 @@ public class Phantom : NetworkBehaviour
         }
     }
 
-    [TargetRpc]
-    private void TargetAttackSoundPlay()
+    [Client]
+    private void DisableCollisionOnDoors()
+    {
+        GameObject[] doors = GameObject.FindGameObjectsWithTag(Tags.DOOR);
+
+        if (doors != null)
+        {
+            for (var i = 0; i < doors.Length; i++)
+            {
+                Door door = doors[i].GetComponent<Door>();
+                door.DisableCollision();
+            }
+        }
+
+    }
+
+    [Client]
+    public void ClientPlayAttackSound()
     {
         attackSound.Play();
     }
 
-    [Command]
-    private void CmdAttack()
+    [Client]
+    private void Attack()
     {
-        if (canAttack)
+        RaycastHit hit;
+        Ray ray = phantomCamera.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out hit, attackDistance))
         {
-            StartCoroutine(AttackCoolDown());
-            RaycastHit hit;
-            Ray ray = phantomCamera.ScreenPointToRay(Input.mousePosition);
-            TargetAttackSoundPlay();
+            GameObject hitGameObject = hit.collider.gameObject;
 
-            if (Physics.Raycast(ray, out hit, attackDistance))
+            if (hitGameObject.CompareTag(Tags.SURVIVOR))
             {
-                GameObject hitGameObject = hit.collider.gameObject;
-
-                if (hitGameObject.CompareTag(Tags.SURVIVOR))
-                {
-                    Survivor survivor = hitGameObject.GetComponent<Survivor>();
-                }
+                uint survivorId = hitGameObject.GetComponent<Survivor>().netIdentity.netId;
+                NetworkClient.Send(new ServerClientGamePhantomSwingAttackMessage { requestedSurvivorId = survivorId });
             }
+        }
 
+        else
+        {
+            NetworkClient.Send(new ServerClientGamePhantomSwingAtNothingMessage { });
         }
     }
 
-
-    [Server]
-    private IEnumerator AttackCoolDown()
-    {
-        canAttack = false;
-        yield return new WaitForSeconds(attackCoolDownInSeconds);
-        canAttack = true;
-    }
-
-
-    // TODO: How do we want to handle the traps for the Phantom?
-    [Server]
-    private IEnumerator HandleTraps()
-    {
-        yield return null;
-    }
-
-    // TODO: How do we want to handle the survivor detection for the Phantom?
-    [Server]
-    private IEnumerator HandleSurvivorDetection()
-    {
-        yield return null;
-    }
-
+    [Client]
     private void OnGUI()
     {
         if (windows.IsWindowOpen())
