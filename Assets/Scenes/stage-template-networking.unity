@@ -4975,11 +4975,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1605835860505027258, guid: bc9d511738fb16d448f092fa93e10ebe,
-        type: 3}
-      propertyPath: onlineScene
-      value: Assets/Scenes/stage-template-networking.unity
-      objectReference: {fileID: 0}
     - target: {fileID: 4677071615283615570, guid: bc9d511738fb16d448f092fa93e10ebe,
         type: 3}
       propertyPath: m_RootOrder

@@ -34,7 +34,7 @@ public class GameMessages : MonoBehaviour
         EventManager.clientServerGameSurvivorUnlockedDoorEvent.AddListener(OnSurvivorUnlockedDoor);
         EventManager.clientServerGamePlayerDisconnectedEvent.AddListener(OnPlayerDisconnectMidGame);
         EventManager.clientServerGameLurkerReadyToGoIntoPhysicalFormEvent.AddListener(OnLurkerReadyToGoIntoPhysicalForm);
-        EventManager.ClientServerGameMaryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
+        EventManager.clientServerGameMaryReadyToFrenzyEvent.AddListener(OnMaryReadyToFrenzy);
         EventManager.clientServerGameMaryReadyToTeleportEvent.AddListener(OnMaryReadyToTeleport);
         EventManager.clientServerLobbyClientKickedEvent.AddListener(OnLobbyHostKickedPlayer);
         EventManager.clientServerLobbyHostKickedYouEvent.AddListener(OnLobbyHostKickedYou);

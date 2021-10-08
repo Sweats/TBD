@@ -300,7 +300,6 @@ public class Lurker : NetworkBehaviour
 
                 else if (hitGameObject.CompareTag(Tags.SURVIVOR))
                 {
-                    Debug.Log("TUHEUTNAH");
                     uint survivorId = hitGameObject.GetComponent<Survivor>().netIdentity.netId;
                     NetworkClient.Send(new ServerClientGameLurkerSwingAttackMessage { requestedTargetId = survivorId });
                 }

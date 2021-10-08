@@ -45,11 +45,17 @@ public static class EventManager
 
     public static ClientServerGameLurkerArmableTrapsEvent clientServerGameLurkerArmableTrapsEvent = new ClientServerGameLurkerArmableTrapsEvent();
 
-    public static ClientServerGameMaryReadyToFrenzyEvent ClientServerGameMaryReadyToFrenzyEvent = new ClientServerGameMaryReadyToFrenzyEvent();
+    public static ClientServerGameMaryReadyToFrenzyEvent clientServerGameMaryReadyToFrenzyEvent = new ClientServerGameMaryReadyToFrenzyEvent();
+
+    public static ClientServerGameMaryFrenzyOverEvent clientServerGameMaryFrenzyOverEvent = new ClientServerGameMaryFrenzyOverEvent();
 
     public static ClientServerGameMaryReadyToTeleportEvent clientServerGameMaryReadyToTeleportEvent = new ClientServerGameMaryReadyToTeleportEvent();
 
     public static ClientServerGameHostStartedGameEvent clientServerGameHostStartedGameEvent = new ClientServerGameHostStartedGameEvent();
+
+    public static ClientServerGameMaryServerTeleportedYouEvent clientServerGameMaryServerTeleportedYouEvent = new ClientServerGameMaryServerTeleportedYouEvent{};
+
+    public static ClientServerGameMaryFrenziedEvent clientServerGameMaryFrenziedEvent = new ClientServerGameMaryFrenziedEvent();
 
 #endregion
 
@@ -60,6 +66,8 @@ public static class EventManager
     public static ServerClientGameSurvivorsDeadEvent serverClientGameSurvivorsDeadEvent = new ServerClientGameSurvivorsDeadEvent();
 
     public static ServerClientGameLurkerJoinedEvent serverClientGameLurkerJoinedEvent = new ServerClientGameLurkerJoinedEvent();
+
+    public static ServerClientGameMaryJoinedEvent serverClientGameMaryJoinedEvent = new ServerClientGameMaryJoinedEvent();
 
     public static ServerClientGamePhantomJoinedEvent serverClientGamePhantomJoinedEvent = new ServerClientGamePhantomJoinedEvent();
 
@@ -142,6 +150,8 @@ public class ServerClientGameSurvivorsDeadEvent: UnityEvent{}
 
 public class ServerClientGameLurkerJoinedEvent: UnityEvent<uint>{}
 
+public class ServerClientGameMaryJoinedEvent: UnityEvent<uint>{}
+
 public class ServerClientGamePhantomJoinedEvent: UnityEvent<uint>{}
 
 #endregion
@@ -150,9 +160,15 @@ public class ServerClientGamePhantomJoinedEvent: UnityEvent<uint>{}
 
 public class ClientServerGameMaryReadyToFrenzyEvent : UnityEvent { }
 
+public class ClientServerGameMaryFrenzyOverEvent: UnityEvent{}
+
 public class ClientServerGameMaryReadyToTeleportEvent : UnityEvent { }
 
 public class ClientServerGameHostStartedGameEvent: UnityEvent{}
+
+public class ClientServerGameMaryServerTeleportedYouEvent: UnityEvent<float, float, float>{}
+
+public class ClientServerGameMaryFrenziedEvent: UnityEvent{}
 
 #endregion
 

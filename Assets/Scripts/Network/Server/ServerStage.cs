@@ -23,6 +23,7 @@ public class ServerStage : MonoBehaviour
         NetworkServer.RegisterHandler<ServerClientGameLurkerJoinedMessage>(OnServerClientGameLurkerJoined);
         NetworkServer.RegisterHandler<ServerClientGamePhantomJoinedMessage>(OnServerClientGamePhantomJoined);
         NetworkServer.RegisterHandler<ServerClientGamePlayerSpectatorJoinedMessage>(OnServerClientGamePlayerSpectatorConnected);
+        NetworkServer.RegisterHandler<ServerClientGameMaryJoinedMessage>(OnServerClientGameMaryJoined);
 
     }
 
@@ -48,6 +49,23 @@ public class ServerStage : MonoBehaviour
         }
 
         EventManager.serverClientGameLurkerJoinedEvent.Invoke(lurker.netIdentity.netId);
+
+    }
+
+    private void OnServerClientGameMaryJoined(NetworkConnection connection, ServerClientGameMaryJoinedMessage message)
+    {
+        Mary mary;
+
+        bool isMary = connection.identity.TryGetComponent<Mary>(out mary);
+
+        if (!isMary)
+        {
+            return;
+        }
+
+        uint id = connection.identity.netId;
+
+        EventManager.serverClientGameMaryJoinedEvent.Invoke(id);
 
     }
 
@@ -204,7 +222,6 @@ public class ServerStage : MonoBehaviour
                 unAvailableCharacters.Add(Character.Fallen);
                 unAvailableCharacters.Add(Character.Mary);
                 unAvailableCharacters.Add(Character.Phantom);
-                unAvailableCharacters.Add(Character.Mary);
                 continue;
             }
 
@@ -215,7 +232,7 @@ public class ServerStage : MonoBehaviour
                 unAvailableCharacters.Add(Character.Lurker);
                 unAvailableCharacters.Add(Character.Fallen);
                 unAvailableCharacters.Add(Character.Mary);
-                unAvailableCharacters.Add(Character.Mary);
+                unAvailableCharacters.Add(Character.Phantom);
                 continue;
 
             }
@@ -227,7 +244,7 @@ public class ServerStage : MonoBehaviour
                 unAvailableCharacters.Add(Character.Lurker);
                 unAvailableCharacters.Add(Character.Fallen);
                 unAvailableCharacters.Add(Character.Mary);
-                unAvailableCharacters.Add(Character.Mary);
+                unAvailableCharacters.Add(Character.Phantom);
                 continue;
             }
 

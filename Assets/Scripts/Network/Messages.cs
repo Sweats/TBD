@@ -173,10 +173,36 @@ public struct ServerClientGameLurkerJoinedMessage: NetworkMessage
 
 }
 
+public struct ServerClientGameMaryJoinedMessage: NetworkMessage
+{
+
+}
+
+public struct ServerClientGameMaryTeleportRequest: NetworkMessage
+{
+
+}
+
+public struct ServerClientGameMaryFrenzyRequest: NetworkMessage
+{
+
+}
+
+public struct ServerClientGameMaryAttackedSurvivorMessage: NetworkMessage
+{
+    public uint requestedSurvivorId;
+}
+
+public struct ServerClientGameMaryAttackedNothingMessage: NetworkMessage
+{
+
+}
+
 public struct ServerClientGamePhantomJoinedMessage: NetworkMessage
 {
 
 }
+
 
 
 
@@ -378,6 +404,43 @@ public struct ClientServerGamePhantomSurvivorDetectedMesasge: NetworkMessage
 public struct ClientServerGamePhantomSurvivorNoLongerDetected: NetworkMessage
 {
     public uint noLongerDetectedSurvivorId;
+}
+
+public struct ClientServerGameMaryReadyToFrenzyMessage: NetworkMessage
+{
+
+}
+
+public struct ClientServerGameMaryAttackedMessage: NetworkMessage
+{
+    public uint maryId;
+
+}
+
+public struct ClientServerGameMaryReadyToTeleportMessage: NetworkMessage
+{
+
+}
+
+public struct ClientServerGameMaryAutoTeleportMessage: NetworkMessage
+{
+    public Vector3 newPosition;
+}
+
+public struct ClientServerGameMaryFrenzyOverMessage: NetworkMessage
+{
+    public uint maryId;
+}
+
+public struct ClientServerGameMaryAllowTeleportMessage: NetworkMessage
+{
+    public Vector3 newPosition;
+}
+
+public struct ClientServerGameMaryFrenziedMessage: NetworkMessage
+{
+    public uint maryId;
+
 }
 
 

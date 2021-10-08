@@ -25,6 +25,9 @@ public class TestNetworkManager : NetworkManager
     [SerializeField]
     private ServerEscape serverEscape;
 
+    [SerializeField]
+    private ServerMary serverMary;
+
 
     [SerializeField]
     private ServerBattery serverBattery;
@@ -68,6 +71,9 @@ public class TestNetworkManager : NetworkManager
     [SerializeField]
     private ClientTrap clientTrap;
 
+    [SerializeField]
+    private ClientMary clientMary; 
+
 
     [SerializeField]
     private bool insanityEnabled;
@@ -89,6 +95,7 @@ public class TestNetworkManager : NetworkManager
         serverLurker.RegisterNetworkHandlers();
         serverPhantom.RegisterNetworkHandlers();
         serverTrap.RegisterNetworkHandlers();
+        serverMary.RegisterNetworkHandlers();
 
         serverStage.OnServerSceneChanged();
         serverKey.OnServerSceneChanged();
@@ -126,6 +133,7 @@ public class TestNetworkManager : NetworkManager
         clientLurker.RegisterNetworkHandlers();
         clientTrap.RegisterNetworkHandlers();
         clientPhantom.RegisterNetworkHandlers();
+        clientMary.RegisterNetworkHandlers();
 
 
     }
