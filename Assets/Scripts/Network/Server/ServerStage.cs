@@ -8,6 +8,8 @@ public class ServerStage : MonoBehaviour
 
     private SurvivorSpawnPoint[] survivorSpawnPoints;
 
+    private Character monsterCharacterForGame = Character.Empty;
+
     // NOTE: Called when we are going from lobby -> stage.
     public void OnServerSceneChanged()
     {
@@ -48,6 +50,8 @@ public class ServerStage : MonoBehaviour
             return;
         }
 
+        monsterCharacterForGame = Character.Lurker;
+
         EventManager.serverClientGameLurkerJoinedEvent.Invoke(lurker.netIdentity.netId);
 
     }
@@ -62,6 +66,8 @@ public class ServerStage : MonoBehaviour
         {
             return;
         }
+
+        monsterCharacterForGame = Character.Mary;
 
         uint id = connection.identity.netId;
 
@@ -79,8 +85,10 @@ public class ServerStage : MonoBehaviour
         {
             return;
         }
-        
+
         uint netid = phantom.netIdentity.netId;
+
+        monsterCharacterForGame = Character.Phantom;
 
         EventManager.serverClientGamePhantomJoinedEvent.Invoke(netid);
     }
@@ -148,7 +156,7 @@ public class ServerStage : MonoBehaviour
         Survivor survivor;
         string disconnectedName = string.Empty;
 
-        bool isSurvivor  = connection.identity.TryGetComponent<Survivor>(out survivor);
+        bool isSurvivor = connection.identity.TryGetComponent<Survivor>(out survivor);
 
         if (isSurvivor)
         {
@@ -174,7 +182,7 @@ public class ServerStage : MonoBehaviour
 
         }
 
-        Phantom  phantom;
+        Phantom phantom;
 
         bool isPhantom = connection.identity.TryGetComponent<Phantom>(out phantom);
 
@@ -200,6 +208,28 @@ public class ServerStage : MonoBehaviour
 
         var keys = NetworkServer.connections.Keys;
 
+        if (monsterCharacterForGame == Character.Phantom)
+        {
+            unAvailableCharacters.Add(Character.Lurker);
+            unAvailableCharacters.Add(Character.Fallen);
+            unAvailableCharacters.Add(Character.Mary);
+
+        }
+
+        else if (monsterCharacterForGame == Character.Lurker)
+        {
+            unAvailableCharacters.Add(Character.Fallen);
+            unAvailableCharacters.Add(Character.Phantom);
+            unAvailableCharacters.Add(Character.Mary);
+        }
+
+        else if (monsterCharacterForGame == Character.Mary)
+        {
+            unAvailableCharacters.Add(Character.Fallen);
+            unAvailableCharacters.Add(Character.Phantom);
+            unAvailableCharacters.Add(Character.Lurker);
+        }
+
         foreach (int key in keys)
         {
             int connectionId = key;
@@ -210,18 +240,17 @@ public class ServerStage : MonoBehaviour
 
             if (survivor != null)
             {
-                unAvailableCharacters.Add(survivor.ServerPlayerCharacter());
+                unAvailableCharacters.Add(survivor.SurvivorCharacter());
                 continue;
             }
+
 
             Mary mary = connection.identity.GetComponent<Mary>();
 
             if (mary != null)
             {
-                unAvailableCharacters.Add(Character.Lurker);
-                unAvailableCharacters.Add(Character.Fallen);
+                monsterCharacterForGame = Character.Mary;
                 unAvailableCharacters.Add(Character.Mary);
-                unAvailableCharacters.Add(Character.Phantom);
                 continue;
             }
 
@@ -229,10 +258,8 @@ public class ServerStage : MonoBehaviour
 
             if (lurker != null)
             {
+                monsterCharacterForGame = Character.Lurker;
                 unAvailableCharacters.Add(Character.Lurker);
-                unAvailableCharacters.Add(Character.Fallen);
-                unAvailableCharacters.Add(Character.Mary);
-                unAvailableCharacters.Add(Character.Phantom);
                 continue;
 
             }
@@ -241,9 +268,7 @@ public class ServerStage : MonoBehaviour
 
             if (phantom != null)
             {
-                unAvailableCharacters.Add(Character.Lurker);
-                unAvailableCharacters.Add(Character.Fallen);
-                unAvailableCharacters.Add(Character.Mary);
+                monsterCharacterForGame = Character.Phantom;
                 unAvailableCharacters.Add(Character.Phantom);
                 continue;
             }
@@ -291,6 +316,7 @@ public class ServerStage : MonoBehaviour
         GameObject monsterObject = Monster(monster);
         GameObject pickedSpawnPoint = monsterSpawnPoints[randomNumber];
         GameObject spawnedMonster = Instantiate(monsterObject, pickedSpawnPoint.transform.position, Quaternion.identity);
+        monsterCharacterForGame = monster;
 
         GameObject playerGameObject = connection.identity.gameObject;
         NetworkServer.ReplacePlayerForConnection(connection, spawnedMonster);
@@ -316,6 +342,7 @@ public class ServerStage : MonoBehaviour
             string playerName = playerSpectator.ServerName();
             NetworkServer.ReplacePlayerForConnection(connection, spawnedSurvivor);
             Survivor spawnedSurvivorPlayer = spawnedSurvivor.GetComponent<Survivor>();
+            spawnedSurvivorPlayer.SetCharacter(survivorCharacter);
             spawnedSurvivorPlayer.ServerSetName(playerName);
             NetworkServer.Destroy(playerSpectator.gameObject);
             break;
@@ -342,6 +369,7 @@ public class ServerStage : MonoBehaviour
             NetworkServer.ReplacePlayerForConnection(connection, spawnedSurvivor);
             Survivor spawnedSurvivorPlayer = spawnedSurvivor.GetComponent<Survivor>();
             spawnedSurvivorPlayer.ServerSetName(playerName);
+            spawnedSurvivorPlayer.SetCharacter(survivorCharacter);
             NetworkServer.Destroy(lobbyPlayer.gameObject);
             break;
         }
@@ -368,8 +396,8 @@ public class ServerStage : MonoBehaviour
         {
             case Character.Chad:
                 return (GameObject)Resources.Load("Chad");
-            case Character.Alice:
-                return (GameObject)Resources.Load("Alice");
+            case Character.Karen:
+                return (GameObject)Resources.Load("Karen");
             case Character.Jamal:
                 return (GameObject)Resources.Load("Jamal");
             case Character.Jesus:

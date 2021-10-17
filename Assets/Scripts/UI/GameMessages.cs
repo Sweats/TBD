@@ -40,6 +40,7 @@ public class GameMessages : MonoBehaviour
         EventManager.clientServerLobbyHostKickedYouEvent.AddListener(OnLobbyHostKickedYou);
         EventManager.clientServerLobbyServerPickedNewHostEvent.AddListener(OnLobbyServerAssignedANewHost);
         EventManager.clientServerLobbyServerAssignedYouHostEvent.AddListener(OnLobbyServerAssignedYouHost);
+        EventManager.clientServerLobbyPlayerJoinedEvent.AddListener(OnLobbyNewPlayerJoined);
         EventManager.clientServerGamePlayerChangedNameEvent.AddListener(OnPlayerChangedName);
         EventManager.clientServerGamePlayerConnectedEvent.AddListener(OnPlayerConnectedMidGame);
         EventManager.clientServerGamePlayerJoinedEvent.AddListener(OnPlayerJoinedMidGame);
@@ -193,6 +194,12 @@ public class GameMessages : MonoBehaviour
     private void OnLobbyServerAssignedANewHost(string newHostName, int index)
     {
         string newMessage = $"Server assigned {newHostName} as the new host of the lobby!";
+        StartCoroutine(AddAndRemoveGameMessage(newMessage));
+    }
+
+    private void OnLobbyNewPlayerJoined(string name, int index)
+    {
+        string newMessage = "${name} has joined!";
         StartCoroutine(AddAndRemoveGameMessage(newMessage));
     }
 

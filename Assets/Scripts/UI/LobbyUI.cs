@@ -8,7 +8,7 @@ public enum Character : byte
 {
     Random = 0,
     Chad,
-    Alice,
+    Karen,
     Jesus,
     Jamal,
     Lurker,
@@ -178,13 +178,6 @@ public class LobbyUI : MonoBehaviour
 
     [SerializeField]
     private TMP_InputField chatMessageBox;
-
-
-    private const int STAGE_TEMPLATE = 0;
-    private const int STAGE_TEMPLATE_MARY = 1;
-    private const int STAGE_TEMPLATE_FALLEN = 2;
-    private const int STAGE_TEMPLATE_LURKER = 3;
-    private const int STAGE_TEMPLATE_PHANTOM = 4;
 
     private const int PLAYER_ONE = 0;
     private const int PLAYER_TWO = 1;
@@ -420,6 +413,7 @@ public class LobbyUI : MonoBehaviour
                 break;
         }
     }
+
     private void ExitScene()
     {
         if (hostingLobby)
@@ -536,7 +530,7 @@ public class LobbyUI : MonoBehaviour
 
     public void OnAliceButtonClicked()
     {
-        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Alice });
+        NetworkClient.Send(new ServerClientLobbyRequestedCharacterChangeMessage { requestedCharacter = Character.Karen });
         DisableSelectCharacterControls();
         //EnableControls();
     }
@@ -672,7 +666,7 @@ public class LobbyUI : MonoBehaviour
         {
             case Character.Jamal:
                 return jamalIcon;
-            case Character.Alice:
+            case Character.Karen:
                 return aliceIcon;
             case Character.Chad:
                 return chadIcon;
@@ -863,7 +857,6 @@ public class LobbyUI : MonoBehaviour
 
     private void OnKickedFromLobby()
     {
-        NetworkManager.singleton.StopClient();
         ExitScene();
     }
 

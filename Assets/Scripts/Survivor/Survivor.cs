@@ -5,6 +5,8 @@ using System.Collections.Generic;
 public class Survivor : NetworkBehaviour
 {
     public Insanity insanity;
+    
+    private Character survivorCharacter;
 
     [SerializeField]
     private AudioSource deathSound;
@@ -338,11 +340,17 @@ public class Survivor : NetworkBehaviour
     }
 
     [Server]
-    public Character ServerPlayerCharacter()
+    public Character SurvivorCharacter()
     {
-        return character;
+        return survivorCharacter;
+
     }
 
+    [Server]
+    public void SetCharacter(Character character)
+    {
+        survivorCharacter = character;
+    }
     public bool Dead()
     {
         return isDead;

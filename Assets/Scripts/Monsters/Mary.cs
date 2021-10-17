@@ -67,12 +67,6 @@ public class Mary : NetworkBehaviour
     private int maryTeleportTimer;
 
     [SerializeField]
-    private bool canTeleport = false;
-
-    [SerializeField]
-    private bool readyToFrenzy = false;
-
-    [SerializeField]
     private AudioSource maryScreamSound;
 
     [SerializeField]
@@ -92,8 +86,6 @@ public class Mary : NetworkBehaviour
 
     [SerializeField]
     private Windows windows;
-
-    private GameObject[] teleportLocations;
 
     private CharacterController maryController;
 
@@ -123,7 +115,7 @@ public class Mary : NetworkBehaviour
     [SerializeField]
     private bool canAttack = false;
 
-    void LateUpdate()
+    private void LateUpdate()
     {
         if (!isLocalPlayer)
         {

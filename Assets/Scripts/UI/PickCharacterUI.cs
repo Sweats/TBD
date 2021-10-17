@@ -100,7 +100,7 @@ public class PickCharacterUI : MonoBehaviour
 
             switch (character)
             {
-                case Character.Alice:
+                case Character.Karen:
                     aliceButton.image.sprite = emptyLobbySlotIcon;
                     aliceButton.interactable = false;
                     aliceButton.enabled = false;

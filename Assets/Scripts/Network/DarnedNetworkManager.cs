@@ -34,6 +34,15 @@ public class DarnedNetworkManager: NetworkManager
     private ServerBattery serverBattery;
 
     [SerializeField]
+    private ServerLurker serverLurker;
+
+    [SerializeField]
+    private ServerPhantom serverPhantom;
+
+    [SerializeField]
+    private ServerMary serverMary;
+
+    [SerializeField]
     private ClientLobby clientLobby;
 
     [SerializeField]
@@ -49,16 +58,31 @@ public class DarnedNetworkManager: NetworkManager
     private ClientStage clientStage;
 
     [SerializeField]
+    private ClientLurker clientLurker;
+
+    [SerializeField]
+    private ClientPhantom clientPhantom;
+
+    [SerializeField]
+    private ClientMary clientMary;
+
+    [SerializeField]
     private float survivorInsanityRate;
+
+    private bool justStartedHosting; 
 
     public override void OnStartServer()
     {
         base.OnStartServer();
+        justStartedHosting = true;
         serverDoor.RegisterNetworkHandlers();
         serverKey.RegisterNetworkHandlers();
         serverLobby.RegisterNetworkHandlers();
         serverStage.RegisterNetworkHandlers();
         serverBattery.RegisterNetworkHandlers();
+        serverPhantom.RegisterNetworkHandlers();
+        serverLurker.RegisterNetworkHandlers();
+        serverMary.RegisterNetworkHandlers();
     }
 
     public override void OnServerConnect(NetworkConnection connection)
@@ -76,9 +100,16 @@ public class DarnedNetworkManager: NetworkManager
         }
     }
 
-    public override void OnServerSceneChanged(string sceneName)
+    public override void OnServerSceneChanged(string newSceneName)
     {
-        base.OnServerSceneChanged(sceneName);
+        base.OnServerSceneChanged(newSceneName);
+
+        if (justStartedHosting)
+        {
+            justStartedHosting = false;
+            serverLobby.OnServerJustStarted();
+            return;
+        }
 
         if (inLobby)
         {
@@ -93,9 +124,7 @@ public class DarnedNetworkManager: NetworkManager
         {
             inLobby = true;
             serverLobby.OnServerSceneChanged();
-
         }
-
     }
 
     public override void OnStartClient()
@@ -106,7 +135,8 @@ public class DarnedNetworkManager: NetworkManager
         clientKey.RegisterNetworkHandlers();
         clientLobby.RegisterNetworkHandlers();
         clientStage.RegisterNetworkHandlers();
+        clientMary.RegisterNetworkHandlers();
+        clientLurker.RegisterNetworkHandlers();
+        clientPhantom.RegisterNetworkHandlers();
     }
-
-
 }

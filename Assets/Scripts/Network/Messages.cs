@@ -109,6 +109,11 @@ public struct ServerClientLobbyRequestedToChangeVoiceChatMessage: NetworkMessage
 
 }
 
+public struct ServerClientLobbyPlayerJoinedMessage: NetworkMessage
+{
+
+}
+
 public struct ServerClientGamePlayerSpectatorJoinedMessage: NetworkMessage
 {
 
@@ -218,6 +223,7 @@ public struct ClientServerLobbyHostChangedInsanityOption: NetworkMessage
 }
 
 
+
 public struct ClientServerLobbyHostChangedVoiceChatMessage: NetworkMessage
 {
     public bool newVoiceChatValue;
@@ -247,7 +253,7 @@ public struct ClientServerLobbyPlayerChangedCharacterMessage: NetworkMessage
     // Who is the new character that the player picked?
     public Character newCharacter;
     // Index of the person who picked the new character
-    public byte playerIndexInLobby;
+    public int playerIndexInLobby;
 
 }
 
@@ -594,5 +600,6 @@ public struct MasterClientServerSentServerListingMessage: NetworkMessage
     public Lobby[] lobbiesOnServer;
 
 }
+
 
 #endregion

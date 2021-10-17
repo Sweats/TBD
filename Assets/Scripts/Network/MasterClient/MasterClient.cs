@@ -1,6 +1,7 @@
 using Mirror;
+using UnityEngine;
 
-public class MasterClient
+public class MasterClient: MonoBehaviour
 {
     private MasterClient(){}
 

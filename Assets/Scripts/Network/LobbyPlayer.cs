@@ -17,6 +17,7 @@ public class LobbyPlayer : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         CmdSetProfileName(Settings.PROFILE_NAME);
+        NetworkClient.Send(new ServerClientLobbyPlayerJoinedMessage{});
     }
 
     [Command]

@@ -25,7 +25,7 @@ public class ServerLobby: MonoBehaviour
         NetworkServer.RegisterHandler<ServerClientLobbyRequestedToChangeVoiceChatMessage>(ServerClientLobbyOnRequestedToChangeVoiceChatOption);
         NetworkServer.RegisterHandler<ServerClientLobbyRequestedToChangeStageMessage>(ServerClientLobbyOnRequestedToChangeStageOption);
         NetworkServer.RegisterHandler<ServerClientLobbyRequestedToStartGameMessage>(ServerClientLobbyOnRequestedToStartGame);
-
+        NetworkServer.RegisterHandler<ServerClientLobbyPlayerJoinedMessage>(OnServerClientLobbyPlayerJoined);
     }
 
     // NOTE: Called when we are going from a stage to the lobby.
@@ -43,7 +43,7 @@ public class ServerLobby: MonoBehaviour
 
             if (oldSurvivorObject != null)
             {
-                Character survivorCharacter = oldSurvivorObject.ServerPlayerCharacter();
+                Character survivorCharacter = oldSurvivorObject.SurvivorCharacter();
                 RespawnAsLobbyPlayer(connection, survivorCharacter);
                 NetworkServer.Destroy(oldSurvivorObject.gameObject);
                 continue;
@@ -80,18 +80,40 @@ public class ServerLobby: MonoBehaviour
         }
 
     }
+
+    public void OnServerJustStarted() 
+    {
+        var keys = NetworkServer.connections.Keys;
+
+        //NOTE: Dumb way to do this I guess but it works. There will always be one key at this exact point because the host has just started hosting.
+        foreach (int key in keys)
+        {
+            int connectionId = key;
+            Debug.Log($"ConnectionID = {connectionId} !");
+            NetworkConnection connection = NetworkServer.connections[connectionId];
+            SpawnLobbyPlayer(connection);
+            LobbyPlayer player = connection.identity.GetComponent<LobbyPlayer>();
+            player.SetHosting(true);
+
+        }
+    }
+
     public void OnServerConnect(NetworkConnection connection)
     {
-        GameObject spawnedLobbyPlayer = (GameObject)Resources.Load("LobbyPlayer");
+        SpawnLobbyPlayer(connection);
+    }
+
+    private void SpawnLobbyPlayer(NetworkConnection connection)
+    {
+        GameObject spawnedLobbyPlayer = (GameObject)Resources.Load("Lobby Player");
         LobbyPlayer player = Instantiate(spawnedLobbyPlayer, new Vector3(0, 0, 0), Quaternion.identity).GetComponent<LobbyPlayer>();
         NetworkServer.AddPlayerForConnection(connection, player.gameObject);
         player.SetCharacter(Character.Random);
     }
 
-
     private void RespawnAsLobbyPlayer(NetworkConnection connection, Character character)
     {
-        GameObject spawnedLobbyPlayer = (GameObject)Resources.Load("LobbyPlayer");
+        GameObject spawnedLobbyPlayer = (GameObject)Resources.Load("Lobby Player");
         LobbyPlayer player = Instantiate(spawnedLobbyPlayer, new Vector3(0, 0, 0), Quaternion.identity).GetComponent<LobbyPlayer>();
         NetworkServer.ReplacePlayerForConnection(connection, player.gameObject);
         player.SetCharacter(character);
@@ -110,6 +132,41 @@ public class ServerLobby: MonoBehaviour
         Character[] unavailableCharactersOnServer = UnavailableCharacters();
 
         connection.identity.connectionToClient.Send(new ClientServerLobbyUnavailableCharactersMessage{unavailableCharacters = unavailableCharactersOnServer});
+    }
+
+    private void OnServerClientLobbyPlayerJoined(NetworkConnection connection, ServerClientLobbyPlayerJoinedMessage message)
+    {
+        int index = GetLobbyIndexOfConnection(connection);
+        LobbyPlayer newLobbyPlayer;
+        bool isLobbyPlayer = connection.identity.TryGetComponent<LobbyPlayer>(out newLobbyPlayer);
+
+        if (!isLobbyPlayer)
+        {
+            return;
+        }
+        
+        string name = newLobbyPlayer.Name();
+        int newIndexOfPlayer = GetLobbyIndexOfConnection(connection);
+        NetworkServer.SendToReady(new ClientServerLobbyPlayerJoinedMessage{clientName = name, index = newIndexOfPlayer});
+    }
+
+    private int GetLobbyIndexOfConnection(NetworkConnection connection)
+    {
+        var keys = NetworkServer.connections.Keys;
+        int index = -1;
+        int connectionIdToFind = connection.connectionId;
+
+        foreach (int connectionId in keys)
+        {
+            index++;
+
+            if (connectionId == connectionIdToFind)
+            {
+                break;
+            }
+        }
+
+        return index;
     }
 
     private void ServerClientLobbyOnRequestedToChangeCharacter(NetworkConnection connection, ServerClientLobbyRequestedCharacterChangeMessage message)
@@ -139,7 +196,10 @@ public class ServerLobby: MonoBehaviour
             connection.identity.connectionToClient.Send(new ClientServerLobbyCharacterAlreadyTakenMessage{});
         }
 
+        int indexOfPlayer = GetLobbyIndexOfConnection(connection);
+
         playerWhoRequstedCharacterChange.SetCharacter(message.requestedCharacter);
+        NetworkServer.SendToReady(new ClientServerLobbyPlayerChangedCharacterMessage{newCharacter = message.requestedCharacter, playerIndexInLobby = indexOfPlayer});
 
     }
 
@@ -172,8 +232,8 @@ public class ServerLobby: MonoBehaviour
 
             switch (selectedCharacter)
             {
-                case Character.Alice:
-                unavailableCharacters.Add(Character.Alice);
+                case Character.Karen:
+                unavailableCharacters.Add(Character.Karen);
                 break;
                 case Character.Chad:
                 unavailableCharacters.Add(Character.Chad);
@@ -254,7 +314,7 @@ public class ServerLobby: MonoBehaviour
     {
         switch (message.requestedStageValue)
         {
-            case StageName.Template_Lurker:
+            case StageName.Templace_Networking:
             break;
             default:
             return;

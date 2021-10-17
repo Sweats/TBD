@@ -23,14 +23,17 @@ public class DarnedMasterServerManager : NetworkManager
     public static ushort PORT;
     public List<Lobby> lobbies;
 
+    [SerializeField]
     private MasterServer masterServer;
 
+    [SerializeField]
     private MasterClient masterClient;
 
     [Server]
     public override void OnStartServer()
     {
         base.OnStartServer();
+        lobbies = new List<Lobby>();
         masterServer.RegisterNetworkHandlers();
         Log("Master server has started successfully!");
     }
